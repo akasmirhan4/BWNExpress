@@ -4,7 +4,7 @@ import LandingTopbar from "../../components/LandingTopbar";
 import styles from "../../styles/main.module.scss";
 
 import { UserContext } from "../../lib/context";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import router from "next/router";
 import GoogleSignInBtn from "../../components/GoogleSignInBtn";
 import { auth, FacebookAuthProvider } from "../../lib/firebase";
@@ -28,12 +28,20 @@ export default function Register(params) {
 	return (
 		<Box>
 			<LandingTopbar bgcolor="transparent" />
-			<LoginContainer pt={"4em"} />
+			<RegisterContainer pt={"4em"} />
 		</Box>
 	);
 }
 
-function LoginContainer(props) {
+function RegisterContainer(props) {
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [verifyPassword, setVerifyPassword] = useState("");
+	const [emailError, setEmailError] = useState("");
+	const [generalError, setGeneralError] = useState("");
+	const [passwordError, setPasswordError] = useState("");
+	const [verifyPasswordError, setVerifyPasswordError] = useState("");
+
 	return (
 		<Box
 			{...props}
@@ -86,41 +94,47 @@ function LoginContainer(props) {
 						<TextField
 							label="Email"
 							type="email"
-							inputProps={{ sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
 							InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
 							InputLabelProps={{ sx: { color: "text.secondary" } }}
 							fullWidth
 							sx={{ maxWidth: 384, borderRadius: 2, mb: 2 }}
-							className={styles.dropShadow}
 							variant="filled"
 							color="secondary"
 							margin="dense"
+							onChange={(e) => setEmail(e.target.value)}
+							value={email}
+							helperText={emailError}
+							error={!!emailError}
 						/>
 						<TextField
 							label="Password"
 							type="password"
-							inputProps={{ sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
 							InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
 							InputLabelProps={{ sx: { color: "text.secondary" } }}
 							fullWidth
 							sx={{ maxWidth: 384, borderRadius: 2 }}
-							className={styles.dropShadow}
 							variant="filled"
 							color="secondary"
 							margin="dense"
+							onChange={(e) => setPassword(e.target.value)}
+							value={password}
+							helperText={passwordError}
+							error={!!passwordError}
 						/>
 						<TextField
 							label="Verify Password"
 							type="password"
-							inputProps={{ sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
 							InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
 							InputLabelProps={{ sx: { color: "text.secondary" } }}
 							fullWidth
 							sx={{ maxWidth: 384, borderRadius: 2 }}
-							className={styles.dropShadow}
 							variant="filled"
 							color="secondary"
 							margin="dense"
+							onChange={(e) => setVerifyPassword(e.target.value)}
+							value={verifyPassword}
+							helperText={verifyPasswordError}
+							error={!!verifyPasswordError}
 						/>
 						<Button
 							variant="contained"
@@ -128,6 +142,52 @@ function LoginContainer(props) {
 							color="secondary"
 							fullWidth
 							className={styles.dropShadow}
+							onClick={async () => {
+								let isValid = true;
+								setEmailError("");
+								setPasswordError("");
+								setVerifyPasswordError("");
+								setGeneralError("");
+
+								if (!email) {
+									isValid = false;
+									setEmailError("Please enter an email address");
+								}
+								if (!password) {
+									isValid = false;
+									setPasswordError("Please enter a password");
+								}
+								if (!verifyPassword) {
+									isValid = false;
+									setVerifyPasswordError("Please enter a second password to verify");
+								}
+								if (!!password && !!verifyPassword && password !== verifyPassword) {
+									isValid = false;
+									setPasswordError("Passwords are not the same");
+									setVerifyPasswordError("Passwords are not the same");
+								}
+
+								if (isValid) {
+									const response = await auth.createUserWithEmailAndPassword(email, password).catch((error) => {
+										console.log(error);
+										switch (error.code) {
+											case "auth/invalid-email":
+												setEmailError("The email address is badly formatted");
+												break;
+											case "auth/weak-password":
+												setPasswordError("Password should be at least 6 characters");
+												break;
+											case "auth/email-already-in-use":
+												setEmailError("Email already in use. Try logging in instead");
+												break;
+											default:
+												break;
+										}
+										console.log(JSON.stringify(error));
+									});
+									console.log(response);
+								}
+							}}
 						>
 							Register
 						</Button>

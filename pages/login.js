@@ -5,9 +5,11 @@ import styles from "../styles/main.module.scss";
 import Link2 from "next/link";
 import GoogleGLogo from "../components/GoogleGLogo";
 import { UserContext } from "../lib/context";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import router from "next/router";
 import GoogleSignInBtn from "../components/GoogleSignInBtn";
+import { auth } from "../lib/firebase";
+import toast from "react-hot-toast";
 
 export default function Login(params) {
 	const { user, loading, userData } = useContext(UserContext);
@@ -33,9 +35,11 @@ export default function Login(params) {
 }
 
 function LoginContainer(props) {
-	const responseGoogle = (response) => {
-		console.log(response);
-	};
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+
+	const [emailError, setEmailError] = useState("");
+	const [passwordError, setPasswordError] = useState("");
 
 	return (
 		<Box
@@ -56,28 +60,32 @@ function LoginContainer(props) {
 				<TextField
 					label="Email"
 					type="email"
-					inputProps={{ sx: { bgcolor: "#FFFFFF", borderRadius: 2 } }}
-					InputProps={{ disableUnderline: true, sx: { bgcolor: "#FFFFFF", borderRadius: 2 } }}
+					InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
 					InputLabelProps={{ sx: { color: "text.secondary" } }}
 					fullWidth
-					sx={{ maxWidth: 384, borderRadius: 2 }}
-					className={styles.dropShadow}
+					sx={{ maxWidth: 384, borderRadius: 2, mb: 2 }}
 					variant="filled"
-					color="primary"
+					color="secondary"
 					margin="dense"
+					onChange={(e) => setEmail(e.target.value)}
+					value={email}
+					helperText={emailError}
+					error={!!emailError}
 				/>
 				<TextField
 					label="Password"
 					type="password"
-					inputProps={{ sx: { bgcolor: "#FFFFFF", borderRadius: 2 } }}
-					InputProps={{ disableUnderline: true, sx: { bgcolor: "#FFFFFF", borderRadius: 2 } }}
+					InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
 					InputLabelProps={{ sx: { color: "text.secondary" } }}
 					fullWidth
 					sx={{ maxWidth: 384, borderRadius: 2 }}
-					className={styles.dropShadow}
 					variant="filled"
-					color="primary"
+					color="secondary"
 					margin="dense"
+					onChange={(e) => setPassword(e.target.value)}
+					value={password}
+					helperText={passwordError}
+					error={!!passwordError}
 				/>
 				<Button
 					variant="contained"
@@ -85,6 +93,58 @@ function LoginContainer(props) {
 					color="secondary"
 					fullWidth
 					className={styles.dropShadow}
+					onClick={async () => {
+						let isValid = true;
+						setEmailError("");
+						setPasswordError("");
+
+						if (!email) {
+							isValid = false;
+							setEmailError("Please enter an email address");
+						}
+						if (!password) {
+							isValid = false;
+							setPasswordError("Please enter a password");
+						} else if (password.length < 6) {
+							isValid = false;
+							setPasswordError("Passwords are 6 characters min");
+						}
+						if (isValid) {
+							const methods = await auth.fetchSignInMethodsForEmail(email).catch((error) => {
+								console.log(error);
+								switch (error.code) {
+									case "auth/invalid-email":
+										setEmailError("The email address is badly formatted");
+										break;
+									default:
+										break;
+								}
+							});
+							if (methods.includes("google.com")) {
+								toast.error("You registered with Google. Continue With Google instead");
+							}
+							if (!methods.length) {
+								const response = await auth.signInWithEmailAndPassword(email, password).catch((error) => {
+									console.log(error);
+									switch (error.code) {
+										case "auth/invalid-email":
+											setEmailError("The email address is badly formatted");
+											break;
+										case "auth/user-not-found":
+											setEmailError("No user exist. Register instead if you are new");
+											break;
+										case "auth/wrong-password":
+											setPasswordError("The password is invalid");
+											break;
+										default:
+											break;
+									}
+									console.log(JSON.stringify(error));
+								});
+								console.log(response);
+							}
+						}
+					}}
 				>
 					Log In
 				</Button>
