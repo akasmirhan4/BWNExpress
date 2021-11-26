@@ -1,0 +1,57 @@
+@import "react-awesome-slider/src/core/styles.scss";
+
+.#{$root-element} {
+	--content-background-color: #ffffff;
+	--slider-height-percentage: 50%;
+	--slider-transition-duration: 500ms;
+	--organic-arrow-thickness: 4px;
+	--organic-arrow-border-radius: 2px;
+	--organic-arrow-height: 15px;
+	--organic-arrow-color: #458fb4;
+	--control-button-width: 5%;
+	--control-button-background: transparent;
+	--control-bullet-color: #ffffff;
+	--control-bullet-active-color: #aadee9;
+	--loader-bar-color: #f492a6;
+	--loader-bar-height: 5px;
+
+	border-radius: 8px;
+	overflow: hidden;
+	> nav {
+		bottom: 40px;
+		z-index: 2;
+	}
+}
+
+.aws-sld {
+	&__content {
+		p {
+			transform: translate3d(0, 0, 0);
+			opacity: 1;
+			transition: transform 0.45s cubic-bezier(0.15, 0.3, 0.15, 1), opacity 0.35s ease-out;
+		}
+		p:nth-child(2) {
+			transition-delay: 0.05s, 0.05s;
+		}
+		&--exit {
+			p {
+				transition: transform 0.225s cubic-bezier(0.85, 0, 0.85, 0.7), opacity 0.4s ease-out;
+			}
+			p:nth-child(2) {
+				transition-delay: 0.05s, 0.05s;
+			}
+		}
+		&--moveLeft {
+			p {
+				transform: translate3d(-50px, 0, 0);
+				opacity: 0;
+			}
+		}
+		&--moveRight {
+			p {
+				transform: translate3d(50px, 0, 0);
+				opacity: 0;
+			}
+		}
+	}
+}
