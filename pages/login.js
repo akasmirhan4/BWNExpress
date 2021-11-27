@@ -3,28 +3,17 @@ import { Typography, Box, Container, TextField, Button, Link } from "@mui/materi
 import LandingTopbar from "../components/LandingTopbar";
 import styles from "../styles/main.module.scss";
 import Link2 from "next/link";
-import GoogleGLogo from "../components/GoogleGLogo";
 import { UserContext } from "../lib/context";
 import { useContext, useEffect, useState } from "react";
 import router from "next/router";
 import GoogleSignInBtn from "../components/GoogleSignInBtn";
 import { auth } from "../lib/firebase";
 import toast from "react-hot-toast";
+import next from "next";
+import { useAuthCheck } from "../lib/hooks";
 
 export default function Login(params) {
-	const { user, loading, userData } = useContext(UserContext);
-	useEffect(() => {
-		if (!loading) {
-			if (user) {
-				const { userVerifiedLevel } = userData || {};
-				if (!userVerifiedLevel) {
-					router.push("/register/new-user");
-				} else {
-					router.push("/dashboard");
-				}
-			}
-		}
-	}, [loading, user, userData]);
+	useAuthCheck();
 
 	return (
 		<Box>
@@ -110,39 +99,40 @@ function LoginContainer(props) {
 							setPasswordError("Passwords are 6 characters min");
 						}
 						if (isValid) {
-							const methods = await auth.fetchSignInMethodsForEmail(email).catch((error) => {
+							// const methods = await auth.fetchSignInMethodsForEmail(email).catch((error) => {
+							// 	console.log(error);
+							// 	switch (error.code) {
+							// 		case "auth/invalid-email":
+							// 			setEmailError("The email address is badly formatted");
+							// 			break;
+							// 		default:
+							// 			break;
+							// 	}
+							// });
+							// if (methods.includes("google.com")) {
+							// 	toast.error("You registered with Google. Continue With Google instead");
+							// }
+							// console.log({ methods });
+							// if (methods.includes("password")) {
+							const response = await auth.signInWithEmailAndPassword(email, password).catch((error) => {
 								console.log(error);
 								switch (error.code) {
 									case "auth/invalid-email":
 										setEmailError("The email address is badly formatted");
 										break;
+									case "auth/user-not-found":
+										setEmailError("No user exist. Register instead if you are new");
+										break;
+									case "auth/wrong-password":
+										setPasswordError("The password is invalid");
+										break;
 									default:
 										break;
 								}
+								console.log(JSON.stringify(error));
 							});
-							if (methods.includes("google.com")) {
-								toast.error("You registered with Google. Continue With Google instead");
-							}
-							if (!methods.length) {
-								const response = await auth.signInWithEmailAndPassword(email, password).catch((error) => {
-									console.log(error);
-									switch (error.code) {
-										case "auth/invalid-email":
-											setEmailError("The email address is badly formatted");
-											break;
-										case "auth/user-not-found":
-											setEmailError("No user exist. Register instead if you are new");
-											break;
-										case "auth/wrong-password":
-											setPasswordError("The password is invalid");
-											break;
-										default:
-											break;
-									}
-									console.log(JSON.stringify(error));
-								});
-								console.log(response);
-							}
+							console.log(response);
+							// }
 						}
 					}}
 				>
@@ -187,7 +177,7 @@ function LoginContainer(props) {
 					<Typography variant="body2" sx={{ color: "#FFFFFF" }}>
 						Not a member yet?{" "}
 						<Link2 href="/register" prefetch={false}>
-							<Link color="#FFFFFF" sx={{ fontWeight: 700 }}>
+							<Link color="#FFFFFF" sx={{ fontWeight: 700, cursor: "pointer" }}>
 								Sign Up
 							</Link>
 						</Link2>

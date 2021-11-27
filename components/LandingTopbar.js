@@ -5,6 +5,7 @@ import { cloneElement, useContext, useEffect } from "react";
 import styles from "../styles/main.module.scss";
 import { UserContext } from "../lib/context";
 import { auth } from "../lib/firebase";
+import toast from "react-hot-toast";
 
 export default function LandingTopbar(props) {
 	const { user, loading } = useContext(UserContext);
@@ -14,14 +15,14 @@ export default function LandingTopbar(props) {
 				<Container>
 					<Grid container spacing={2}>
 						<Grid item md={3} alignItems="center">
-							<Link href="/home" prefetch={false} passHref>
+							<Link href="home" prefetch={false} passHref>
 								<IconButton sx={{ borderRadius: 4, my: 1 }} centerRipple={false}>
 									<BrandWithLogo />
 								</IconButton>
 							</Link>
 						</Grid>
 						<Grid item md={4} display="flex" justifyContent="flex-start" alignItems="center">
-							<Link href="/home" prefetch={false} passHref>
+							<Link href="home" prefetch={false} passHref>
 								<Button color="white" sx={{ mr: 2 }}>
 									Home
 								</Button>
@@ -33,10 +34,10 @@ export default function LandingTopbar(props) {
 						</Grid>
 						{!user ? (
 							<Grid item md={5} display="flex" justifyContent="flex-end" alignItems="center">
-								<Link href="/login" prefetch={false} passHref>
+								<Link href="login" prefetch={false} passHref>
 									<Button color="white">Login</Button>
 								</Link>
-								<Link href="/register" prefetch={false} passHref>
+								<Link href="register" prefetch={false} passHref>
 									<Button variant="contained" color="secondary" sx={{ ml: 2 }} style={{ color: "white" }} className={styles.dropShadow}>
 										Register
 									</Button>
@@ -44,10 +45,13 @@ export default function LandingTopbar(props) {
 							</Grid>
 						) : (
 							<Grid item md={5} display="flex" justifyContent="flex-end" alignItems="center">
-								<Button color="white" onClick={() => auth.signOut()}>
+								<Button
+									color="white"
+									onClick={() => toast.promise(auth.signOut(), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" })}
+								>
 									Logout
 								</Button>
-								<Link href="/dashboard" prefetch={false} passHref>
+								<Link href="dashboard" prefetch={false} passHref>
 									<Button variant="contained" color="secondary" sx={{ ml: 2 }} style={{ color: "white" }} className={styles.dropShadow}>
 										Dashboard
 									</Button>

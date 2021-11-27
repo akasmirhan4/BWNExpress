@@ -8,35 +8,22 @@ import Link2 from "next/link";
 import { DatePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { IMaskInput } from "react-imask";
-import { functions } from "../../lib/firebase";
+import { auth, functions } from "../../lib/firebase";
 import toast from "react-hot-toast";
+import { useAuthCheck } from "../../lib/hooks";
 
 export default function NewUser(params) {
-	const { user, loading, userData } = useContext(UserContext);
-
-	useEffect(() => {
-		if (!loading) {
-			if (user) {
-				const { userVerifiedLevel } = userData;
-				if (userVerifiedLevel >= 2) {
-					toast.error("Permission Denied 🙅‍♂️");
-					router.push("/dashboard");
-				}
-			} else {
-				router.push("/home");
-			}
-		}
-	}, [loading, user, userData]);
+	const { userData } = useAuthCheck();
 
 	return (
 		<Box>
-			<NewUserContainer pt={"4em"} />
+			<NewUserContainer pt={"4em"} userData={userData} />
 		</Box>
 	);
 }
 
 function NewUserContainer(props) {
-	const { userData } = useContext(UserContext);
+	const { userData } = props;
 	const [fullName, setFullName] = useState("");
 	const [preferredName, setPreferredName] = useState("");
 	const [IC, setIC] = useState("");
@@ -53,15 +40,15 @@ function NewUserContainer(props) {
 	useEffect(() => {
 		if (userData) {
 			const { fullName, preferredName, IC, gender, DOB, phoneNo, address, isDifferentAddress, deliveryAddress } = userData || {};
-			setFullName(fullName);
-			setPreferredName(preferredName);
-			setIC(IC);
-			setGender(gender);
+			setFullName(fullName ?? "");
+			setPreferredName(preferredName ?? "");
+			setIC(IC ?? "");
+			setGender(gender ?? "");
 			setDOB(DOB ? new Date(DOB) : null);
-			setPhoneNo(phoneNo);
-			setAddress(address);
-			setIsDifferentAddress(isDifferentAddress);
-			setDeliveryAddress(deliveryAddress);
+			setPhoneNo(phoneNo ?? "");
+			setAddress(address ?? "");
+			setIsDifferentAddress(isDifferentAddress ?? false);
+			setDeliveryAddress(deliveryAddress ?? "");
 		}
 	}, [userData]);
 

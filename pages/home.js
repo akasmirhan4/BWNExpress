@@ -2,7 +2,7 @@ import { Box, Button, Container, Grid, IconButton, Typography } from "@mui/mater
 import Image from "next/image";
 import styles from "../styles/main.module.scss";
 
-import { Facebook, Instagram, Phone, Twitter } from "@mui/icons-material";
+import { Facebook, Instagram, Twitter } from "@mui/icons-material";
 import LandingTopbar from "../components/LandingTopbar";
 import LandingFooter from "../components/LandingFooter";
 
