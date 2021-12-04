@@ -1,16 +1,15 @@
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
-import { Typography, Box, Container, TextField, Button, Link, IconButton, Grid, MenuItem, Checkbox, InputAdornment } from "@mui/material";
-import styles from "../../styles/main.module.scss";
-import { UserContext } from "../../lib/context";
-import { forwardRef, useContext, useEffect, useState } from "react";
+import { Typography, Box, Container, TextField, Button, Grid, MenuItem, Checkbox, InputAdornment } from "@mui/material";
+import styles from "styles/main.module.scss";
+import { forwardRef, useEffect, useState } from "react";
 import router from "next/router";
 import Link2 from "next/link";
 import { DatePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { IMaskInput } from "react-imask";
-import { auth, functions } from "../../lib/firebase";
+import { functions } from "lib/firebase";
 import toast from "react-hot-toast";
-import { useAuthCheck } from "../../lib/hooks";
+import { useAuthCheck } from "lib/hooks";
 
 export default function NewUser(params) {
 	const { userData } = useAuthCheck();
@@ -405,11 +404,11 @@ function NewUserContainer(props) {
 							startIcon={<ArrowBack />}
 							className={styles.dropShadow}
 						>
-							Back
+							Home
 						</Button>
 					</Link2>
 					<Button
-						disabled={isUploading && validity && !Object.values(validity).every((v) => v.valid === true)}
+						disabled={isUploading || (validity && !Object.values(validity).every((v) => v.valid === true))}
 						variant="contained"
 						color="secondary"
 						size="large"
@@ -436,7 +435,7 @@ function NewUserContainer(props) {
 										.then(({ data }) => {
 											console.log(data);
 											if (!data.success) throw "Error in backend";
-											router.push("/register/upload-ic");
+											router.push("/auth/register/upload-ic");
 										}),
 									{ loading: "updating user...", success: "user updated 👌", error: "error updating user 😫" }
 								);

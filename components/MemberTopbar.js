@@ -1,27 +1,13 @@
 import { ChatBubble, Menu, Notifications } from "@mui/icons-material";
 import { Avatar, Badge, Box, Container, IconButton, Typography } from "@mui/material";
-import { useContext, useEffect } from "react";
-import { UserContext } from "../lib/context";
-import styles from "../styles/main.module.scss";
+import styles from "styles/main.module.scss";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import router from "next/router";
+import { useAuthCheck } from "lib/hooks";
 
 export default function MemberTopbar(props) {
 	const isLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("xl"));
 
-	const { user, loading, userData } = useContext(UserContext);
-	useEffect(() => {
-		if (!loading) {
-			if (!user) {
-				router.push("/home");
-			} else {
-				const { userVerifiedLevel } = userData || {};
-				if (!userVerifiedLevel) {
-					router.push("/register/new-user");
-				}
-			}
-		}
-	}, [loading, user, userData]);
+	const { user, loading, userData } = useAuthCheck();
 
 	return (
 		<Container sx={{ pt: 8 }}>

@@ -1,33 +1,18 @@
-import { ArrowBack, ArrowForward, FamilyRestroomRounded } from "@mui/icons-material";
-import { Typography, Box, Container, TextField, Button, Link, IconButton, Grid, MenuItem, Checkbox, FormHelperText } from "@mui/material";
-import styles from "../../styles/main.module.scss";
-import { UserContext } from "../../lib/context";
-import { useContext, useEffect, useState } from "react";
+import { ArrowBack, ArrowForward } from "@mui/icons-material";
+import { Typography, Box, Container, Button, Grid, Checkbox, FormHelperText } from "@mui/material";
+import styles from "styles/main.module.scss";
+import { useState } from "react";
 import router from "next/router";
 import Link2 from "next/link";
 import toast from "react-hot-toast";
-import { firestore, storage } from "../../lib/firebase";
+import { firestore, storage } from "lib/firebase";
+import { useAuthCheck } from "lib/hooks";
 
 export default function UploadIC(params) {
-	const { user, loading, userData } = useContext(UserContext);
+	const { user } = useAuthCheck();
 	const [isUploadingLater, setIsUploadingLater] = useState(false);
 	const [selectedFiles, setSelectedFiles] = useState(null);
 	const [isValid, setIsValid] = useState(true);
-
-	useEffect(() => {
-		if (!loading) {
-			if (user) {
-				const { userVerifiedLevel, verified } = userData;
-				if (verified.IC === "pending") toast.error("You already have uploaded an IC 🤔");
-				if (userVerifiedLevel && verified.IC !== false) {
-					router.push("/dashboard");
-				}
-			} else {
-				toast("Redirecting...");
-				router.push("/home");
-			}
-		}
-	}, [loading, user, userData]);
 
 	return (
 		<Box>
@@ -163,7 +148,7 @@ export default function UploadIC(params) {
 						</Box>
 					</Box>
 					<Box width="100%" display="flex" justifyContent="space-between">
-						<Link2 href="/register/new-user" prefetch={false}>
+						<Link2 href="/home" prefetch={false}>
 							<Button
 								variant="contained"
 								className={styles.dropShadow}
@@ -172,7 +157,7 @@ export default function UploadIC(params) {
 								sx={{ color: "#FFFFFF", width: "12em" }}
 								startIcon={<ArrowBack />}
 							>
-								Back
+								Home
 							</Button>
 						</Link2>
 						<Button
@@ -185,8 +170,24 @@ export default function UploadIC(params) {
 							endIcon={<ArrowForward />}
 							onClick={async () => {
 								if (isUploadingLater) {
-									router.push("/dashboard");
-									return;
+									await toast.promise(
+										firestore
+											.collection("users")
+											.doc(user.uid)
+											.update({ "verified.IC": "uploadingLater", userVerifiedLevel: 1.5 })
+											.then((response) => {
+												console.log({ response });
+												firestore
+													.collection("users")
+													.doc(user.uid)
+													.get()
+													.then((doc) => {
+														console.log(doc.data());
+														router.push("/member/dashboard");
+													});
+											}),
+										{ loading: "updating user...", success: "user updated 👌", error: "error updating user 😫" }
+									);
 								}
 								if (selectedFiles) {
 									let batchPromises = [];
@@ -194,10 +195,10 @@ export default function UploadIC(params) {
 										const storageRef = storage.ref(`users/${user.uid}/unverifiedIC/${new Date().getTime()}${i}`);
 										batchPromises.push(storageRef.put(selectedFiles[i]));
 									}
-									await toast.promise(
+									return await toast.promise(
 										Promise.all(batchPromises).then(() => {
 											firestore.collection("users").doc(user.uid).update({ "verified.IC": "pending", userVerifiedLevel: 1.5 });
-											router.push("/dashboard");
+											router.push("/member/dashboard");
 										}),
 										{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
 									);

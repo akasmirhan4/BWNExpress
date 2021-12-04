@@ -1,16 +1,13 @@
 import { FacebookRounded } from "@mui/icons-material";
 import { Typography, Box, Container, TextField, Button, Link } from "@mui/material";
-import LandingTopbar from "../components/LandingTopbar";
-import styles from "../styles/main.module.scss";
+import LandingTopbar from "components/LandingTopbar";
+import styles from "styles/main.module.scss";
 import Link2 from "next/link";
-import { UserContext } from "../lib/context";
-import { useContext, useEffect, useState } from "react";
-import router from "next/router";
-import GoogleSignInBtn from "../components/GoogleSignInBtn";
-import { auth } from "../lib/firebase";
+import { useState } from "react";
+import GoogleSignInBtn from "components/GoogleSignInBtn";
+import { auth } from "lib/firebase";
+import { useAuthCheck } from "lib/hooks";
 import toast from "react-hot-toast";
-import next from "next";
-import { useAuthCheck } from "../lib/hooks";
 
 export default function Login(params) {
 	useAuthCheck();
@@ -30,6 +27,50 @@ function LoginContainer(props) {
 	const [emailError, setEmailError] = useState("");
 	const [passwordError, setPasswordError] = useState("");
 
+	function logIn() {
+		return new Promise(async (resolve, reject) => {
+			let isValid = true;
+			setEmailError("");
+			setPasswordError("");
+
+			if (!email) {
+				isValid = false;
+				setEmailError("Please enter an email address");
+			}
+			if (!password) {
+				isValid = false;
+				setPasswordError("Please enter a password");
+			} else if (password.length < 6) {
+				isValid = false;
+				setPasswordError("Passwords are 6 characters min");
+			}
+			if (isValid) {
+				await auth
+					.signInWithEmailAndPassword(email, password)
+					.then(resolve)
+					.catch((error) => {
+						console.log(error);
+						switch (error.code) {
+							case "auth/invalid-email":
+								setEmailError("The email address is badly formatted");
+								break;
+							case "auth/user-not-found":
+								setEmailError("No user exist. Register instead if you are new");
+								break;
+							case "auth/wrong-password":
+								setPasswordError("The password is invalid");
+								break;
+							default:
+								break;
+						}
+						reject(error);
+					});
+			} else {
+				reject("Form invalid");
+			}
+		});
+	}
+
 	return (
 		<Box
 			{...props}
@@ -37,7 +78,7 @@ function LoginContainer(props) {
 			alignItems="center"
 			justifyContent="center"
 			display="flex"
-			sx={{ background: "url(svgs/background.svg) no-repeat", backgroundSize: "cover" }}
+			sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover" }}
 		>
 			<Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
 				<Typography sx={{ textTransform: "uppercase", fontSize: "2.4rem", letterSpacing: "0.1em", color: "#FFFFFF", fontWeight: 800, lineHeight: "1em" }}>
@@ -82,58 +123,8 @@ function LoginContainer(props) {
 					color="secondary"
 					fullWidth
 					className={styles.dropShadow}
-					onClick={async () => {
-						let isValid = true;
-						setEmailError("");
-						setPasswordError("");
-
-						if (!email) {
-							isValid = false;
-							setEmailError("Please enter an email address");
-						}
-						if (!password) {
-							isValid = false;
-							setPasswordError("Please enter a password");
-						} else if (password.length < 6) {
-							isValid = false;
-							setPasswordError("Passwords are 6 characters min");
-						}
-						if (isValid) {
-							// const methods = await auth.fetchSignInMethodsForEmail(email).catch((error) => {
-							// 	console.log(error);
-							// 	switch (error.code) {
-							// 		case "auth/invalid-email":
-							// 			setEmailError("The email address is badly formatted");
-							// 			break;
-							// 		default:
-							// 			break;
-							// 	}
-							// });
-							// if (methods.includes("google.com")) {
-							// 	toast.error("You registered with Google. Continue With Google instead");
-							// }
-							// console.log({ methods });
-							// if (methods.includes("password")) {
-							const response = await auth.signInWithEmailAndPassword(email, password).catch((error) => {
-								console.log(error);
-								switch (error.code) {
-									case "auth/invalid-email":
-										setEmailError("The email address is badly formatted");
-										break;
-									case "auth/user-not-found":
-										setEmailError("No user exist. Register instead if you are new");
-										break;
-									case "auth/wrong-password":
-										setPasswordError("The password is invalid");
-										break;
-									default:
-										break;
-								}
-								console.log(JSON.stringify(error));
-							});
-							console.log(response);
-							// }
-						}
+					onClick={() => {
+						toast.promise(logIn, { success: "Logged In", loading: "Logging In...", error: "Error Logging In" });
 					}}
 				>
 					Log In

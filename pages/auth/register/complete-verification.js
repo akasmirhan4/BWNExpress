@@ -7,7 +7,7 @@ import { auth, firestore } from "../../lib/firebase";
 import { useAuthCheck } from "../../lib/hooks";
 
 export default function CompleteVerification(params) {
-	const { user } = useAuthCheck();
+	const { user, userData } = useAuthCheck();
 	const [isValid, setIsValid] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -65,7 +65,7 @@ export default function CompleteVerification(params) {
 						disabled={isLoading || isValid}
 						className={styles.dropShadow}
 						onClick={() => {
-							router.push("/register/send-verification");
+							router.push("/auth/register/send-verification");
 						}}
 					>
 						Send Again
@@ -77,7 +77,7 @@ export default function CompleteVerification(params) {
 						className={styles.dropShadow}
 						onClick={() => {
 							console.log(auth.currentUser.emailVerified);
-							router.push("/register/new-user");
+							router.push("/auth/register/new-user");
 						}}
 					>
 						Continue

@@ -1,14 +1,13 @@
 import { FacebookRounded } from "@mui/icons-material";
 import { Typography, Box, Container, TextField, Button, Link } from "@mui/material";
-import LandingTopbar from "../../components/LandingTopbar";
-import styles from "../../styles/main.module.scss";
+import LandingTopbar from "components/LandingTopbar";
+import styles from "styles/main.module.scss";
 
-import { UserContext } from "../../lib/context";
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import router from "next/router";
-import GoogleSignInBtn from "../../components/GoogleSignInBtn";
-import { auth, FacebookAuthProvider } from "../../lib/firebase";
-import { useAuthCheck } from "../../lib/hooks";
+import GoogleSignInBtn from "components/GoogleSignInBtn";
+import { auth, FacebookAuthProvider } from "lib/firebase";
+import { useAuthCheck } from "lib/hooks";
 
 export default function Register(params) {
 	useAuthCheck();

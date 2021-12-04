@@ -1,11 +1,10 @@
-import { Box, Container, Typography, Grid, Button, Paper } from "@mui/material";
-import CustomDrawer from "../components/CustomDrawer";
-import CustomHead from "../components/CustomHead";
-import MemberTopbar from "../components/MemberTopbar";
-import styles from "../styles/main.module.scss";
-import dashboardStyles from "../styles/dashboard.module.scss";
-import { useEffect, useState } from "react";
-import AwesomeCarousel from "../components/AwesomeCarousel";
+import { Box, Container, Typography, Grid, Button } from "@mui/material";
+import CustomDrawer from "components/CustomDrawer";
+import MemberTopbar from "components/MemberTopbar";
+import styles from "styles/main.module.scss";
+import dashboardStyles from "styles/dashboard.module.scss";
+import { useState } from "react";
+import AwesomeCarousel from "components/AwesomeCarousel";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function Dashboard() {

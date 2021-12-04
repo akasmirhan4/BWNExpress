@@ -31,22 +31,7 @@ export default function GoogleSignInBtn(params) {
 				toast
 					.promise(
 						auth.signInWithPopup(googleAuthProvider).then(({ user, additionalUserInfo }) => {
-							firestore
-								.collection("users")
-								.doc(user.uid)
-								.get()
-								.then((doc) => {
-									if (!doc.exists) {
-										router.push("/register/new-user");
-										return;
-									}
-									const { userVerifiedLevel } = doc.data() || {};
-									if (!userVerifiedLevel) {
-										router.push("/register/new-user");
-									} else {
-										router.push("/dashboard");
-									}
-								});
+							firestore.collection("users").doc(user.uid).get();
 						}),
 						{
 							loading: "Awaiting to sign in...",
