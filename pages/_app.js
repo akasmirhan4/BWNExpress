@@ -5,11 +5,19 @@ import { UserContext } from "lib/context";
 import { useUserData } from "lib/hooks";
 import { customTheme } from "styles/customTheme";
 import "styles/globals.css";
+import { useEffect, useState } from "react";
+import cookieCutter from "cookie-cutter";
 
 function App({ Component, pageProps }) {
 	const userData = useUserData();
+	const [lang, setLang] = useState("EN");
+
+	useEffect(() => {
+		setLang(cookieCutter.get("lang") ?? "EN");
+	}, [lang]);
+
 	return (
-		<UserContext.Provider value={userData}>
+		<UserContext.Provider value={{ ...userData, lang, setLang }}>
 			<ThemeProvider theme={customTheme}>
 				<CustomHead />
 				<Component {...pageProps} />

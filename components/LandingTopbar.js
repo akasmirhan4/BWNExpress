@@ -1,4 +1,4 @@
-import { AppBar, Button, Container, Grid, IconButton, useScrollTrigger } from "@mui/material";
+import { AppBar, Box, Button, Container, Grid, IconButton, Typography, useScrollTrigger } from "@mui/material";
 import Link from "next/link";
 import BrandWithLogo from "./BrandWithLogo";
 import { cloneElement, useContext, useEffect } from "react";
@@ -8,7 +8,7 @@ import { auth } from "../lib/firebase";
 import toast from "react-hot-toast";
 
 export default function LandingTopbar(props) {
-	const { user, loading } = useContext(UserContext);
+	const { user, loading, lang, setLang } = useContext(UserContext);
 	return (
 		<ElevationScroll bgColorScroll={props.bgColorScroll} bgcolor={props.bgcolor}>
 			<AppBar elevation={0}>
@@ -32,32 +32,61 @@ export default function LandingTopbar(props) {
 							</Button>
 							<Button color="white">Resources</Button>
 						</Grid>
-						{!user ? (
-							<Grid item md={5} display="flex" justifyContent="flex-end" alignItems="center">
-								<Link href="/auth/login" prefetch={false} passHref>
-									<Button color="white">Login</Button>
-								</Link>
-								<Link href="/auth/register" prefetch={false} passHref>
-									<Button variant="contained" color="secondary" sx={{ ml: 2 }} style={{ color: "white" }} className={styles.dropShadow}>
-										Register
-									</Button>
-								</Link>
-							</Grid>
-						) : (
-							<Grid item md={5} display="flex" justifyContent="flex-end" alignItems="center">
+						<Grid item md={5} display="flex" justifyContent="flex-end" alignItems="center">
+							<Box display="flex" alignItems="center" sx={{ mr: "2em" }}>
 								<Button
 									color="white"
-									onClick={() => toast.promise(auth.signOut(), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" })}
+									size="small"
+									sx={{ maxWidth: "2.5em", minWidth: "2.5em" }}
+									onClick={() => {
+										document.cookie = "lang=EN";
+										setLang("EN");
+									}}
 								>
-									Logout
+									EN
 								</Button>
-								<Link href="/member/dashboard" prefetch={false} passHref>
-									<Button variant="contained" color="secondary" sx={{ ml: 2 }} style={{ color: "white" }} className={styles.dropShadow}>
-										Dashboard
+								<Typography color="#FFFFFF" sx={{ mx: "0.2em" }}>
+									|
+								</Typography>
+								<Button
+									color="white"
+									size="small"
+									sx={{ maxWidth: "2.5em", minWidth: "2.5em" }}
+									onClick={() => {
+										document.cookie = "lang=BM";
+										setLang("BM");
+									}}
+								>
+									BM
+								</Button>
+							</Box>
+							{!user ? (
+								<Box>
+									<Link href="/auth/login" prefetch={false} passHref>
+										<Button color="white">Login</Button>
+									</Link>
+									<Link href="/auth/register" prefetch={false} passHref>
+										<Button variant="contained" color="secondary" sx={{ ml: 2 }} style={{ color: "white" }} className={styles.dropShadow}>
+											Register
+										</Button>
+									</Link>
+								</Box>
+							) : (
+								<Box>
+									<Button
+										color="white"
+										onClick={() => toast.promise(auth.signOut(), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" })}
+									>
+										Logout
 									</Button>
-								</Link>
-							</Grid>
-						)}
+									<Link href="/member/dashboard" prefetch={false} passHref>
+										<Button variant="contained" color="secondary" sx={{ ml: 2 }} style={{ color: "white" }} className={styles.dropShadow}>
+											Dashboard
+										</Button>
+									</Link>
+								</Box>
+							)}
+						</Grid>
 					</Grid>
 				</Container>
 			</AppBar>

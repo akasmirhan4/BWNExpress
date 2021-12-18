@@ -26,7 +26,7 @@ function HeroContainer(props) {
 				<Grid container>
 					<Grid item md={7}>
 						<Typography variant="h3" sx={{ textTransform: "uppercase" }} fontWeight="bold" color="#FFFFFF">
-							Bringing You Closer To The World
+							{`Bringing You Closer To The World`}
 						</Typography>
 						<Typography variant="h5" color="#FFFFFF" mt={2} mb={12}>
 							One step at a time. Download our app today and experience the world in the palm of your hand.
@@ -49,7 +49,16 @@ function HeroContainer(props) {
 								size="large"
 								fullWidth
 								className={styles.dropShadow}
-								sx={{ mr: 4, py: 2, fontSize: "1.25rem", fontWeight: "bold" }}
+								sx={{
+									mr: 4,
+									py: 2,
+									fontSize: "1.25rem",
+									fontWeight: "bold",
+									borderWidth: "2px",
+									":hover": {
+										borderWidth: "2px",
+									},
+								}}
 							>
 								Register Now
 							</Button>
@@ -70,25 +79,23 @@ function FeaturesContainer(props) {
 	return (
 		<Box {...props}>
 			<Container>
-				<Grid container pt={24} pb={12}>
-					<Grid item md={5}>
-						<Box bgcolor="accent.main" width="512px" height="512px" borderRadius="50%" />
-					</Grid>
-					<Grid item md={7} justifyContent="center" display="flex" flexDirection="column">
+				<Grid container pt={12} position="relative">
+					<Grid item md={7}>
 						<Typography color="secondaryAccent.main">New Features</Typography>
-						<Typography variant="h3" sx={{ textTransform: "uppercase" }} fontWeight="bold" color="secondaryAccent.main" mb={4}>
-							Making It Easier
+						<Typography variant="h4" fontWeight="bold" color="secondaryAccent.main">
+							Shop from your favorite e-commerce platforms and have it delivered to you.
 						</Typography>
-						<Typography color="secondaryAccent.main" mb={2}>
-							We simplified the steps to delivering your parcel to your doorstep with an all new tracking feature.
-						</Typography>
-						<Typography color="secondaryAccent.main" mb={2}>
-							We simplified the steps to delivering your parcel to your doorstep with an all new tracking feature.
-						</Typography>
+						<Box height="30em" />
+					</Grid>
+					<Grid item md={5} justifyContent="center" display="flex" flexDirection="column">
 						<Typography color="secondaryAccent.main">
-							We simplified the steps to delivering your parcel to your doorstep with an all new tracking feature.
+							Shop with a peace of mind knowing that the goods that you have purchased will reach you at your doorstep. With our new features and service, you
+							can now order for your personal and commercial needs.
 						</Typography>
 					</Grid>
+					<Box width="100%" maxWidth={"64em"} height="32em" position="absolute" bottom="0px" left="-16em">
+						<Image src="/pngs/new-features.png" alt="upcoming-apps" objectFit="contain" layout="fill" />
+					</Box>
 				</Grid>
 			</Container>
 		</Box>
@@ -97,19 +104,19 @@ function FeaturesContainer(props) {
 
 function PricesContainer(props) {
 	const pricingDetails = [
-		{ price: { from: 5, to: 8 }, size: [28, 20], weight: 0.5 },
-		{ price: { from: 8, to: 11 }, size: [38, 32], weight: 1 },
-		{ price: { from: 11, to: 14 }, size: [34, 25, 8], weight: 2 },
-		{ price: { from: 14, to: 17 }, size: [34, 25, 15], weight: 5 },
-		{ price: { from: 17, to: 20 }, size: [38, 32, 20], weight: 10 },
+		{ price: { from: "6", to: "10" }, weight: { from: "0.1", to: "1.99" }, src: "/pngs/mail.png" },
+		{ price: { from: "14", to: "18" }, weight: { from: "2.0", to: "7.99" }, src: "/pngs/envelope.png" },
+		{ price: { from: "23", to: "27" }, weight: { from: "8.0", to: "13.99" }, src: "/pngs/box.png", size: "40%" },
+		{ price: { from: "31", to: "35" }, weight: { from: "14", to: "19.99" }, src: "/pngs/box.png", size: "60%" },
+		{ price: { from: "39", to: "43" }, weight: { from: "20", to: "25.99" }, src: "/pngs/box.png", size: "80%" },
 	];
 
 	return (
-		<Box bgcolor="secondaryAccent.main" pt={4} pb={8} {...props}>
+		<Box bgcolor="#DEC3E6" pt={4} pb={8} {...props}>
 			<Container sx={{ display: "flex", flexDirection: "column" }}>
 				<Typography color="#FFFFFF">Prices</Typography>
-				<Typography variant="h3" sx={{ textTransform: "uppercase" }} fontWeight="bold" color="#FFFFFF" mb={2}>
-					Providing Competitive Pricing
+				<Typography variant="h4" fontWeight="bold" color="#FFFFFF" mb={2}>
+					Affordable choice of delivery to your doorstep.
 				</Typography>
 				<Box display="flex" justifyContent="space-around" my={4}>
 					{pricingDetails.map((details, index) => (
@@ -117,7 +124,7 @@ function PricesContainer(props) {
 					))}
 				</Box>
 				<Box display="flex" justifyContent="center">
-					<Button variant="contained" style={{ color: "white" }} size="large" className={styles.dropShadow}>
+					<Button variant="contained" style={{ color: "white" }} sx={{ py: "1.4em", px: "3em" }} size="large" className={styles.dropShadow} color="secondary">
 						Get Your Quotation
 					</Button>
 				</Box>
@@ -127,7 +134,7 @@ function PricesContainer(props) {
 }
 
 function PriceItem(props) {
-	const { price, size, weight } = props.details;
+	const { price, weight, src, size } = props.details || {};
 
 	return (
 		<Box
@@ -141,11 +148,15 @@ function PriceItem(props) {
 			p={2}
 			borderRadius={2}
 			flexDirection="column"
+			height={"14em"}
 		>
 			<Typography textAlign="center">{`$${price.from} to $${price.to}`}</Typography>
-			<Box height={128}></Box>
-			<Typography textAlign="center">{`${size[0]}cm x ${size[1]}cm${size[2] ? ` x ${size[2]}cm` : ""}`}</Typography>
-			<Typography textAlign="center">{`${weight}kg`}</Typography>
+			<Box flex={1} width="100%" alignItems={"center"} justifyContent={"center"} display={"flex"}>
+				<Box height={size ?? "60%"} width="100%" position="relative" my={2}>
+					<Image src={src} alt="upcoming-apps" objectFit="contain" layout="fill" />
+				</Box>
+			</Box>
+			<Typography textAlign="center">{`${weight.from} to ${weight.to} kg`}</Typography>
 		</Box>
 	);
 }
