@@ -6,8 +6,8 @@ import styles from "styles/main.module.scss";
 import { useState } from "react";
 import router from "next/router";
 import GoogleSignInBtn from "components/GoogleSignInBtn";
-import { auth, FacebookAuthProvider } from "lib/firebase";
-import { useAuthCheck } from "lib/hooks";
+import { auth, FacebookAuthProvider } from "../../../lib/firebase";
+import { useAuthCheck } from "../../../lib/hooks";
 
 export default function Register(params) {
 	useAuthCheck();

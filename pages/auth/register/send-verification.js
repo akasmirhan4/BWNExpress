@@ -1,12 +1,11 @@
 import { ArrowBack, ArrowForward, FamilyRestroomRounded } from "@mui/icons-material";
-import { Typography, Box, Container, TextField, Button, Link, IconButton, Grid, MenuItem, Checkbox, FormHelperText } from "@mui/material";
-import styles from "../../styles/main.module.scss";
-import { UserContext } from "../../lib/context";
+import { Box, Container, Button, Link, IconButton, Grid, MenuItem, Checkbox, FormHelperText } from "@mui/material";
+import styles from "../../../styles/main.module.scss";
+import { UserContext } from "../../../lib/context";
 import { useContext, useEffect, useState } from "react";
 import router from "next/router";
-import Link2 from "next/link";
 import toast from "react-hot-toast";
-import { auth, firestore, storage } from "../../lib/firebase";
+import { auth } from "../../../lib/firebase";
 
 export default function SendVerification(params) {
 	const { user, loading, userData } = useContext(UserContext);
