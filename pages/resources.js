@@ -232,7 +232,7 @@ function PermitTax(props) {
 					>
 						<ImageWithSkeleton
 							src="/svgs/permit.svg"
-							containerSx={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}
+							containersx={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}
 							objectFit="contain"
 							layout="responsive"
 							width={"100%"}
