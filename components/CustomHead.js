@@ -2,8 +2,8 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 export default function CustomHead(props) {
-	const { route } = useRouter();
 	const { title, iconPath, metaName, metaContent, links } = props;
+	const { route } = useRouter();
 	const routeTitle = title ?? routeToString(route);
 	return (
 		<Head>

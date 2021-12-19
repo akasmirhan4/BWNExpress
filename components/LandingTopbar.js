@@ -1,41 +1,65 @@
-import { AppBar, Box, Button, Container, Grid, IconButton, Typography, useScrollTrigger } from "@mui/material";
+import {
+	AppBar,
+	Box,
+	Button,
+	Container,
+	Divider,
+	Grid,
+	IconButton,
+	List,
+	ListItem,
+	ListItemIcon,
+	ListItemText,
+	SwipeableDrawer,
+	Typography,
+	useScrollTrigger,
+} from "@mui/material";
 import Link from "next/link";
 import BrandWithLogo from "./BrandWithLogo";
-import { cloneElement, useContext, useEffect } from "react";
+import { cloneElement, useContext, useState } from "react";
 import styles from "../styles/main.module.scss";
 import { UserContext } from "../lib/context";
 import { auth } from "../lib/firebase";
 import toast from "react-hot-toast";
+import { CollectionsBookmarkRounded, HomeRounded, LoginRounded, MenuRounded, PeopleRounded, PersonAddRounded } from "@mui/icons-material";
+import { useRouter } from "next/router";
 
 export default function LandingTopbar(props) {
 	const { user, loading, lang, setLang } = useContext(UserContext);
+
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
 	return (
-		<ElevationScroll bgColorScroll={props.bgColorScroll} bgcolor={props.bgcolor}>
+		<ElevationScroll bgcolor={props.bgcolor}>
 			<AppBar elevation={0}>
-				<Container>
-					<Grid container spacing={2}>
-						<Grid item md={3} alignItems="center">
+				<Container sx={{ py: 2, position: "relative" }}>
+					<Grid container spacing={2} sx={{ display: { xs: "none", md: "flex" } }}>
+						<Grid item md={3} alignItems="center" display="flex">
 							<Link href="/home" prefetch={false} passHref>
-								<IconButton sx={{ borderRadius: 4, my: 1 }} centerRipple={false}>
-									<BrandWithLogo />
+								<IconButton sx={{ borderRadius: 4 }} centerRipple={false}>
+									<BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} />
 								</IconButton>
 							</Link>
 						</Grid>
-						<Grid item md={4} display="flex" justifyContent="flex-start" alignItems="center">
+						<Grid item md={4} justifyContent="flex-start" alignItems="center" display="flex">
 							<Link href="/home" prefetch={false} passHref>
-								<Button color="white" sx={{ mr: 2 }}>
+								<Button color={props.darkText ? "text" : "white"} sx={{ mr: 2 }}>
 									Home
 								</Button>
 							</Link>
-							<Button color="white" sx={{ mr: 2 }}>
-								About Us
-							</Button>
-							<Button color="white">Resources</Button>
+							<Link href="/about-us" prefetch={false} passHref>
+								<Button color={props.darkText ? "text" : "white"} sx={{ mr: 2 }}>
+									About Us
+								</Button>
+							</Link>
+							<Link href="/resources" prefetch={false} passHref>
+								<Button color={props.darkText ? "text" : "white"}>Resources</Button>
+							</Link>
 						</Grid>
-						<Grid item md={5} display="flex" justifyContent="flex-end" alignItems="center">
+						<Grid item md={5} justifyContent="flex-end" alignItems="center" display="flex">
 							<Box display="flex" alignItems="center" sx={{ mr: "2em" }}>
 								<Button
-									color="white"
+									color={props.darkText ? "text" : "white"}
 									size="small"
 									sx={{ maxWidth: "2.5em", minWidth: "2.5em" }}
 									onClick={() => {
@@ -45,11 +69,11 @@ export default function LandingTopbar(props) {
 								>
 									EN
 								</Button>
-								<Typography color="#FFFFFF" sx={{ mx: "0.2em" }}>
+								<Typography color={props.darkText ? "text.main" : "white.main"} sx={{ mx: "0.2em" }}>
 									|
 								</Typography>
 								<Button
-									color="white"
+									color={props.darkText ? "text" : "white"}
 									size="small"
 									sx={{ maxWidth: "2.5em", minWidth: "2.5em" }}
 									onClick={() => {
@@ -63,7 +87,7 @@ export default function LandingTopbar(props) {
 							{!user ? (
 								<Box>
 									<Link href="/auth/login" prefetch={false} passHref>
-										<Button color="white">Login</Button>
+										<Button color={props.darkText ? "text" : "white"}>Login</Button>
 									</Link>
 									<Link href="/auth/register" prefetch={false} passHref>
 										<Button variant="contained" color="secondary" sx={{ ml: 2 }} style={{ color: "white" }} className={styles.dropShadow}>
@@ -88,9 +112,112 @@ export default function LandingTopbar(props) {
 							)}
 						</Grid>
 					</Grid>
+					<Box sx={{ display: { md: "none", xs: "flex" }, justifyContent: "center" }}>
+						<BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} />
+						<Box sx={{ right: 0, position: "absolute", mr: 2 }}>
+							<IconButton
+								color="white"
+								sx={{ borderRadius: "50%", height: "2em", width: "2em" }}
+								centerRipple={false}
+								onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+							>
+								<MenuRounded color={props.darkText ? "secondaryAccent" : "white"} />
+							</IconButton>
+						</Box>
+					</Box>
 				</Container>
+				<SwipeableDrawer
+					anchor={"left"}
+					open={isDrawerOpen}
+					onClose={() => setIsDrawerOpen(false)}
+					onOpen={() => setIsDrawerOpen(true)}
+					disableBackdropTransition
+				>
+					<Box
+						sx={{ width: 320, height: "100%" }}
+						role="presentation"
+						onClick={() => setIsDrawerOpen(false)}
+						// bgcolor={props.bgcolor ?? "primary.main"}
+					>
+						<Box p={2} bgcolor={props.bgcolor ?? "primary.main"} display="flex" justifyContent={"center"}>
+							<BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} />
+						</Box>
+						<List>
+							<DrawerLink href="/home" title="Home" icon={<HomeRounded />} />
+							<DrawerLink href="/about-us" title="About Us" icon={<PeopleRounded />} />
+							<DrawerLink href="/resources" title="Resources" icon={<CollectionsBookmarkRounded />} />
+						</List>
+						<Divider />
+						<List>
+							<ListItem button>
+								<ListItemIcon>
+									<LoginRounded />
+								</ListItemIcon>
+								<ListItemText disableTypography primary={<Typography type="body2">Login</Typography>} />
+							</ListItem>
+							<ListItem button>
+								<ListItemIcon>
+									<PersonAddRounded />
+								</ListItemIcon>
+								<ListItemText disableTypography primary={<Typography type="body2">Register</Typography>} />
+							</ListItem>
+							<ListItem display="flex" alignItems="center" sx={{ mr: "2em" }}>
+								<Button
+									color={props.darkText ? "text" : "white"}
+									size="small"
+									sx={{ maxWidth: "2.5em", minWidth: "2.5em" }}
+									onClick={() => {
+										document.cookie = "lang=EN";
+										setLang("EN");
+									}}
+								>
+									EN
+								</Button>
+								<Typography color={props.darkText ? "text.main" : "white.main"} sx={{ mx: "0.2em" }}>
+									|
+								</Typography>
+								<Button
+									color={props.darkText ? "text" : "white"}
+									size="small"
+									sx={{ maxWidth: "2.5em", minWidth: "2.5em" }}
+									onClick={() => {
+										document.cookie = "lang=BM";
+										setLang("BM");
+									}}
+								>
+									BM
+								</Button>
+							</ListItem>
+						</List>
+					</Box>
+				</SwipeableDrawer>
 			</AppBar>
 		</ElevationScroll>
+	);
+}
+
+function DrawerLink(props) {
+	const { href, title, icon } = props;
+	const { route } = useRouter();
+	let routeTitle = routeToString(route);
+	const Icon = () => cloneElement(icon, { color: routeTitle == title ? "secondary" : "text" });
+
+	return (
+		<Link href={href} prefetch={false} passHref>
+			<ListItem button>
+				<ListItemIcon>
+					<Icon />
+				</ListItemIcon>
+				<ListItemText
+					disableTypography
+					primary={
+						<Typography type="body2" fontWeight={routeTitle == title ? "bold" : "normal"} color={routeTitle == title ? "secondary" : "text"}>
+							{title}
+						</Typography>
+					}
+				/>
+			</ListItem>
+		</Link>
 	);
 }
 
@@ -107,4 +234,14 @@ function ElevationScroll(props) {
 		className: trigger ? styles.dropShadow : null,
 		sx: { bgcolor: trigger ? bgColorScroll ?? bgcolor ?? "primary.main" : bgcolor ?? "primary.main" },
 	});
+}
+
+function routeToString(route) {
+	route = route.split("/")[route.split("/").length - 1];
+	route = route.replace(/\-/g, " ");
+	var splitStr = route.toLowerCase().split(" ");
+	for (var i = 0; i < splitStr.length; i++) {
+		splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+	}
+	return splitStr.join(" ");
 }

@@ -24,6 +24,8 @@
 		"react-firebase-hooks": "^4.0.1",
 		"react-hot-toast": "^2.1.1",
 		"react-imask": "^6.2.2",
+		"react-twitter-embed": "^3.0.3",
+		"react-visibility-sensor": "^5.1.1",
 		"sass": "^1.43.4"
 	},
 	"devDependencies": {

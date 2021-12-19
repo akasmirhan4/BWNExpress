@@ -1,3 +1,5 @@
+
+
 @font-face {
 	font-family: "Product Sans";
 	font-style: normal;
@@ -58,4 +60,20 @@
 
 .dropShadow {
 	box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px !important;
+}
+
+@keyframes float {
+	0% {
+		transform: translatey(0px);
+	}
+	50% {
+		transform: translatey(-20px);
+	}
+	100% {
+		transform: translatey(0px);
+	}
+}
+
+.float {
+	animation: float 6s ease-in-out infinite;
 }

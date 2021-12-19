@@ -35,7 +35,7 @@ const customTheme = createTheme({
 			main: "#FFFFFF",
 		},
 		offWhite: {
-			main: "#F2F2F2",
+			main: "#DCDCDC",
 			secondary: "#F4F4F4",
 		},
 		lightGrey: {
