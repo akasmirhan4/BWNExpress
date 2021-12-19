@@ -7,7 +7,7 @@ export default function LandingFooter(params) {
 	const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("md"));
 	const { palette } = useTheme();
 	return (
-		<Box bgcolor="lightGrey.secondary" pt={2} pb={6}>
+		<Box bgcolor="lightGrey.secondary" py={8}>
 			<Container>
 				<Grid container spacing={2} justifyContent={"center"} display="flex">
 					<Grid item xs={12} sm={6} md={4} display="flex" flexDirection="column" justifyContent="center" order={{ xs: 2, sm: 1 }}>
