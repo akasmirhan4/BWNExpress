@@ -3,8 +3,8 @@ import styles from "../../../styles/main.module.scss";
 import { useEffect, useState } from "react";
 import router from "next/router";
 import toast from "react-hot-toast";
-import { auth, firestore } from "../../lib/firebase";
-import { useAuthCheck } from "../../lib/hooks";
+import { auth, firestore } from "../../../lib/firebase";
+import { useAuthCheck } from "../../../lib/hooks";
 
 export default function CompleteVerification(params) {
 	const { user, userData } = useAuthCheck();
