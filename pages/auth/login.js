@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 export default function Login(params) {
 	return (
 		<Box>
-			<LandingTopbar bgcolor="transparent" />
+			<LandingTopbar bgColorScroll="primary.main" bgcolor="transparent" />
 			<LoginContainer pt={"4em"} />
 		</Box>
 	);
@@ -78,10 +78,31 @@ function LoginContainer(props) {
 			sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover" }}
 		>
 			<Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-				<Typography sx={{ textTransform: "uppercase", fontSize: "2.4rem", letterSpacing: "0.1em", color: "#FFFFFF", fontWeight: 800, lineHeight: "1em" }}>
+				<Typography
+					sx={{
+						textTransform: "uppercase",
+						fontSize: { sm: "2.4rem", xs: "1.7rem" },
+						letterSpacing: "0.1em",
+						color: "#FFFFFF",
+						fontWeight: 800,
+						lineHeight: "1em",
+						textAlign: "center",
+					}}
+				>
 					Welcome Back
 				</Typography>
-				<Typography sx={{ textTransform: "uppercase", fontSize: "1.8rem", color: "#FFFFFF", letterSpacing: "0.22em", fontWeight: 800, mb: "1.2em", ml: "4px" }}>
+				<Typography
+					sx={{
+						textTransform: "uppercase",
+						fontSize: { sm: "1.8rem", xs: "1.2rem" },
+						color: "#FFFFFF",
+						letterSpacing: "0.22em",
+						fontWeight: 800,
+						mb: "1.2em",
+						ml: "4px",
+						textAlign: "center",
+					}}
+				>
 					Selamat Kembali
 				</Typography>
 				<TextField
@@ -159,10 +180,10 @@ function LoginContainer(props) {
 					Continue with Facebook
 				</Button>
 				<Box maxWidth={384}>
-					<Typography variant="body2" my="2em" sx={{ color: "#FFFFFF" }}>
+					<Typography variant="body2" my="2em" sx={{ color: "#FFFFFF", textAlign: { sm: "left", xs: "center" } }}>
 						By logging in, you agree to our Membership Agreement and to receive BWNEXPRESS emails and updates.
 					</Typography>
-					<Typography variant="body2" sx={{ color: "#FFFFFF" }}>
+					<Typography variant="body2" sx={{ color: "#FFFFFF", textAlign: { sm: "left", xs: "center" } }}>
 						Not a member yet?{" "}
 						<Link2 href="/register" prefetch={false}>
 							<Link color="#FFFFFF" sx={{ fontWeight: 700, cursor: "pointer" }}>

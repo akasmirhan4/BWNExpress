@@ -34,7 +34,7 @@ export default function LandingTopbar(props) {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
 	return (
-		<ElevationScroll bgcolor={props.bgcolor}>
+		<ElevationScroll bgColorScroll={props.bgColorScroll} bgcolor={props.bgcolor}>
 			<AppBar elevation={0}>
 				<Container sx={{ py: 2, position: "relative" }}>
 					<Grid container spacing={2} sx={{ display: { xs: "none", md: "flex" } }}>
