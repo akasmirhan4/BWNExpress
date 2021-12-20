@@ -20,7 +20,17 @@ import { cloneElement, useState } from "react";
 import styles from "../styles/main.module.scss";
 import { auth } from "../lib/firebase";
 import toast from "react-hot-toast";
-import { CollectionsBookmarkRounded, HomeRounded, LoginRounded, MenuRounded, PeopleRounded, PersonAddRounded } from "@mui/icons-material";
+import {
+	CloseRounded,
+	CollectionsBookmarkRounded,
+	DashboardRounded,
+	HomeRounded,
+	LoginRounded,
+	LogoutRounded,
+	MenuRounded,
+	PeopleRounded,
+	PersonAddRounded,
+} from "@mui/icons-material";
 import { useRouter } from "next/router";
 import { selectLang, setLang } from "lib/slices/prefSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -131,20 +141,30 @@ export default function LandingTopbar(props) {
 					</Box>
 				</Container>
 				<SwipeableDrawer
-					anchor={"left"}
+					anchor={"top"}
 					open={isDrawerOpen}
 					onClose={() => setIsDrawerOpen(false)}
 					onOpen={() => setIsDrawerOpen(true)}
 					disableBackdropTransition
 				>
 					<Box
-						sx={{ width: 320, height: "100%" }}
+						sx={{ width: "100%", height: "100%" }}
 						role="presentation"
 						onClick={() => setIsDrawerOpen(false)}
 						// bgcolor={props.bgcolor ?? "primary.main"}
 					>
-						<Box p={2} bgcolor={props.bgcolor ?? "primary.main"} display="flex" justifyContent={"center"}>
+						<Box p={2} bgcolor={props.bgColorScroll ?? props.bgcolor ?? "primary.main"} display="flex" justifyContent={"center"}>
 							<BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} />
+							<Box sx={{ right: 0, position: "absolute", mr: 2 }}>
+								<IconButton
+									color="white"
+									sx={{ borderRadius: "50%", height: "2em", width: "2em" }}
+									centerRipple={false}
+									onClick={() => setIsDrawerOpen(false)}
+								>
+									<CloseRounded color={props.darkText ? "secondaryAccent" : "white"} />
+								</IconButton>
+							</Box>
 						</Box>
 						<List>
 							<DrawerLink href="/home" title="Home" icon={<HomeRounded />} />
@@ -153,8 +173,26 @@ export default function LandingTopbar(props) {
 						</List>
 						<Divider />
 						<List>
-							<DrawerLink href="/auth/login" title="Login" icon={<LoginRounded />} />
-							<DrawerLink href="/auth/register" title="Register" icon={<PersonAddRounded />} />
+							{!user.uid ? (
+								<>
+									<DrawerLink href="/auth/login" title="Login" icon={<LoginRounded />} />
+									<DrawerLink href="/auth/register" title="Register" icon={<PersonAddRounded />} />
+								</>
+							) : (
+								<>
+									<DrawerLink href="/member/dashboard" title="Dashboard" icon={<DashboardRounded />} />
+									<ListItem
+										button
+										onClick={() => toast.promise(auth.signOut(), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" })}
+									>
+										<ListItemIcon>
+											<LogoutRounded />
+										</ListItemIcon>
+										<ListItemText disableTypography primary={<Typography type="body2">Logout</Typography>} />
+									</ListItem>
+								</>
+							)}
+
 							<ListItem display="flex" alignItems="center" sx={{ mr: "2em" }}>
 								<Button
 									color={props.darkText ? "text" : "white"}
