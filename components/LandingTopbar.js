@@ -16,16 +16,20 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import BrandWithLogo from "./BrandWithLogo";
-import { cloneElement, useContext, useState } from "react";
+import { cloneElement, useState } from "react";
 import styles from "../styles/main.module.scss";
-import { UserContext } from "../lib/context";
 import { auth } from "../lib/firebase";
 import toast from "react-hot-toast";
 import { CollectionsBookmarkRounded, HomeRounded, LoginRounded, MenuRounded, PeopleRounded, PersonAddRounded } from "@mui/icons-material";
 import { useRouter } from "next/router";
+import { selectLang, setLang } from "lib/slices/prefSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "lib/slices/userSlice";
 
 export default function LandingTopbar(props) {
-	const { user, loading, lang, setLang } = useContext(UserContext);
+	const lang = useSelector(selectLang);
+	const dispatch = useDispatch();
+	const user = useSelector(selectUser);
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -64,7 +68,7 @@ export default function LandingTopbar(props) {
 									sx={{ maxWidth: "2.5em", minWidth: "2.5em" }}
 									onClick={() => {
 										document.cookie = "lang=EN";
-										setLang("EN");
+										dispatch(setLang("EN"));
 									}}
 								>
 									EN
@@ -78,13 +82,13 @@ export default function LandingTopbar(props) {
 									sx={{ maxWidth: "2.5em", minWidth: "2.5em" }}
 									onClick={() => {
 										document.cookie = "lang=BM";
-										setLang("BM");
+										dispatch(setLang("BM"));
 									}}
 								>
 									BM
 								</Button>
 							</Box>
-							{!user ? (
+							{!user.uid ? (
 								<Box>
 									<Link href="/auth/login" prefetch={false} passHref>
 										<Button color={props.darkText ? "text" : "white"}>Login</Button>
@@ -149,18 +153,8 @@ export default function LandingTopbar(props) {
 						</List>
 						<Divider />
 						<List>
-							<ListItem button>
-								<ListItemIcon>
-									<LoginRounded />
-								</ListItemIcon>
-								<ListItemText disableTypography primary={<Typography type="body2">Login</Typography>} />
-							</ListItem>
-							<ListItem button>
-								<ListItemIcon>
-									<PersonAddRounded />
-								</ListItemIcon>
-								<ListItemText disableTypography primary={<Typography type="body2">Register</Typography>} />
-							</ListItem>
+							<DrawerLink href="/auth/login" title="Login" icon={<LoginRounded />} />
+							<DrawerLink href="/auth/register" title="Register" icon={<PersonAddRounded />} />
 							<ListItem display="flex" alignItems="center" sx={{ mr: "2em" }}>
 								<Button
 									color={props.darkText ? "text" : "white"}
@@ -168,7 +162,7 @@ export default function LandingTopbar(props) {
 									sx={{ maxWidth: "2.5em", minWidth: "2.5em" }}
 									onClick={() => {
 										document.cookie = "lang=EN";
-										setLang("EN");
+										dispatch(setLang("EN"));
 									}}
 								>
 									EN
@@ -182,7 +176,7 @@ export default function LandingTopbar(props) {
 									sx={{ maxWidth: "2.5em", minWidth: "2.5em" }}
 									onClick={() => {
 										document.cookie = "lang=BM";
-										setLang("BM");
+										dispatch(setLang("BM"));
 									}}
 								>
 									BM

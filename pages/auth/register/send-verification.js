@@ -6,41 +6,18 @@ import { useContext, useEffect, useState } from "react";
 import router from "next/router";
 import toast from "react-hot-toast";
 import { auth } from "../../../lib/firebase";
+import { useSelector } from "react-redux";
+import { selectUser, selectUserData } from "lib/slices/userSlice";
 
 export default function SendVerification(params) {
-	const { user, loading, userData } = useContext(UserContext);
+	const user = useSelector(selectUser);
+	const userData = useSelector(selectUserData);
 	const [isUploadingLater, setIsUploadingLater] = useState(false);
 	const [selectedFiles, setSelectedFiles] = useState(null);
 	const [isValid, setIsValid] = useState(true);
 	const TIMER = 20;
 	const [counter, setCounter] = useState(TIMER);
 	const [startTimer, setStartTimer] = useState(false);
-
-	useEffect(() => {
-		(async () => {
-			if (!loading) {
-				if (user && userData) {
-					if (user.emailVerified) {
-						toast.error("Your email already verified");
-						const { userVerifiedLevel, verified } = userData;
-						if (userVerifiedLevel < 1) {
-							router.push("/register/new-user");
-						} else if (verified.IC !== true) {
-							router.push("/register/upload-ic");
-						} else {
-							router.push("/dashboard");
-						}
-					} else {
-						// setStartTimer(true);
-						// toast.success("Verification link has been sent to your email", { style: { textAlign: "center" } });
-					}
-				} else {
-					toast("Redirecting...");
-					router.push("/home");
-				}
-			}
-		})();
-	}, [loading, user, userData]);
 
 	useEffect(() => {
 		if (!startTimer) return;
@@ -77,7 +54,7 @@ export default function SendVerification(params) {
 						disabled={startTimer}
 						className={styles.dropShadow}
 						onClick={() => {
-							auth.currentUser.sendEmailVerification({ url: "http://localhost:3000//register/complete-verification", handleCodeInApp: true }).then(() => {
+							auth.currentUser.sendEmailVerification({ url: "http://localhost:3000/auth/register/complete-verification", handleCodeInApp: true }).then(() => {
 								// The link was successfully sent. Inform the user.
 								// Save the email locally so you don't need to ask the user for it again
 								// if they open the link on the same device.

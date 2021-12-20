@@ -7,10 +7,8 @@ import { useState } from "react";
 import router from "next/router";
 import GoogleSignInBtn from "components/GoogleSignInBtn";
 import { auth, FacebookAuthProvider } from "../../../lib/firebase";
-import { useAuthCheck } from "../../../lib/hooks";
 
 export default function Register(params) {
-	useAuthCheck();
 	return (
 		<Box>
 			<LandingTopbar bgcolor="transparent" />
@@ -154,28 +152,23 @@ function RegisterContainer(props) {
 								}
 
 								if (isValid) {
-									const response = await auth
-										.createUserWithEmailAndPassword(email, password)
-										.then(() => {
-											router.push("/register/send-verification");
-										})
-										.catch((error) => {
-											console.log(error);
-											switch (error.code) {
-												case "auth/invalid-email":
-													setEmailError("The email address is badly formatted");
-													break;
-												case "auth/weak-password":
-													setPasswordError("Password should be at least 6 characters");
-													break;
-												case "auth/email-already-in-use":
-													setEmailError("Email already in use. Try logging in instead");
-													break;
-												default:
-													break;
-											}
-											console.log(JSON.stringify(error));
-										});
+									const response = await auth.createUserWithEmailAndPassword(email, password).catch((error) => {
+										console.log(error);
+										switch (error.code) {
+											case "auth/invalid-email":
+												setEmailError("The email address is badly formatted");
+												break;
+											case "auth/weak-password":
+												setPasswordError("Password should be at least 6 characters");
+												break;
+											case "auth/email-already-in-use":
+												setEmailError("Email already in use. Try logging in instead");
+												break;
+											default:
+												break;
+										}
+										console.log(JSON.stringify(error));
+									});
 									console.log(response);
 								}
 							}}

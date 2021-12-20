@@ -2,12 +2,12 @@ import { ChatBubble, Menu, Notifications } from "@mui/icons-material";
 import { Avatar, Badge, Box, Container, IconButton, Typography } from "@mui/material";
 import styles from "styles/main.module.scss";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useAuthCheck } from "lib/hooks";
+import { selectUserData } from "lib/slices/userSlice";
+import { useSelector } from "react-redux";
 
 export default function MemberTopbar(props) {
 	const isLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("xl"));
-
-	const { user, loading, userData } = useAuthCheck();
+	const userData = useSelector(selectUserData);
 
 	return (
 		<Container sx={{ pt: 8 }}>

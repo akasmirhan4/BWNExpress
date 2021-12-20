@@ -1,18 +1,18 @@
 import { Typography, Box, Container, Button } from "@mui/material";
-import styles from "../../../styles/main.module.scss";
+import styles from "styles/main.module.scss";
 import { useEffect, useState } from "react";
 import router from "next/router";
 import toast from "react-hot-toast";
-import { auth, firestore } from "../../../lib/firebase";
-import { useAuthCheck } from "../../../lib/hooks";
+import { auth, firestore } from "lib/firebase";
 
 export default function CompleteVerification(params) {
-	const { user, userData } = useAuthCheck();
 	const [isValid, setIsValid] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
+	const user = auth.currentUser;
 
 	useEffect(() => {
-		if (user && !user.emailVerified) {
+		console.log(user, user?.emailVerified);
+		if (user?.emailVerified) {
 			if (auth.isSignInWithEmailLink(window.location.href)) {
 				let email = window.localStorage.getItem("emailForSignIn");
 				if (!email) {
@@ -41,7 +41,6 @@ export default function CompleteVerification(params) {
 					});
 			} else {
 				toast.error("Permission Denied. Missing auth", { style: { textAlign: "center" } });
-				router.push("/home");
 				setIsLoading(false);
 			}
 		}
@@ -65,7 +64,7 @@ export default function CompleteVerification(params) {
 						disabled={isLoading || isValid}
 						className={styles.dropShadow}
 						onClick={() => {
-							router.push("/auth/register/send-verification");
+							// router.push("/auth/register/send-verification");
 						}}
 					>
 						Send Again
@@ -77,7 +76,7 @@ export default function CompleteVerification(params) {
 						className={styles.dropShadow}
 						onClick={() => {
 							console.log(auth.currentUser.emailVerified);
-							router.push("/auth/register/new-user");
+							// router.push("/auth/register/new-user");
 						}}
 					>
 						Continue

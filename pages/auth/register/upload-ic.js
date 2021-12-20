@@ -2,17 +2,18 @@ import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { Typography, Box, Container, Button, Grid, Checkbox, FormHelperText } from "@mui/material";
 import styles from "styles/main.module.scss";
 import { useState } from "react";
-import router from "next/router";
 import Link2 from "next/link";
 import toast from "react-hot-toast";
-import { firestore, storage } from "lib/firebase";
-import { useAuthCheck } from "lib/hooks";
+import { auth, firestore, storage } from "lib/firebase";
+import { selectUserData, setUserData } from "lib/slices/userSlice";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function UploadIC(params) {
-	const { user } = useAuthCheck();
 	const [isUploadingLater, setIsUploadingLater] = useState(false);
 	const [selectedFiles, setSelectedFiles] = useState(null);
 	const [isValid, setIsValid] = useState(true);
+	const userData = useSelector(selectUserData);
+	const dispatch = useDispatch();
 
 	return (
 		<Box>
@@ -170,21 +171,14 @@ export default function UploadIC(params) {
 							endIcon={<ArrowForward />}
 							onClick={async () => {
 								if (isUploadingLater) {
+									const updateDetails = { "verified.IC": "uploadingLater", userVerifiedLevel: 1.5 };
 									await toast.promise(
 										firestore
 											.collection("users")
-											.doc(user.uid)
-											.update({ "verified.IC": "uploadingLater", userVerifiedLevel: 1.5 })
-											.then((response) => {
-												console.log({ response });
-												firestore
-													.collection("users")
-													.doc(user.uid)
-													.get()
-													.then((doc) => {
-														console.log(doc.data());
-														router.push("/member/dashboard");
-													});
+											.doc(auth.currentUser.uid)
+											.update(updateDetails)
+											.then(() => {
+												dispatch(setUserData({ ...userData, ...updateDetails }));
 											}),
 										{ loading: "updating user...", success: "user updated 👌", error: "error updating user 😫" }
 									);
@@ -192,13 +186,19 @@ export default function UploadIC(params) {
 								if (selectedFiles) {
 									let batchPromises = [];
 									for (var i = 0; i < selectedFiles.length; i++) {
-										const storageRef = storage.ref(`users/${user.uid}/unverifiedIC/${new Date().getTime()}${i}`);
+										const storageRef = storage.ref(`users/${auth.currentUser.uid}/unverifiedIC/${new Date().getTime()}${i}`);
 										batchPromises.push(storageRef.put(selectedFiles[i]));
 									}
+									const updateDetails = { "verified.IC": "pending", userVerifiedLevel: 1.5 };
 									return await toast.promise(
 										Promise.all(batchPromises).then(() => {
-											firestore.collection("users").doc(user.uid).update({ "verified.IC": "pending", userVerifiedLevel: 1.5 });
-											router.push("/member/dashboard");
+											firestore
+												.collection("users")
+												.doc(auth.currentUser.uid)
+												.update(updateDetails)
+												.then(() => {
+													dispatch(setUserData({ ...userData, ...updateDetails }));
+												});
 										}),
 										{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
 									);

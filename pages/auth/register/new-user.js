@@ -2,27 +2,25 @@ import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { Typography, Box, Container, TextField, Button, Grid, MenuItem, Checkbox, InputAdornment } from "@mui/material";
 import styles from "styles/main.module.scss";
 import { forwardRef, useEffect, useState } from "react";
-import router from "next/router";
 import Link2 from "next/link";
 import { DatePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { IMaskInput } from "react-imask";
 import { functions } from "lib/firebase";
 import toast from "react-hot-toast";
-import { useAuthCheck } from "lib/hooks";
+import { selectUserData, setUserData } from "lib/slices/userSlice";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function NewUser(params) {
-	const { userData } = useAuthCheck();
-
 	return (
 		<Box>
-			<NewUserContainer pt={"4em"} userData={userData} />
+			<NewUserContainer pt={"4em"} />
 		</Box>
 	);
 }
 
 function NewUserContainer(props) {
-	const { userData } = props;
+	const userData = useSelector(selectUserData);
 	const [fullName, setFullName] = useState("");
 	const [preferredName, setPreferredName] = useState("");
 	const [IC, setIC] = useState("");
@@ -35,6 +33,7 @@ function NewUserContainer(props) {
 	const [validity, setValidity] = useState(null);
 	const [valid, setValid] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		if (userData) {
@@ -417,25 +416,25 @@ function NewUserContainer(props) {
 						onClick={async () => {
 							const { isValid } = checkValidity();
 							if (isValid) {
+								const updateDetails = {
+									fullName,
+									preferredName,
+									IC,
+									gender,
+									DOB: DOB.toLocaleDateString(),
+									phoneNo,
+									address,
+									isDifferentAddress,
+									deliveryAddress,
+									userVerifiedLevel: 1,
+								};
 								setIsUploading(true);
 								await toast.promise(
 									functions
-										.httpsCallable("setUserDetails")({
-											fullName,
-											preferredName,
-											IC,
-											gender,
-											DOB: DOB.toLocaleDateString(),
-											phoneNo,
-											address,
-											isDifferentAddress,
-											deliveryAddress,
-											userVerifiedLevel: 1,
-										})
+										.httpsCallable("setUserDetails")(updateDetails)
 										.then(({ data }) => {
-											console.log(data);
+											dispatch(setUserData({ ...userData, ...updateDetails }));
 											if (!data.success) throw "Error in backend";
-											router.push("/auth/register/upload-ic");
 										}),
 									{ loading: "updating user...", success: "user updated 👌", error: "error updating user 😫" }
 								);

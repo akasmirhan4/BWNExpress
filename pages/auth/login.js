@@ -6,12 +6,9 @@ import Link2 from "next/link";
 import { useState } from "react";
 import GoogleSignInBtn from "components/GoogleSignInBtn";
 import { auth } from "lib/firebase";
-import { useAuthCheck } from "lib/hooks";
 import toast from "react-hot-toast";
 
 export default function Login(params) {
-	useAuthCheck();
-
 	return (
 		<Box>
 			<LandingTopbar bgcolor="transparent" />
@@ -124,7 +121,7 @@ function LoginContainer(props) {
 					fullWidth
 					className={styles.dropShadow}
 					onClick={() => {
-						toast.promise(logIn, { success: "Logged In", loading: "Logging In...", error: "Error Logging In" });
+						toast.promise(logIn(), { success: "Logged In", loading: "Logging In...", error: "Error Logging In" });
 					}}
 				>
 					Log In

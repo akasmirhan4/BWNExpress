@@ -4,18 +4,19 @@ import Logo from "../public/svgs/logo.svg";
 import styles from "../styles/main.module.scss";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Dashboard, Inbox, Logout, Settings, SwapHoriz } from "@mui/icons-material";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { auth } from "../lib/firebase";
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../lib/context";
+import { useEffect, useState } from "react";
+import { selectUserData } from "lib/slices/userSlice";
+import { useSelector } from "react-redux";
 
 export default function CustomDrawer(props) {
 	const { palette } = useTheme();
 	const isLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("xl"));
-	const { user, loading, userData } = useContext(UserContext);
+	const userData = useSelector(selectUserData);
 	const [verifyStatus, setVerifyStatus] = useState("...");
 
 	useEffect(() => {
@@ -83,12 +84,7 @@ export default function CustomDrawer(props) {
 				<Box display="flex" flexDirection="column" width="100%">
 					<Button
 						onClick={() => {
-							toast.promise(
-								auth.signOut().then(() => {
-									router.push("/home");
-								}),
-								{ loading: "logging out...", success: " log out successful", error: "error logging out" }
-							);
+							toast.promise(auth.signOut(), { loading: "logging out...", success: " log out successful", error: "error logging out" });
 						}}
 						startIcon={<Logout />}
 						fullWidth
