@@ -115,6 +115,7 @@ function HeroContainer(props) {
 							<Fade in={isVisible} timeout={1000}>
 								<Box display="flex" mt={12} flex={1} flexDirection="column" alignItems={"center"}>
 									<Button
+									disabled={true}
 										variant="contained"
 										color="secondary"
 										size="large"

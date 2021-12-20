@@ -7,6 +7,7 @@ import { customTheme } from "styles/customTheme";
 import "styles/globals.css";
 import { useEffect, useState } from "react";
 import cookieCutter from "cookie-cutter";
+import NextNProgress from "nextjs-progressbar";
 
 function App({ Component, pageProps }) {
 	const userData = useUserData();
@@ -19,6 +20,7 @@ function App({ Component, pageProps }) {
 	return (
 		<UserContext.Provider value={{ ...userData, lang, setLang }}>
 			<ThemeProvider theme={customTheme}>
+				<NextNProgress color={customTheme.palette.secondaryAccent.main} />
 				<CustomHead />
 				<Component {...pageProps} />
 				<Toaster />
