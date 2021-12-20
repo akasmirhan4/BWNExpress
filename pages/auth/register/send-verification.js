@@ -1,20 +1,13 @@
-import { ArrowBack, ArrowForward, FamilyRestroomRounded } from "@mui/icons-material";
-import { Box, Container, Button, Link, IconButton, Grid, MenuItem, Checkbox, FormHelperText } from "@mui/material";
+
+import { Box, Container, Button } from "@mui/material";
 import styles from "../../../styles/main.module.scss";
-import { UserContext } from "../../../lib/context";
-import { useContext, useEffect, useState } from "react";
-import router from "next/router";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { auth } from "../../../lib/firebase";
 import { useSelector } from "react-redux";
 import { selectUser, selectUserData } from "lib/slices/userSlice";
 
 export default function SendVerification(params) {
-	const user = useSelector(selectUser);
-	const userData = useSelector(selectUserData);
-	const [isUploadingLater, setIsUploadingLater] = useState(false);
-	const [selectedFiles, setSelectedFiles] = useState(null);
-	const [isValid, setIsValid] = useState(true);
 	const TIMER = 20;
 	const [counter, setCounter] = useState(TIMER);
 	const [startTimer, setStartTimer] = useState(false);
