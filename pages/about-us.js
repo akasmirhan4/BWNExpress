@@ -1,5 +1,6 @@
-import { Box, Button, CircularProgress, Container, Grid, IconButton, Typography, useMediaQuery } from "@mui/material";
+import { Box, Button, Container, Grid, Typography, useMediaQuery } from "@mui/material";
 import styles from "../styles/main.module.scss";
+import Link from "next/link";
 
 import LandingTopbar from "../components/LandingTopbar";
 import LandingFooter from "../components/LandingFooter";
@@ -166,16 +167,18 @@ function HowItWorks(props) {
 					What are you waiting for?
 				</Typography>
 				<Box display={"flex"} justifyContent={"center"}>
-					<Button
-						variant="contained"
-						style={{ color: "white" }}
-						sx={{ py: "1.4em", width: "20em" }}
-						size="large"
-						className={styles.dropShadow}
-						color="secondary"
-					>
-						Register now!
-					</Button>
+					<Link href="/auth/register" prefetch={false} passHref>
+						<Button
+							variant="contained"
+							style={{ color: "white" }}
+							sx={{ py: "1.4em", width: "20em" }}
+							size="large"
+							className={styles.dropShadow}
+							color="secondary"
+						>
+							Register now!
+						</Button>
+					</Link>
 				</Box>
 			</Container>
 		</Box>
@@ -200,41 +203,31 @@ function Location(props) {
 							Opening Hours:
 						</Typography>
 						<Box display={"flex"} justifyContent={"space-between"}>
-							<Typography color={"white.main"}>
-								Monday - Thursday
-							</Typography>
+							<Typography color={"white.main"}>Monday - Thursday</Typography>
 							<Typography color={"white.main"} fontWeight={"bold"}>
 								11:30 am - 5:30 pm
 							</Typography>
 						</Box>
 						<Box display={"flex"} justifyContent={"space-between"}>
-							<Typography color={"white.main"}>
-								Friday
-							</Typography>
+							<Typography color={"white.main"}>Friday</Typography>
 							<Typography color={"white.main"} fontWeight={"bold"}>
 								2:00 pm - 6:00 pm
 							</Typography>
 						</Box>
 						<Box display={"flex"} justifyContent={"space-between"}>
-							<Typography color={"white.main"}>
-								Saturday
-							</Typography>
+							<Typography color={"white.main"}>Saturday</Typography>
 							<Typography color={"white.main"} fontWeight={"bold"}>
 								11:30 am - 5:30 pm
 							</Typography>
 						</Box>
 						<Box display={"flex"} justifyContent={"space-between"}>
-							<Typography color={"white.main"}>
-								Sunday
-							</Typography>
+							<Typography color={"white.main"}>Sunday</Typography>
 							<Typography color={"white.main"} fontWeight={"bold"}>
 								CLOSED
 							</Typography>
 						</Box>
 						<Box display={"flex"} justifyContent={"space-between"}>
-							<Typography color={"white.main"}>
-								Public Holidays
-							</Typography>
+							<Typography color={"white.main"}>Public Holidays</Typography>
 							<Typography color={"white.main"} fontWeight={"bold"}>
 								CLOSED
 							</Typography>

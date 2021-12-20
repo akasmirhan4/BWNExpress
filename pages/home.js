@@ -54,6 +54,7 @@ function HeroContainer(props) {
 							<Fade in={isVisible} timeout={1000}>
 								<Box sx={{ display: { xs: "none", md: "flex" } }} justifyContent="space-between">
 									<Button
+										disabled={true}
 										variant="contained"
 										color="secondary"
 										size="large"
@@ -62,27 +63,29 @@ function HeroContainer(props) {
 										className={styles.dropShadow}
 										sx={{ mr: 4, py: 2, fontSize: "1.25rem", fontWeight: "bold" }}
 									>
-										Start Today
+										Download app
 									</Button>
-									<Button
-										variant="outlined"
-										color="secondary"
-										size="large"
-										fullWidth
-										className={styles.dropShadow}
-										sx={{
-											mr: 4,
-											py: 2,
-											fontSize: "1.25rem",
-											fontWeight: "bold",
-											borderWidth: "2px",
-											":hover": {
+									<Link href="/auth/register" prefetch={false} passHref>
+										<Button
+											variant="outlined"
+											color="secondary"
+											size="large"
+											fullWidth
+											className={styles.dropShadow}
+											sx={{
+												mr: 4,
+												py: 2,
+												fontSize: "1.25rem",
+												fontWeight: "bold",
 												borderWidth: "2px",
-											},
-										}}
-									>
-										Register Now
-									</Button>
+												":hover": {
+													borderWidth: "2px",
+												},
+											}}
+										>
+											Register Now
+										</Button>
+									</Link>
 								</Box>
 							</Fade>
 						</Grid>
@@ -120,7 +123,8 @@ function HeroContainer(props) {
 										className={styles.dropShadow}
 										sx={{ maxWidth: "90vw", mb: 2, py: 2, fontSize: "1rem", fontWeight: "bold" }}
 									>
-										Start Today
+										In progress
+										{/* Start Today */}
 									</Button>
 									<Button
 										variant="outlined"
@@ -239,6 +243,7 @@ function PricesContainer(props) {
 						<Box display="flex" justifyContent="center">
 							<Link href="/resources" prefetch={false} passHref>
 								<Button
+								disabled={true}
 									variant="contained"
 									style={{ color: "white" }}
 									sx={{ py: "1.4em", width: "20em" }}
@@ -246,7 +251,8 @@ function PricesContainer(props) {
 									className={styles.dropShadow}
 									color="secondary"
 								>
-									Get Your Quotation
+									In progress
+									{/* Get Your Quotation */}
 								</Button>
 							</Link>
 						</Box>
