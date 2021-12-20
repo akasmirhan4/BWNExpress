@@ -52,20 +52,45 @@ function ShippingFee(props) {
 		<Box {...props} bgcolor={"accent.main"}>
 			<Container>
 				<Grid container py={8} spacing={2}>
-					<Grid item xs={12} md={4} display={"flex"} justifyContent={"center"} flexDirection={"column"}>
+					<Grid
+						item
+						xs={12}
+						//  md={4}
+						display={"flex"}
+						justifyContent={"center"}
+						flexDirection={"column"}
+					>
 						<Typography
 							color={"white.main"}
 							fontWeight="bold"
 							variant={"h4"}
-							sx={{ textTransform: "uppercase", pb: 2, textAlign: { xs: "center", md: "left" } }}
+							sx={{
+								textTransform: "uppercase",
+								pb: 2,
+								textAlign: {
+									xs: "center",
+									//  md: "left"
+								},
+							}}
 						>
 							Shipping Fee
 						</Typography>
-						<Typography color={"white.main"} fontWeight="bold" variant={isSmallScreen ? "h8" : "h6"} sx={{ textAlign: { xs: "center", md: "left" }, mb: 4 }}>
+						<Typography
+							color={"white.main"}
+							fontWeight="bold"
+							variant={isSmallScreen ? "h8" : "h6"}
+							sx={{
+								textAlign: {
+									xs: "center",
+									// md: "left"
+								},
+								mb: 4,
+							}}
+						>
 							Get your parcel delivered to you from as low as $6!
 						</Typography>
 					</Grid>
-					<Grid item xs={12} md={8}>
+					{/* <Grid item xs={12} md={8}>
 						<Box px={6} py={4} display={"flex"} flexDirection={"column"} width={"100%"} bgcolor={"white.main"} borderRadius={4} className={styles.dropShadow}>
 							<Typography>1. Where do you want your parcel to be delivered to?</Typography>
 							<FormControl fullWidth sx={{ my: 2 }} margin="dense" className={styles.dropShadow}>
@@ -182,7 +207,7 @@ function ShippingFee(props) {
 								</Grid>
 							</Grid>
 						</Box>
-					</Grid>
+					</Grid> */}
 				</Grid>
 			</Container>
 		</Box>
@@ -308,7 +333,7 @@ function RestrictedGoods(props) {
 				<Typography fontWeight="bold" variant={"h5"} sx={{ textTransform: "uppercase", pb: 4 }} textAlign={"center"}>
 					RESTRICTED GOODS
 				</Typography>
-				<Masonry sx={{m: 0}} columns={isSmallScreen ? 1 : 2} spacing={2}>
+				<Masonry sx={{ m: 0 }} columns={isSmallScreen ? 1 : 2} spacing={2}>
 					{restrictedGoods.map((item, index) => (
 						<Box key={index} bgcolor={"#FFF0F3"} p={4} borderRadius={4}>
 							<Typography fontWeight="bold" variant={"h5"} sx={{ pb: 1 }}>

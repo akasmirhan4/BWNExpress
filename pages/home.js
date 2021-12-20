@@ -270,12 +270,12 @@ function PriceItem(props) {
 				alignItems="center"
 				display="flex"
 				flex={1}
-				py={2}
+				p={4}
 				borderRadius={2}
 				flexDirection="column"
 				height={"14em"}
 			>
-				<Typography textAlign="center">{`$${price.from} to $${price.to}`}</Typography>
+				{/* <Typography textAlign="center">{`$${price.from} to $${price.to}`}</Typography> */}
 				<Box flex={1} width="100%" alignItems={"center"} justifyContent={"center"} display={"flex"}>
 					<Slide direction="up" in={props.isVisible} timeout={1000} style={{ transitionDelay: props.index * 100 }}>
 						<Box height={size ?? "60%"} width="100%" position="relative" my={2}>
@@ -283,7 +283,7 @@ function PriceItem(props) {
 						</Box>
 					</Slide>
 				</Box>
-				<Typography textAlign="center">{`${weight.from} to ${weight.to} kg`}</Typography>
+				<Typography textAlign="center" fontWeight={"bold"}>{`${weight.from} to ${weight.to} kg`}</Typography>
 			</Box>
 		</Grid>
 	);
