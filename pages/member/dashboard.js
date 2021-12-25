@@ -1,35 +1,17 @@
 import { Box, Container, Typography, Grid, Button } from "@mui/material";
-import CustomDrawer from "components/CustomDrawer";
-import MemberTopbar from "components/MemberTopbar";
 import styles from "styles/main.module.scss";
 import dashboardStyles from "styles/dashboard.module.scss";
-import { useState } from "react";
 import AwesomeCarousel from "components/AwesomeCarousel";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import MemberPageTemplate from "components/MemberPageTemplate";
 
 export default function Dashboard() {
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	return (
-		<Box pb={"8em"}>
-			<Box display="flex">
-				<CustomDrawer
-					open={isDrawerOpen}
-					onClose={() => {
-						setIsDrawerOpen(false);
-					}}
-				/>
-				<main style={{ flex: 1 }}>
-					<MemberTopbar
-						onMenuClicked={() => {
-							setIsDrawerOpen(!isDrawerOpen);
-						}}
-					/>
-					<PendingPaymentsBox sx={{ mt: 4 }} />
-					<PendingActionsBox sx={{ mt: 4 }} />
-					<PromotionsBox sx={{ mt: 4 }} />
-				</main>
-			</Box>
-		</Box>
+		<MemberPageTemplate>
+			<PendingPaymentsBox sx={{ mt: 4 }} />
+			<PendingActionsBox sx={{ mt: 4 }} />
+			<PromotionsBox sx={{ mt: 4 }} />
+		</MemberPageTemplate>
 	);
 }
 
