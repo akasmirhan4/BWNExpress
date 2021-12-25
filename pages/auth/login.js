@@ -108,7 +108,7 @@ function LoginContainer(props) {
 				<TextField
 					label="Email"
 					type="email"
-					InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
+					InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2, ":hover": { bgcolor: "offWhite.secondary", opacity: 0.5 } } }}
 					InputLabelProps={{ sx: { color: "text.secondary" } }}
 					fullWidth
 					sx={{ maxWidth: 384, borderRadius: 2, mb: 2 }}
@@ -123,7 +123,7 @@ function LoginContainer(props) {
 				<TextField
 					label="Password"
 					type="password"
-					InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
+					InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2, ":hover": { bgcolor: "offWhite.secondary", opacity: 0.5 } } }}
 					InputLabelProps={{ sx: { color: "text.secondary" } }}
 					fullWidth
 					sx={{ maxWidth: 384, borderRadius: 2 }}

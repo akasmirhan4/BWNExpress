@@ -1,4 +1,4 @@
-import { Button, Typography, Box, useTheme, IconButton, Drawer } from "@mui/material";
+import { Button, Typography, Box, useTheme, IconButton, Drawer, Tooltip } from "@mui/material";
 import Image from "next/image";
 import Logo from "../public/svgs/logo.svg";
 import styles from "../styles/main.module.scss";
@@ -42,7 +42,17 @@ export default function CustomDrawer(props) {
 
 	return (
 		<Drawer {...props} anchor="left" variant={isLargeScreen ? "permanent" : "temporary"}>
-			<Box {...props} bgcolor={palette.offWhite.main} display="flex" flexDirection="column" alignItems="center" pb={4} px={2} minWidth={256} flex={1}>
+			<Box
+				{...props}
+				sx={{ backgroundImage: `url("/svgs/background.svg")`, backgroundRepeat: "no-repeat", backgroundSize: "cover", backgroundPosition: "left" }}
+				display="flex"
+				flexDirection="column"
+				alignItems="center"
+				pb={4}
+				px={2}
+				minWidth={256}
+				flex={1}
+			>
 				{/* Top part of the drawer */}
 				<Box display="flex" flexDirection="column" alignItems="center" mb={2} width="100%">
 					<Link prefetch={false} href="dashboard" passHref>
@@ -50,9 +60,11 @@ export default function CustomDrawer(props) {
 							<Image src={Logo} alt="Company Logo" />
 						</IconButton>
 					</Link>
-					<Typography className={styles.companyName}>{"BWNEXPRESS"}</Typography>
+					<Typography className={styles.companyName} color="white.main">
+						{"BWNEXPRESS"}
+					</Typography>
 					<Button fullWidth sx={{ color: "secondaryAccent.main" }}>
-						<Typography variant="caption" sx={{ color: palette.lightGrey.main }}>
+						<Typography variant="caption" sx={{ color: palette.white.main }}>
 							{"member"} <span className={styles[verifyStatus]}>{verifyStatus}</span>
 						</Typography>
 					</Button>
@@ -60,17 +72,21 @@ export default function CustomDrawer(props) {
 
 				{/* CTA Button */}
 				{/* <Link href="new-order" prefetch={false}> */}
-				<Button
-					disabled={verifyStatus !== "verified"}
-					variant="outlined"
-					color="secondaryAccent"
-					className={styles.dropShadow}
-					startIcon={<ShoppingCartIcon />}
-					fullWidth
-					onClick={() => toast.success("Order Placed!")}
-				>
-					{"PLACE AN ORDER"}
-				</Button>
+				<Tooltip title={verifyStatus !== "verified" ? "Complete verification to place an order" : ""} placement="right" disableFocusListener disableTouchListener arrow>
+					<span>
+						<Button
+							disabled={verifyStatus !== "verified"}
+							variant="outlined"
+							color="secondaryAccent"
+							className={styles.dropShadow}
+							startIcon={<ShoppingCartIcon />}
+							fullWidth
+							onClick={() => toast.success("Order Placed!")}
+						>
+							{"PLACE AN ORDER"}
+						</Button>
+					</span>
+				</Tooltip>
 				{/* </Link> */}
 
 				{/* main nav */}
@@ -106,7 +122,7 @@ export default function CustomDrawer(props) {
 function DrawerButton(props) {
 	const { startIcon, href, label } = props;
 	const { route } = useRouter();
-	const isActive = route.substring(1) == href;
+	const isActive = route.substring(1).split("/")[1] == href;
 	const { palette } = useTheme();
 
 	if (isActive) {
@@ -116,9 +132,9 @@ function DrawerButton(props) {
 					variant="contained"
 					startIcon={startIcon}
 					fullWidth
-					color="secondaryAccent"
+					color="accent"
 					sx={{ mb: 1 }}
-					style={{ justifyContent: "flex-start", paddingLeft: "1em", color: palette.offWhite.main }}
+					style={{ justifyContent: "flex-start", paddingLeft: "1em", color: "white" }}
 					className={styles.dropShadow}
 				>
 					{label}
@@ -128,7 +144,7 @@ function DrawerButton(props) {
 	} else {
 		return (
 			<Link href={href} prefetch={false} passHref>
-				<Button startIcon={startIcon} fullWidth color="lightGrey" sx={{ mb: 1 }} style={{ justifyContent: "flex-start", paddingLeft: "1em" }}>
+				<Button startIcon={startIcon} fullWidth color="white" sx={{ mb: 1 }} style={{ justifyContent: "flex-start", paddingLeft: "1em" }}>
 					{label}
 				</Button>
 			</Link>
