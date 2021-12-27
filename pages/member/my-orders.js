@@ -1,4 +1,4 @@
-import { ExpandMoreRounded, MapRounded, PageviewRounded } from "@mui/icons-material";
+import { ExpandMoreRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, MapRounded, PageviewRounded } from "@mui/icons-material";
 import { DateRangePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import {
@@ -8,6 +8,7 @@ import {
 	Box,
 	Button,
 	Checkbox,
+	Collapse,
 	Container,
 	FormControl,
 	FormControlLabel,
@@ -64,6 +65,7 @@ export default function MyOrders() {
 
 	const [displayedRows, setDisplayedRows] = useState(rows);
 	const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
+	const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
 	useEffect(() => {
 		const isStatusSelected = Object.values(status).some((e) => e);
@@ -147,35 +149,53 @@ export default function MyOrders() {
 					<Table size="small">
 						<TableHead>
 							<TableRow>
+								{isMdDown && <TableCell />}
 								<TableCell>ORDER ID</TableCell>
 								<TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw", overflow: "hidden" }}>DATE SUBMITTED</TableCell>
-								<TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw" }}>STATUS</TableCell>
-								<TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw" }}>EXPECTED ARRIVAL</TableCell>
-								<TableCell align="right" sx={{minWidth: "18em"}}>ACTIONS</TableCell>
+								{!isSmDown && <TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw" }}>STATUS</TableCell>}
+								{!isMdDown && <TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw" }}>EXPECTED ARRIVAL</TableCell>}
+								{!isMdDown && (
+									<TableCell align="right" sx={{ minWidth: "18em" }}>
+										ACTIONS
+									</TableCell>
+								)}
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{displayedRows.map((row) => (
-								<TableRow key={row.orderID} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-									<TableCell component="th" scope="row">
-										{row.orderID}
-									</TableCell>
-									<TableCell>{row.dateSubmitted}</TableCell>
-									<TableCell>{camelCaseToText(row.status)}</TableCell>
-									<TableCell>{row.expectedArrival ?? "-"}</TableCell>
-									<TableCell align="right">
-										<IconButton>
-											<PageviewRounded color="primary" />
-										</IconButton>
-										<IconButton sx={{ ml: 1 }}>
-											<MapRounded color="primary" />
-										</IconButton>
-										<Button variant="contained" sx={{ color: "white.main", ml: 1 }} className={styles.dropShadow}>
-											Track Order
-										</Button>
-									</TableCell>
-								</TableRow>
-							))}
+							{displayedRows.map((row) => {
+								const [collapseOpen, setCollapseOpen] = useState(false);
+
+								return (
+									<TableRow key={row.orderID} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+										{isMdDown && (
+											<TableCell sx={{px: 0}}>
+												<IconButton aria-label="expand row" size="small" onClick={() => setCollapseOpen(!collapseOpen)}>
+													{collapseOpen ? <KeyboardArrowUpRounded /> : <KeyboardArrowDownRounded />}
+												</IconButton>
+											</TableCell>
+										)}
+										<TableCell component="th" scope="row">
+											{row.orderID}
+										</TableCell>
+										<TableCell>{row.dateSubmitted}</TableCell>
+										{!isSmDown && <TableCell>{camelCaseToText(row.status)}</TableCell>}
+										{!isMdDown && <TableCell>{row.expectedArrival ?? "-"}</TableCell>}
+										{!isMdDown && (
+											<TableCell align="right">
+												<IconButton>
+													<PageviewRounded color="primary" />
+												</IconButton>
+												<IconButton sx={{ ml: 1 }}>
+													<MapRounded color="primary" />
+												</IconButton>
+												<Button variant="contained" sx={{ color: "white.main", ml: 1 }} className={styles.dropShadow}>
+													Track Order
+												</Button>
+											</TableCell>
+										)}
+									</TableRow>
+								);
+							})}
 						</TableBody>
 					</Table>
 				</TableContainer>

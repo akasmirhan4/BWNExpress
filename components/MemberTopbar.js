@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 
 export default function MemberTopbar(props) {
 	const isLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("xl"));
+	const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 	const userData = useSelector(selectUserData);
 
 	return (
@@ -23,14 +24,16 @@ export default function MemberTopbar(props) {
 							<Menu color="secondaryAccent" />
 						</IconButton>
 					)}
-					<Box>
-						<Typography variant="h4" sx={{ color: "secondaryAccent.main" }} fontWeight="bold">
-							{`Hello, ${userData?.preferredName ?? "Unknown"}!`}
-						</Typography>
-						<Typography variant="caption" whiteSpace="pre-wrap">
-							{`${userData?.email ?? "..."}  |  ${userData?.phoneNo ?? "..."}`}
-						</Typography>
-					</Box>
+					{!isSmDown && (
+						<Box>
+							<Typography variant="h4" sx={{ color: "secondaryAccent.main" }} fontWeight="bold">
+								{`Hello, ${userData?.preferredName ?? "Unknown"}!`}
+							</Typography>
+							<Typography variant="caption" whiteSpace="pre-wrap">
+								{`${userData?.email ?? "..."}  |  ${userData?.phoneNo ?? "..."}`}
+							</Typography>
+						</Box>
+					)}
 				</Box>
 				<Box display="flex" alignItems="center">
 					<IconButton sx={{ mr: 2 }}>
