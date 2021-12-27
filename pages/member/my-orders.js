@@ -23,6 +23,7 @@ import {
 	TableRow,
 	TextField,
 	Typography,
+	useMediaQuery,
 } from "@mui/material";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import { Fragment, useEffect, useState } from "react";
@@ -62,6 +63,8 @@ export default function MyOrders() {
 	];
 
 	const [displayedRows, setDisplayedRows] = useState(rows);
+	const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
+	const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
 	useEffect(() => {
 		const isStatusSelected = Object.values(status).some((e) => e);
@@ -148,8 +151,8 @@ export default function MyOrders() {
 								<TableCell>ORDER ID</TableCell>
 								<TableCell>DATE SUBMITTED</TableCell>
 								<TableCell>STATUS</TableCell>
-								<TableCell>EXPECTED ARRIVAL</TableCell>
-								<TableCell align="right">ACTIONS</TableCell>
+								<TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis" }}>EXPECTED ARRIVAL</TableCell>
+								<TableCell align="right" sx={{minWidth: "18em"}}>ACTIONS</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
