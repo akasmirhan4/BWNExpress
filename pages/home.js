@@ -115,7 +115,7 @@ function HeroContainer(props) {
 							<Fade in={isVisible} timeout={1000}>
 								<Box display="flex" mt={12} flex={1} flexDirection="column" alignItems={"center"}>
 									<Button
-									disabled={true}
+										disabled={true}
 										variant="contained"
 										color="secondary"
 										size="large"
@@ -127,25 +127,27 @@ function HeroContainer(props) {
 										In progress
 										{/* Start Today */}
 									</Button>
-									<Button
-										variant="outlined"
-										color="secondary"
-										size="large"
-										fullWidth
-										className={styles.dropShadow}
-										sx={{
-											maxWidth: "90vw",
-											py: 2,
-											fontSize: "1rem",
-											fontWeight: "bold",
-											borderWidth: "2px",
-											":hover": {
+									<Link href="/auth/register" prefetch={false} passHref>
+										<Button
+											variant="outlined"
+											color="secondary"
+											size="large"
+											fullWidth
+											className={styles.dropShadow}
+											sx={{
+												maxWidth: "90vw",
+												py: 2,
+												fontSize: "1rem",
+												fontWeight: "bold",
 												borderWidth: "2px",
-											},
-										}}
-									>
-										Register Now
-									</Button>
+												":hover": {
+													borderWidth: "2px",
+												},
+											}}
+										>
+											Register Now
+										</Button>
+									</Link>
 								</Box>
 							</Fade>
 						</Grid>
@@ -244,7 +246,7 @@ function PricesContainer(props) {
 						<Box display="flex" justifyContent="center">
 							<Link href="/resources" prefetch={false} passHref>
 								<Button
-								disabled={true}
+									disabled={true}
 									variant="contained"
 									style={{ color: "white" }}
 									sx={{ py: "1.4em", width: "20em" }}
