@@ -20,7 +20,7 @@ export default function MemberPageTemplate(props) {
 							setIsDrawerOpen(!isDrawerOpen);
 						}}
 					/>
-					{props.children}
+					<Box mt={12}>{props.children}</Box>
 				</main>
 			</Box>
 		</Box>

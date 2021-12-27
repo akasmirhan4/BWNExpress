@@ -51,12 +51,6 @@ export default function MyOrders() {
 		return { orderID, dateSubmitted, status, expectedArrival };
 	}
 
-	function camelCaseToText(camel) {
-		const result = camel.replace(/([A-Z])/g, " $1");
-		const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
-		return finalResult;
-	}
-
 	const rows = [
 		createData("BWN123456", new Date().toLocaleDateString(), "pendingAction", null),
 		createData("BWN123457", new Date().toLocaleDateString(), "processingPermit", "3 days"),
@@ -163,105 +157,119 @@ export default function MyOrders() {
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{displayedRows.map((row) => {
-								const [collapseOpen, setCollapseOpen] = useState(false);
-
-								return (
-									<Fragment>
-										<TableRow key={row.orderID} sx={{ "& > *": { borderBottom: "unset" } }}>
-											{isMdDown && (
-												<TableCell sx={{ px: 0 }}>
-													<IconButton aria-label="expand row" size="small" onClick={() => setCollapseOpen(!collapseOpen)}>
-														{collapseOpen ? <KeyboardArrowUpRounded /> : <KeyboardArrowDownRounded />}
-													</IconButton>
-												</TableCell>
-											)}
-											<TableCell component="th" scope="row">
-												{row.orderID}
-											</TableCell>
-											<TableCell>{row.dateSubmitted}</TableCell>
-											{!isSmDown && <TableCell>{camelCaseToText(row.status)}</TableCell>}
-											{!isMdDown && <TableCell>{row.expectedArrival ?? "-"}</TableCell>}
-											{!isMdDown && (
-												<TableCell align="right">
-													<IconButton>
-														<PageviewRounded color="primary" />
-													</IconButton>
-													<IconButton sx={{ ml: 1 }}>
-														<MapRounded color="primary" />
-													</IconButton>
-													<Button variant="contained" sx={{ color: "white.main", ml: 1 }} className={styles.dropShadow}>
-														Track Order
-													</Button>
-												</TableCell>
-											)}
-										</TableRow>
-										{isMdDown && (
-											<TableRow sx={{ bgcolor: "offWhite.secondary" }}>
-												<TableCell colSpan={"100%"} sx={{ py: 0, borderBottom: "unset" }}>
-													<Collapse in={collapseOpen} timeout="auto" unmountOnExit>
-														<Box m={2}>
-															<TableContainer>
-																<Table size="small">
-																	{isSmDown && (
-																		<TableRow>
-																			<TableCell component={"th"} sx={{ borderBottom: "unset" }}>
-																				STATUS
-																			</TableCell>
-																			<TableCell align="right" sx={{ borderBottom: "unset" }}>
-																				{camelCaseToText(row.status)}
-																			</TableCell>
-																		</TableRow>
-																	)}
-																	<TableRow>
-																		<TableCell component={"th"} sx={{ borderBottom: "unset" }}>
-																			EXPECTED ARRIVAL
-																		</TableCell>
-																		<TableCell align="right" sx={{ borderBottom: "unset" }}>
-																			{row.expectedArrival ?? "-"}
-																		</TableCell>
-																	</TableRow>
-																	<TableRow>
-																		{!isSmDown && <TableCell sx={{ borderBottom: "unset" }}>ACTIONS</TableCell>}
-																		<TableCell colSpan={isSmDown ? 2 : 1} align={!isSmDown ? "center" : "right"} sx={{ borderBottom: "unset" }}>
-																			<Box display="flex" justifyContent={"space-around"} mt={1}>
-																				<IconButton>
-																					<PageviewRounded color="primary" />
-																				</IconButton>
-																				<IconButton>
-																					<MapRounded color="primary" />
-																				</IconButton>
-																				<Button
-																					variant="contained"
-																					sx={{
-																						color: "white.main",
-																						whiteSpace: "nowrap",
-																						textOverflow: "ellipsis",
-																						overflow: "hidden",
-																						maxWidth: "30vw",
-																						display: "block",
-																					}}
-																					className={styles.dropShadow}
-																				>
-																					Track Order
-																				</Button>
-																			</Box>
-																		</TableCell>
-																	</TableRow>
-																</Table>
-															</TableContainer>
-														</Box>
-													</Collapse>
-												</TableCell>
-											</TableRow>
-										)}
-									</Fragment>
-								);
-							})}
+							{displayedRows.map((row) => (
+								<EnhancedTableRow row={row} key={row.orderID} />
+							))}
 						</TableBody>
 					</Table>
 				</TableContainer>
 			</Container>
 		</MemberPageTemplate>
+	);
+}
+
+function EnhancedTableRow(props) {
+	const [collapseOpen, setCollapseOpen] = useState(false);
+	const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
+	const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+	const row = props.row;
+
+	function camelCaseToText(camel) {
+		const result = camel.replace(/([A-Z])/g, " $1");
+		const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+		return finalResult;
+	}
+
+	return (
+		<Fragment>
+			<TableRow key={row.orderID} sx={{ "& > *": { borderBottom: "unset" } }}>
+				{isMdDown && (
+					<TableCell sx={{ px: 0 }}>
+						<IconButton aria-label="expand row" size="small" onClick={() => setCollapseOpen(!collapseOpen)}>
+							{collapseOpen ? <KeyboardArrowUpRounded /> : <KeyboardArrowDownRounded />}
+						</IconButton>
+					</TableCell>
+				)}
+				<TableCell component="th" scope="row">
+					{row.orderID}
+				</TableCell>
+				<TableCell>{row.dateSubmitted}</TableCell>
+				{!isSmDown && <TableCell>{camelCaseToText(row.status)}</TableCell>}
+				{!isMdDown && <TableCell>{row.expectedArrival ?? "-"}</TableCell>}
+				{!isMdDown && (
+					<TableCell align="right">
+						<IconButton>
+							<PageviewRounded color="primary" />
+						</IconButton>
+						<IconButton sx={{ ml: 1 }}>
+							<MapRounded color="primary" />
+						</IconButton>
+						<Button variant="contained" sx={{ color: "white.main", ml: 1 }} className={styles.dropShadow}>
+							Track Order
+						</Button>
+					</TableCell>
+				)}
+			</TableRow>
+			{isMdDown && (
+				<TableRow sx={{ bgcolor: "offWhite.secondary" }}>
+					<TableCell colSpan={"100%"} sx={{ py: 0, borderBottom: "unset" }}>
+						<Collapse in={collapseOpen} timeout="auto" unmountOnExit>
+							<Box my={2}>
+								<TableContainer>
+									<Table size="small">
+										{isSmDown && (
+											<TableRow>
+												<TableCell component={"th"} sx={{ borderBottom: "unset" }}>
+													STATUS
+												</TableCell>
+												<TableCell align="right" sx={{ borderBottom: "unset" }}>
+													{camelCaseToText(row.status)}
+												</TableCell>
+											</TableRow>
+										)}
+										<TableRow>
+											<TableCell component={"th"} sx={{ borderBottom: "unset" }}>
+												EXPECTED ARRIVAL
+											</TableCell>
+											<TableCell align="right" sx={{ borderBottom: "unset" }}>
+												{row.expectedArrival ?? "-"}
+											</TableCell>
+										</TableRow>
+										<TableRow>
+											{!isSmDown && <TableCell sx={{ borderBottom: "unset" }}>ACTIONS</TableCell>}
+											<TableCell colSpan={isSmDown ? 2 : 1} align={!isSmDown ? "center" : "right"} sx={{ borderBottom: "unset" }}>
+												<Box display="flex" justifyContent={isSmDown ? "center" : "flex-end"} mt={1}>
+													<IconButton sx={{ mx: 1 }}>
+														<PageviewRounded color="primary" />
+													</IconButton>
+													<IconButton sx={{ mx: 1 }}>
+														<MapRounded color="primary" />
+													</IconButton>
+													<Button
+														variant="contained"
+														sx={{
+															color: "white.main",
+															whiteSpace: "nowrap",
+															textOverflow: "ellipsis",
+															overflow: "hidden",
+															display: "block",
+															ml: 1,
+														}}
+														fullWidth
+														className={styles.dropShadow}
+													>
+														Track Order
+													</Button>
+												</Box>
+											</TableCell>
+										</TableRow>
+									</Table>
+								</TableContainer>
+							</Box>
+						</Collapse>
+					</TableCell>
+				</TableRow>
+			)}
+		</Fragment>
 	);
 }

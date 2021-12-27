@@ -1,9 +1,10 @@
-import { Box, Container, Typography, Grid, Button } from "@mui/material";
+import { Box, Container, Typography, Button } from "@mui/material";
 import styles from "styles/main.module.scss";
 import dashboardStyles from "styles/dashboard.module.scss";
 import AwesomeCarousel from "components/AwesomeCarousel";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MemberPageTemplate from "components/MemberPageTemplate";
+import PendingPaymentsBox from "components/PendingPaymentBox";
 
 export default function Dashboard() {
 	return (
@@ -12,39 +13,6 @@ export default function Dashboard() {
 			<PendingActionsBox sx={{ mt: 4 }} />
 			<PromotionsBox sx={{ mt: 4 }} />
 		</MemberPageTemplate>
-	);
-}
-
-function PendingPaymentsBox(props) {
-	return (
-		<Container {...props}>
-			<Box sx={{ borderColor: "border.main", borderWidth: 0.5, borderStyle: "solid", borderRadius: 4, py: 2, px: 4 }} className={styles.dropShadow}>
-				<Grid container>
-					<Grid item md={6} xs={12}>
-						<Typography color="text.main" fontWeight="500">
-							Pending Payment
-						</Typography>
-						<Typography variant="h4" fontWeight="500" my={2} color="primary">
-							$30.00
-						</Typography>
-						<Typography variant="caption" color="lightGrey.main" display="flex">
-							Amount Due: $30.00
-						</Typography>
-						<Typography variant="caption" color="lightGrey.main" display="flex">
-							Due by: 01/01/2021
-						</Typography>
-					</Grid>
-					<Grid item md={6} xs={12} alignItems="flex-end" justifyContent="center" display="flex" flexDirection="column">
-						<Button variant="contained" sx={{ maxWidth: 256, mb: 2 }} style={{ color: "white" }} fullWidth>
-							Pay Now
-						</Button>
-						<Button variant="outlined" sx={{ maxWidth: 256 }} fullWidth>
-							View Bill
-						</Button>
-					</Grid>
-				</Grid>
-			</Box>
-		</Container>
 	);
 }
 
@@ -81,7 +49,7 @@ function PendingActionsBox(props) {
 	return (
 		<Container {...props}>
 			<Box sx={{ borderColor: "border.main", borderWidth: 0.5, borderStyle: "solid", borderRadius: 4, py: 2, px: 4 }} className={styles.dropShadow}>
-				<Typography color="text.main" fontWeight="500" mb={2}>
+				<Typography color="text.main" fontWeight="500" mb={2} sx={{ textAlign: { xs: "center", sm: "left" } }}>
 					Pending Actions
 				</Typography>
 				<AwesomeCarousel cssModule={dashboardStyles} bullets={false} infinite={false} media={getSlides()} />
@@ -93,11 +61,12 @@ function PendingActionsBox(props) {
 function PromotionsBox(props) {
 	return (
 		<Container {...props}>
-			<Typography color="text.main" fontWeight="500" mb={2}>
+			<Typography color="text.main" fontWeight="500" mb={2} sx={{ textAlign: { xs: "center", sm: "left" } }}>
 				Promotions
 			</Typography>
 			<AwesomeCarousel
 				className={styles.dropShadow}
+				bullets={false}
 				media={[
 					{
 						preload: ["https://caferati.me/images/series/bojack-0.png"],
@@ -111,9 +80,7 @@ function PromotionsBox(props) {
 								height="100%"
 								sx={{ background: "url(https://caferati.me/images/series/bojack-0.png) center no-repeat", backgroundSize: "cover" }}
 							>
-								<Typography variant="h3" sx={{ color: "#FFFFFF", bgcolor: "primary.main" }}>
-									Your Advert Space Here!
-								</Typography>
+								<Typography sx={{ fontSize: { sm: "1.5rem", md: "2rem" }, color: "#FFFFFF", bgcolor: "primary.main" }}>Your Advert Space Here!</Typography>
 							</Box>
 						),
 					},
@@ -129,9 +96,7 @@ function PromotionsBox(props) {
 								height="100%"
 								sx={{ background: "url(https://caferati.me/images/series/bojack-1.png) center no-repeat", backgroundSize: "cover" }}
 							>
-								<Typography variant="h3" sx={{ color: "#FFFFFF", bgcolor: "primary.main" }}>
-									Your Advert Space Here!
-								</Typography>
+								<Typography sx={{ fontSize: { sm: "1.5rem", md: "2rem" }, color: "#FFFFFF", bgcolor: "primary.main" }}>Your Advert Space Here!</Typography>
 							</Box>
 						),
 					},
@@ -147,9 +112,7 @@ function PromotionsBox(props) {
 								height="100%"
 								sx={{ background: "url(https://caferati.me/images/series/bojack-2.png) center no-repeat", backgroundSize: "cover" }}
 							>
-								<Typography variant="h3" sx={{ color: "#FFFFFF", bgcolor: "primary.main" }}>
-									Your Advert Space Here!
-								</Typography>
+								<Typography sx={{ fontSize: { sm: "1.5rem", md: "2rem" }, color: "#FFFFFF", bgcolor: "primary.main" }}>Your Advert Space Here!</Typography>
 							</Box>
 						),
 					},

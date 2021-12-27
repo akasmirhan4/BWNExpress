@@ -185,7 +185,7 @@ function LoginContainer(props) {
 					</Typography>
 					<Typography variant="body2" sx={{ color: "#FFFFFF", textAlign: { sm: "left", xs: "center" } }}>
 						Not a member yet?{" "}
-						<Link2 href="/register" prefetch={false}>
+						<Link2 href="/auth/register" prefetch={false}>
 							<Link color="#FFFFFF" sx={{ fontWeight: 700, cursor: "pointer" }}>
 								Sign Up
 							</Link>
