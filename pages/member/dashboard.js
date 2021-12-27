@@ -35,7 +35,14 @@ function PendingActionsBox(props) {
 							.filter((order, index) => index < ordersPerSlide * (n + 1) && index >= ordersPerSlide * n)
 							.map((order, index) => {
 								return (
-									<Button variant="contained" key={index} fullWidth sx={{ mx: 1, py: 2 }} style={{ color: "white" }} className={styles.dropShadow}>
+									<Button
+										variant="contained"
+										key={index}
+										fullWidth
+										sx={{ mx: 1, py: 2, fontSize: { xs: "0.5rem", sm: "1rem" } }}
+										style={{ color: "white" }}
+										className={styles.dropShadow}
+									>
 										{order}
 									</Button>
 								);

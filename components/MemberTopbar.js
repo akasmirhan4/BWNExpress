@@ -35,7 +35,7 @@ export default function MemberTopbar(props) {
 							{!isMdDown && (
 								<Box>
 									<Typography variant="h4" sx={{ color: "secondaryAccent.main" }} fontWeight="bold">
-										{`Hello, ${userData?.preferredName ?? "Unknown"}!`}
+										{`Hello, ${userData?.preferredName ?? "..."}!`}
 									</Typography>
 									<Typography variant="caption" whiteSpace="pre-wrap">
 										{`${userData?.email ?? "..."}  |  ${userData?.phoneNo ?? "..."}`}

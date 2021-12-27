@@ -260,7 +260,7 @@ export default function UploadIC(params) {
 					</Box>
 					<Grid container spacing={2}>
 						<Grid item xs={6}>
-							<Link2 href="/home" prefetch={false}>
+							<Link2 href="/dashboard" prefetch={false}>
 								<Button
 									fullWidth
 									variant="contained"

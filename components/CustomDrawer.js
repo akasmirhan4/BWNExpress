@@ -21,21 +21,20 @@ export default function CustomDrawer(props) {
 
 	useEffect(() => {
 		if (userData) {
-			switch (userData.userVerifiedLevel) {
-				case 0:
-				case 1:
-					setVerifyStatus("unverified");
-					break;
-				case 1.5:
+			let ICVerified = false;
+			switch (userData.verified.IC) {
+				case "pending":
 					setVerifyStatus("pending");
 					break;
-				case 2:
-				case 3:
-					setVerifyStatus("verified");
+				case "unverified":
+					setVerifyStatus("unverified");
 					break;
-				default:
-					setVerifyStatus("unknown");
+				case true:
+					ICVerified = true;
 					break;
+			}
+			if (userData.verified.email && ICVerified) {
+				setVerifyStatus("verified");
 			}
 		}
 	}, [userData]);
@@ -63,28 +62,31 @@ export default function CustomDrawer(props) {
 					<Typography className={styles.companyName} color="white.main">
 						{"BWNEXPRESS"}
 					</Typography>
-					<Button fullWidth sx={{ color: "secondaryAccent.main" }}>
-						<Typography variant="caption" sx={{ color: palette.white.main }}>
-							{"member"} <span className={styles[verifyStatus]}>{verifyStatus}</span>
-						</Typography>
-					</Button>
+					<Link prefetch={false} href="verification" passHref>
+						<Button fullWidth sx={{ color: "secondaryAccent.main" }}>
+							<Typography variant="caption" sx={{ color: palette.white.main }}>
+								{"member"} <span className={styles[verifyStatus]}>{verifyStatus}</span>
+							</Typography>
+						</Button>
+					</Link>
 				</Box>
 
 				{/* CTA Button */}
 				{/* <Link href="new-order" prefetch={false}> */}
-				<Tooltip title={verifyStatus !== "verified" ? "Complete verification to place an order" : ""} placement="right" disableFocusListener disableTouchListener arrow>
+				<Tooltip title={verifyStatus !== "verified" ? `Verify account first` : ""} placement="right" arrow enterTouchDelay={0}>
 					<span>
-						<Button
-							disabled={verifyStatus !== "verified"}
-							variant="outlined"
-							color="secondaryAccent"
-							className={styles.dropShadow}
-							startIcon={<ShoppingCartIcon />}
-							fullWidth
-							onClick={() => toast.success("Order Placed!")}
-						>
-							{"PLACE AN ORDER"}
-						</Button>
+						<Link prefetch={false} href="new-order" passHref>
+							<Button
+								disabled={verifyStatus !== "verified"}
+								variant="outlined"
+								color="secondaryAccent"
+								className={styles.dropShadow}
+								startIcon={<ShoppingCartIcon />}
+								fullWidth
+							>
+								{"PLACE AN ORDER"}
+							</Button>
+						</Link>
 					</span>
 				</Tooltip>
 				{/* </Link> */}
