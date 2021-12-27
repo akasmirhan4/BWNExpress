@@ -1,4 +1,4 @@
-import { ExpandMoreRounded } from "@mui/icons-material";
+import { ExpandMoreRounded, MapRounded, PageviewRounded } from "@mui/icons-material";
 import { DateRangePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import {
@@ -6,6 +6,7 @@ import {
 	AccordionDetails,
 	AccordionSummary,
 	Box,
+	Button,
 	Checkbox,
 	Container,
 	FormControl,
@@ -13,15 +14,21 @@ import {
 	FormGroup,
 	FormLabel,
 	Grid,
+	IconButton,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
 	TextField,
 	Typography,
 } from "@mui/material";
 import MemberPageTemplate from "components/MemberPageTemplate";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import styles from "styles/main.module.scss";
 
 export default function MyOrders() {
-	const allStatus = ["pending action", "processing permit", "delivering", "delivered", "in transit"];
 	const [status, setStatus] = useState({
 		pendingAction: false,
 		processingPermit: false,
@@ -38,11 +45,52 @@ export default function MyOrders() {
 		});
 	};
 
+	function createData(orderID, dateSubmitted, status, expectedArrival) {
+		return { orderID, dateSubmitted, status, expectedArrival };
+	}
+
+	function camelCaseToText(camel) {
+		const result = camel.replace(/([A-Z])/g, " $1");
+		const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
+		return finalResult;
+	}
+
+	const rows = [
+		createData("BWN123456", new Date().toLocaleDateString(), "pendingAction", null),
+		createData("BWN123457", new Date().toLocaleDateString(), "processingPermit", "3 days"),
+		createData("BWN123458", new Date().toLocaleDateString(), "delivered", null),
+	];
+
+	const [displayedRows, setDisplayedRows] = useState(rows);
+
+	useEffect(() => {
+		const isStatusSelected = Object.values(status).some((e) => e);
+		const isDateFilterFilled = dateFilter.some((e) => !!e);
+		if (!isStatusSelected && !isDateFilterFilled) setDisplayedRows(rows);
+		let filteredRows = rows;
+		if (isStatusSelected) {
+			const selectedStatus = Object.keys(status).filter((key) => status[key]);
+			filteredRows = rows.filter((row) => selectedStatus.includes(row.status));
+		}
+		if (isDateFilterFilled) {
+			const startingDate = dateFilter[0] ?? null;
+			const endingDate = dateFilter[1] ?? null;
+			if (startingDate && endingDate) {
+				filteredRows = filteredRows.filter((row) => new Date(row.dateSubmitted) >= startingDate && new Date(row.dateSubmitted) <= endingDate);
+			} else if (startingDate) {
+				filteredRows = filteredRows.filter((row) => new Date(row.dateSubmitted) >= startingDate);
+			} else {
+				filteredRows = filteredRows.filter((row) => new Date(row.dateSubmitted) <= endingDate);
+			}
+		}
+		setDisplayedRows(filteredRows);
+	}, [status, dateFilter]);
+
 	return (
 		<MemberPageTemplate>
 			<Container sx={{ my: 4 }}>
 				{/* Filter Container */}
-				<Accordion className={styles.dropShadow} sx={{ borderWidth: 1, borderStyle: "solid" }}>
+				<Accordion className={styles.dropShadow} sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightgray", mb: 4 }}>
 					<AccordionSummary expandIcon={<ExpandMoreRounded />}>
 						<Typography>Filter</Typography>
 					</AccordionSummary>
@@ -93,6 +141,42 @@ export default function MyOrders() {
 					</AccordionDetails>
 				</Accordion>
 				{/* Order Table */}
+				<TableContainer>
+					<Table size="small">
+						<TableHead>
+							<TableRow>
+								<TableCell>ORDER ID</TableCell>
+								<TableCell>DATE SUBMITTED</TableCell>
+								<TableCell>STATUS</TableCell>
+								<TableCell>EXPECTED ARRIVAL</TableCell>
+								<TableCell align="right">ACTIONS</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{displayedRows.map((row) => (
+								<TableRow key={row.orderID} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+									<TableCell component="th" scope="row">
+										{row.orderID}
+									</TableCell>
+									<TableCell>{row.dateSubmitted}</TableCell>
+									<TableCell>{camelCaseToText(row.status)}</TableCell>
+									<TableCell>{row.expectedArrival ?? "-"}</TableCell>
+									<TableCell align="right">
+										<IconButton>
+											<PageviewRounded color="primary" />
+										</IconButton>
+										<IconButton sx={{ ml: 1 }}>
+											<MapRounded color="primary" />
+										</IconButton>
+										<Button variant="contained" sx={{ color: "white.main", ml: 1 }} className={styles.dropShadow}>
+											Track Order
+										</Button>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
 			</Container>
 		</MemberPageTemplate>
 	);
