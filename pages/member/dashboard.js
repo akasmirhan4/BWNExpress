@@ -5,6 +5,7 @@ import AwesomeCarousel from "components/AwesomeCarousel";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import PendingPaymentsBox from "components/PendingPaymentBox";
+import ImageWithSkeleton from "components/ImageWithSkeleton";
 
 export default function Dashboard() {
 	return (
@@ -59,6 +60,7 @@ function PendingActionsBox(props) {
 }
 
 function PromotionsBox(props) {
+	const promoImgs = ["bojack-0.png", "bojack-1.png", "bojack-2.png"];
 	return (
 		<Container {...props}>
 			<Typography color="text.main" fontWeight="500" mb={2} sx={{ textAlign: { xs: "center", sm: "left" } }}>
@@ -67,56 +69,18 @@ function PromotionsBox(props) {
 			<AwesomeCarousel
 				className={styles.dropShadow}
 				bullets={false}
-				media={[
-					{
-						preload: ["https://caferati.me/images/series/bojack-0.png"],
+				media={promoImgs.map((img) => {
+					return {
+						preload: [`/pngs/promotions/${img}`],
 						className: dashboardStyles.slide,
 						children: (
-							<Box
-								justifyContent="center"
-								alignItems="center"
-								display="flex"
-								width="100%"
-								height="100%"
-								sx={{ background: "url(https://caferati.me/images/series/bojack-0.png) center no-repeat", backgroundSize: "cover" }}
-							>
+							<Box justifyContent="center" alignItems="center" display="flex" width="100%" height="100%" zIndex={0} position="relative">
 								<Typography sx={{ fontSize: { sm: "1.5rem", md: "2rem" }, color: "#FFFFFF", bgcolor: "primary.main" }}>Your Advert Space Here!</Typography>
+								<ImageWithSkeleton src={`/pngs/promotions/${img}`} objectFit="cover" layout="fill" containersx={{ position: "absolute", zIndex: -1 }} />
 							</Box>
 						),
-					},
-					{
-						preload: ["https://caferati.me/images/series/bojack-1.png"],
-						className: dashboardStyles.slide,
-						children: (
-							<Box
-								justifyContent="center"
-								alignItems="center"
-								display="flex"
-								width="100%"
-								height="100%"
-								sx={{ background: "url(https://caferati.me/images/series/bojack-1.png) center no-repeat", backgroundSize: "cover" }}
-							>
-								<Typography sx={{ fontSize: { sm: "1.5rem", md: "2rem" }, color: "#FFFFFF", bgcolor: "primary.main" }}>Your Advert Space Here!</Typography>
-							</Box>
-						),
-					},
-					{
-						preload: ["https://caferati.me/images/series/bojack-2.png"],
-						className: dashboardStyles.slide,
-						children: (
-							<Box
-								justifyContent="center"
-								alignItems="center"
-								display="flex"
-								width="100%"
-								height="100%"
-								sx={{ background: "url(https://caferati.me/images/series/bojack-2.png) center no-repeat", backgroundSize: "cover" }}
-							>
-								<Typography sx={{ fontSize: { sm: "1.5rem", md: "2rem" }, color: "#FFFFFF", bgcolor: "primary.main" }}>Your Advert Space Here!</Typography>
-							</Box>
-						),
-					},
-				]}
+					};
+				})}
 			/>
 		</Container>
 	);
