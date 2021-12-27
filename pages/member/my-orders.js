@@ -87,6 +87,7 @@ export default function MyOrders() {
 				filteredRows = filteredRows.filter((row) => new Date(row.dateSubmitted) <= endingDate);
 			}
 		}
+		console.log(filteredRows);
 		setDisplayedRows(filteredRows);
 	}, [status, dateFilter]);
 
@@ -166,34 +167,59 @@ export default function MyOrders() {
 								const [collapseOpen, setCollapseOpen] = useState(false);
 
 								return (
-									<TableRow key={row.orderID} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+									<Fragment>
+										<TableRow key={row.orderID} sx={{ "& > *": { borderBottom: "unset" } }}>
+											{isMdDown && (
+												<TableCell sx={{ px: 0 }}>
+													<IconButton aria-label="expand row" size="small" onClick={() => setCollapseOpen(!collapseOpen)}>
+														{collapseOpen ? <KeyboardArrowUpRounded /> : <KeyboardArrowDownRounded />}
+													</IconButton>
+												</TableCell>
+											)}
+											<TableCell component="th" scope="row">
+												{row.orderID}
+											</TableCell>
+											<TableCell>{row.dateSubmitted}</TableCell>
+											{!isSmDown && <TableCell>{camelCaseToText(row.status)}</TableCell>}
+											{!isMdDown && <TableCell>{row.expectedArrival ?? "-"}</TableCell>}
+											{!isMdDown && (
+												<TableCell align="right">
+													<IconButton>
+														<PageviewRounded color="primary" />
+													</IconButton>
+													<IconButton sx={{ ml: 1 }}>
+														<MapRounded color="primary" />
+													</IconButton>
+													<Button variant="contained" sx={{ color: "white.main", ml: 1 }} className={styles.dropShadow}>
+														Track Order
+													</Button>
+												</TableCell>
+											)}
+										</TableRow>
 										{isMdDown && (
-											<TableCell sx={{px: 0}}>
-												<IconButton aria-label="expand row" size="small" onClick={() => setCollapseOpen(!collapseOpen)}>
-													{collapseOpen ? <KeyboardArrowUpRounded /> : <KeyboardArrowDownRounded />}
-												</IconButton>
-											</TableCell>
+											<TableRow>
+												<TableCell colSpan={"100%"} sx={{ py: 0 }}>
+													<Collapse in={collapseOpen} timeout="auto" unmountOnExit>
+														<Box m={1}>
+															<Typography variant="h8">Details:</Typography>
+															<TableContainer>
+																<Table size="small">
+																	<TableRow>
+																		<TableCell component={"th"}>Test</TableCell>
+																		<TableCell>Test</TableCell>
+																	</TableRow>
+																	<TableRow>
+																		<TableCell component={"th"}>Test2</TableCell>
+																		<TableCell>Test2</TableCell>
+																	</TableRow>
+																</Table>
+															</TableContainer>
+														</Box>
+													</Collapse>
+												</TableCell>
+											</TableRow>
 										)}
-										<TableCell component="th" scope="row">
-											{row.orderID}
-										</TableCell>
-										<TableCell>{row.dateSubmitted}</TableCell>
-										{!isSmDown && <TableCell>{camelCaseToText(row.status)}</TableCell>}
-										{!isMdDown && <TableCell>{row.expectedArrival ?? "-"}</TableCell>}
-										{!isMdDown && (
-											<TableCell align="right">
-												<IconButton>
-													<PageviewRounded color="primary" />
-												</IconButton>
-												<IconButton sx={{ ml: 1 }}>
-													<MapRounded color="primary" />
-												</IconButton>
-												<Button variant="contained" sx={{ color: "white.main", ml: 1 }} className={styles.dropShadow}>
-													Track Order
-												</Button>
-											</TableCell>
-										)}
-									</TableRow>
+									</Fragment>
 								);
 							})}
 						</TableBody>
