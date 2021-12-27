@@ -197,20 +197,56 @@ export default function MyOrders() {
 											)}
 										</TableRow>
 										{isMdDown && (
-											<TableRow>
-												<TableCell colSpan={"100%"} sx={{ py: 0 }}>
+											<TableRow sx={{ bgcolor: "offWhite.secondary" }}>
+												<TableCell colSpan={"100%"} sx={{ py: 0, borderBottom: "unset" }}>
 													<Collapse in={collapseOpen} timeout="auto" unmountOnExit>
-														<Box m={1}>
-															<Typography variant="h8">Details:</Typography>
+														<Box m={2}>
 															<TableContainer>
 																<Table size="small">
+																	{isSmDown && (
+																		<TableRow>
+																			<TableCell component={"th"} sx={{ borderBottom: "unset" }}>
+																				STATUS
+																			</TableCell>
+																			<TableCell align="right" sx={{ borderBottom: "unset" }}>
+																				{camelCaseToText(row.status)}
+																			</TableCell>
+																		</TableRow>
+																	)}
 																	<TableRow>
-																		<TableCell component={"th"}>Test</TableCell>
-																		<TableCell>Test</TableCell>
+																		<TableCell component={"th"} sx={{ borderBottom: "unset" }}>
+																			EXPECTED ARRIVAL
+																		</TableCell>
+																		<TableCell align="right" sx={{ borderBottom: "unset" }}>
+																			{row.expectedArrival ?? "-"}
+																		</TableCell>
 																	</TableRow>
 																	<TableRow>
-																		<TableCell component={"th"}>Test2</TableCell>
-																		<TableCell>Test2</TableCell>
+																		{!isSmDown && <TableCell sx={{ borderBottom: "unset" }}>ACTIONS</TableCell>}
+																		<TableCell colSpan={isSmDown ? 2 : 1} align={!isSmDown ? "center" : "right"} sx={{ borderBottom: "unset" }}>
+																			<Box display="flex" justifyContent={"space-around"} mt={1}>
+																				<IconButton>
+																					<PageviewRounded color="primary" />
+																				</IconButton>
+																				<IconButton>
+																					<MapRounded color="primary" />
+																				</IconButton>
+																				<Button
+																					variant="contained"
+																					sx={{
+																						color: "white.main",
+																						whiteSpace: "nowrap",
+																						textOverflow: "ellipsis",
+																						overflow: "hidden",
+																						maxWidth: "30vw",
+																						display: "block",
+																					}}
+																					className={styles.dropShadow}
+																				>
+																					Track Order
+																				</Button>
+																			</Box>
+																		</TableCell>
 																	</TableRow>
 																</Table>
 															</TableContainer>
