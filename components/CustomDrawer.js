@@ -54,7 +54,7 @@ export default function CustomDrawer(props) {
 			>
 				{/* Top part of the drawer */}
 				<Box display="flex" flexDirection="column" alignItems="center" mb={2} width="100%">
-					<Link prefetch={false} href="dashboard" passHref>
+					<Link prefetch={false} href="/member/dashboard" passHref>
 						<IconButton sx={{ borderRadius: 4, p: 1, m: 1 }}>
 							<Image src={Logo} alt="Company Logo" />
 						</IconButton>
@@ -62,7 +62,7 @@ export default function CustomDrawer(props) {
 					<Typography className={styles.companyName} color="white.main">
 						{"BWNEXPRESS"}
 					</Typography>
-					<Link prefetch={false} href="verification" passHref>
+					<Link prefetch={false} href="/member/verification" passHref>
 						<Button fullWidth sx={{ color: "secondaryAccent.main" }}>
 							<Typography variant="caption" sx={{ color: palette.white.main }}>
 								{"member"} <span className={styles[verifyStatus]}>{verifyStatus}</span>
@@ -93,9 +93,9 @@ export default function CustomDrawer(props) {
 
 				{/* main nav */}
 				<Box display="flex" flexDirection="column" width="100%" mt={4} flex={1}>
-					<DrawerButton startIcon={<Dashboard />} href="dashboard" label="Dashboard" />
-					<DrawerButton startIcon={<Inbox />} href="my-orders" label="My Orders" />
-					<DrawerButton startIcon={<SwapHoriz />} href="my-transactions" label="My Transactions" />
+					<DrawerButton startIcon={<Dashboard />} href="/member/dashboard" label="Dashboard" />
+					<DrawerButton startIcon={<Inbox />} href="/member/my-orders" label="My Orders" />
+					<DrawerButton startIcon={<SwapHoriz />} href="/member/my-transactions" label="My Transactions" />
 				</Box>
 
 				{/* setting nav */}

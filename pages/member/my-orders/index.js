@@ -23,15 +23,21 @@ import {
 	TableHead,
 	TableRow,
 	TextField,
+	Tooltip,
 	Typography,
 	useMediaQuery,
 } from "@mui/material";
 import MemberPageTemplate from "components/MemberPageTemplate";
+import { auth, getOrders } from "lib/firebase";
+import { selectUser, setOrders } from "lib/slices/userSlice";
 import { Fragment, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styles from "styles/main.module.scss";
+import Link from "next/link";
 
 export default function MyOrders() {
 	const [status, setStatus] = useState({
+		awaitingParcel: false,
 		pendingAction: false,
 		processingPermit: false,
 		delivering: false,
@@ -47,19 +53,12 @@ export default function MyOrders() {
 		});
 	};
 
-	function createData(orderID, dateSubmitted, status, expectedArrival) {
-		return { orderID, dateSubmitted, status, expectedArrival };
-	}
-
-	const rows = [
-		createData("BWN123456", new Date().toLocaleDateString(), "pendingAction", null),
-		createData("BWN123457", new Date().toLocaleDateString(), "processingPermit", "3 days"),
-		createData("BWN123458", new Date().toLocaleDateString(), "delivered", null),
-	];
-
+	const [rows, setRows] = useState([]);
+	const user = useSelector(selectUser);
 	const [displayedRows, setDisplayedRows] = useState(rows);
 	const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
 	const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		const isStatusSelected = Object.values(status).some((e) => e);
@@ -84,6 +83,26 @@ export default function MyOrders() {
 		console.log(filteredRows);
 		setDisplayedRows(filteredRows);
 	}, [status, dateFilter]);
+
+	useEffect(() => {
+		if (user) {
+			getOrders().then((orders) => {
+				if (!orders) return;
+				dispatch(setOrders(orders));
+				const _rows = orders.map(({ orderID, dateSubmitted, status, estimatedDuration }) => {
+					return {
+						orderID,
+						dateSubmitted: new Date(dateSubmitted.seconds * 1000 + dateSubmitted.nanoseconds / 1000000).toLocaleDateString(),
+						status,
+						estimatedDuration,
+					};
+				});
+				console.log(_rows);
+				setRows(_rows);
+				setDisplayedRows(_rows);
+			});
+		}
+	}, [user]);
 
 	return (
 		<MemberPageTemplate>
@@ -112,6 +131,10 @@ export default function MyOrders() {
 										<FormControlLabel control={<Checkbox checked={status.delivering} onChange={handleStatusChange} name="delivering" />} label="Delivering" />
 										<FormControlLabel control={<Checkbox checked={status.delivered} onChange={handleStatusChange} name="delivered" />} label="Delivered" />
 										<FormControlLabel control={<Checkbox checked={status.inTransit} onChange={handleStatusChange} name="inTransit" />} label="In Transit" />
+										<FormControlLabel
+											control={<Checkbox checked={status.awaitingParcel} onChange={handleStatusChange} name="awaitingParcel" />}
+											label="Awaiting Parcel"
+										/>
 									</FormGroup>
 								</FormControl>
 							</Grid>
@@ -148,7 +171,7 @@ export default function MyOrders() {
 								<TableCell>ORDER ID</TableCell>
 								<TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw", overflow: "hidden" }}>DATE SUBMITTED</TableCell>
 								{!isSmDown && <TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw" }}>STATUS</TableCell>}
-								{!isMdDown && <TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw" }}>EXPECTED ARRIVAL</TableCell>}
+								{!isMdDown && <TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw" }}>ESTIMATED DURATION</TableCell>}
 								{!isMdDown && (
 									<TableCell align="right" sx={{ minWidth: "18em" }}>
 										ACTIONS
@@ -195,15 +218,23 @@ function EnhancedTableRow(props) {
 				</TableCell>
 				<TableCell>{row.dateSubmitted}</TableCell>
 				{!isSmDown && <TableCell>{camelCaseToText(row.status)}</TableCell>}
-				{!isMdDown && <TableCell>{row.expectedArrival ?? "-"}</TableCell>}
+				{!isMdDown && <TableCell>{row.estimatedDuration ?? "-"}</TableCell>}
 				{!isMdDown && (
 					<TableCell align="right">
-						<IconButton>
-							<PageviewRounded color="primary" />
-						</IconButton>
-						<IconButton sx={{ ml: 1 }}>
-							<MapRounded color="primary" />
-						</IconButton>
+						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`} prefetch={false} passHref>
+							<Tooltip title="See more details" placement="top" arrow>
+								<IconButton>
+									<PageviewRounded color="primary" />
+								</IconButton>
+							</Tooltip>
+						</Link>
+						<Tooltip title="In Progress" placement="top" arrow>
+							<span>
+								<IconButton sx={{ ml: 1 }} disabled={true}>
+									<MapRounded color="lightGrey.secondary" />
+								</IconButton>
+							</span>
+						</Tooltip>
 						<Button variant="contained" sx={{ color: "white.main", ml: 1 }} className={styles.dropShadow}>
 							Track Order
 						</Button>
@@ -229,19 +260,26 @@ function EnhancedTableRow(props) {
 										)}
 										<TableRow>
 											<TableCell component={"th"} sx={{ borderBottom: "unset" }}>
-												EXPECTED ARRIVAL
+												ESTIMATED DURATION
 											</TableCell>
 											<TableCell align="right" sx={{ borderBottom: "unset" }}>
-												{row.expectedArrival ?? "-"}
+												{row.estimatedDuration ?? "-"}
 											</TableCell>
 										</TableRow>
 										<TableRow>
 											{!isSmDown && <TableCell sx={{ borderBottom: "unset" }}>ACTIONS</TableCell>}
 											<TableCell colSpan={isSmDown ? 2 : 1} align={!isSmDown ? "center" : "right"} sx={{ borderBottom: "unset" }}>
 												<Box display="flex" justifyContent={isSmDown ? "center" : "flex-end"} mt={1}>
-													<IconButton sx={{ mx: 1 }}>
-														<PageviewRounded color="primary" />
-													</IconButton>
+													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`} prefetch={false} passHref>
+														<IconButton
+															sx={{ mx: 1 }}
+															onClick={() => {
+																console.log(`/member/my-orders/${row.orderID}/details`);
+															}}
+														>
+															<PageviewRounded color="primary" />
+														</IconButton>
+													</Link>
 													<IconButton sx={{ mx: 1 }}>
 														<MapRounded color="primary" />
 													</IconButton>
