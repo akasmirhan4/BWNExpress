@@ -1,186 +1,55 @@
-import {
-	Box,
-	Container,
-	Typography,
-	Button,
-	Grid,
-	Breadcrumbs,
-	Link,
-	TextField,
-	FormHelperText,
-	Tooltip,
-	FormControl,
-	InputLabel,
-	Select,
-	MenuItem,
-	IconButton,
-} from "@mui/material";
+import { Box, Container, Typography, Breadcrumbs, Link, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
 import styles from "styles/main.module.scss";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
-import { forwardRef, Fragment, useEffect, useState } from "react";
-import { ChevronRightRounded, InfoRounded } from "@mui/icons-material";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import NumberFormat from "react-number-format";
 import { LoadingButton } from "@mui/lab";
 import { useDispatch, useSelector } from "react-redux";
-import { selectData, setData } from "lib/slices/newOrderSlice";
+import { selectData, selectIsAcknowledged } from "lib/slices/newOrderSlice";
 import { useRouter } from "next/router";
+import NewOrderSteppers from "components/NewOrderSteppers";
+import Image from "next/image";
+import { selectUserData } from "lib/slices/userSlice";
 
-export default function Verification() {
+export default function Summary() {
 	const dispatch = useDispatch();
 	const router = useRouter();
+
+	const isAcknowledged = useSelector(selectIsAcknowledged);
 	const newOrderData = useSelector(selectData);
-	const [purchaseFrom, setPurchaseFrom] = useState("");
-	const [itemCategory, setItemCategory] = useState("");
-	const [parcelValue, setParcelValue] = useState(null);
-	const [currency, setCurrency] = useState("MYR");
-	const [itemDescription, setItemDescription] = useState("");
-	const [courierProvider, setCourierProvider] = useState("");
-	const [specificCourierProvider, setSpecificCourierProvider] = useState("");
-	const [trackingNumber, setTrackingNumber] = useState("");
-	const [receipt, setReceipt] = useState(null);
-	const [paymentMethod, setPaymentMethod] = useState("");
-	const [remark, setRemark] = useState("");
-	const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-	const [errors, setErrors] = useState({
-		purchaseFrom: [],
-		itemCategory: [],
-		currency: [],
-		parcelValue: [],
-		itemDescription: [],
-		courierProvider: [],
-		specificCourierProvider: [],
-		trackingNumber: [],
-		receipt: [],
-		paymentMethod: [],
-	});
-
-	const [loading, setLoading] = useState(false);
+	const userData = useSelector(selectUserData);
+	const [receiptImage, setReceiptImage] = useState(null);
 
 	useEffect(() => {
-		function isTouchScreendevice() {
-			return "ontouchstart" in window || navigator.maxTouchPoints;
+		if (!isAcknowledged) {
+			toast("Redirecting...");
+			router.push("acknowledgement");
+		} else if (!newOrderData) {
+			toast("Redirecting...");
+			router.push("form");
+		} else {
+			console.log(newOrderData?.receipt);
+			readFileAsText(newOrderData.receipt).then((value) => {
+				setReceiptImage(value);
+			});
 		}
+	}, [newOrderData, isAcknowledged]);
 
-		if (isTouchScreendevice()) {
-			setIsTouchDevice(true);
-		}
-	}, []);
+	function readFileAsText(file) {
+		return new Promise(function (resolve, reject) {
+			let fr = new FileReader();
 
-	const itemCategories = [
-		"Facemasks",
-		"Disinfectant spray gun",
-		"Clothes",
-		"Socks",
-		"Pants",
-		"Bra",
-		"Panty",
-		"Shoes",
-		"Shoe accessories",
-		"Bags",
-		"Luggage",
-		"Cap",
-		"Belt",
-		"Scarf",
-		"Glove",
-		"Glasses",
-		"Contact Lens",
-		"Watch",
-		"Jewelleries",
-		"Skincare",
-		"Cosmetics",
-		"Hair care",
-		"Fragrance",
-		"Phone accessories",
-		"Mobile phone",
-		"Computer parts",
-		"Car Parts",
-		"Car care",
-		"Organizers",
-		"Daily items",
-		"Stationaries",
-		"Office supplies",
-		"Electronics (Household)",
-		"Decoration",
-		"Bed sheet",
-		"Household items",
-		"Toiletries",
-		"Camera accessories",
-		"Toys or models",
-		"Baby items",
-		"Baby chair",
-		"Furniture",
-		"Cleaning items",
-		"Music instruments",
-		"Fitness gear",
-		"Renovation material",
-		"Electronic parts",
-		"Garden supplies",
-		"Machine parts",
-		"Camping stuff",
-		"Snack",
-		"Dried Food",
-		"Tea",
-		"Coffee",
-		"Supplements",
-		"Can Drinks",
-		"Bicycle",
-		"Pet supply",
-		"Fishing supply",
-		"Hair trimming supply",
-		"Games",
-		"Kitchenware",
-		"Books",
-		"Sports Equipment",
-		"Medical Use",
-	].sort();
-	const currencies = ["MYR", "BND", "SGD", "USD"];
-	const couriers = ["ABX", "ARAMEX", "GDEX", "Ninja Van", "Pos Laju", "Singpost", "J&T", "Others"];
-	const paymentMethods = ["Card Transfer", "Bank Transfer", "Cash Payment", "None"];
+			fr.onload = function () {
+				resolve(fr.result);
+			};
 
-	function validateInputs() {
-		const currencyRegex = /^(0|[1-9][0-9]{0,2})(,\d{3})*(\.\d{2})?$/;
-		let _errors = {
-			purchaseFrom: [],
-			itemCategory: [],
-			currency: [],
-			parcelValue: [],
-			itemDescription: [],
-			courierProvider: [],
-			specificCourierProvider: [],
-			trackingNumber: [],
-			receipt: [],
-			paymentMethod: [],
-		};
+			fr.onerror = function () {
+				reject(fr);
+			};
 
-		if (!purchaseFrom) _errors.purchaseFrom.push("This is required");
-		if (!itemCategory) _errors.itemCategory.push("This is required");
-		if (!currency) _errors.currency.push("This is required");
-		if (!parcelValue) {
-			_errors.parcelValue.push("This is required");
-		} else if (!currencyRegex.test(parcelValue)) {
-			_errors.parcelValue.push("Invalid format");
-		}
-		if (!itemDescription) {
-			_errors.itemDescription.push("This is required");
-		} else if (itemDescription.length < 10) {
-			_errors.itemDescription.push("Need more details");
-		}
-		if (!courierProvider) _errors.courierProvider.push("This is required");
-		if (courierProvider == "Others") {
-			if (!specificCourierProvider) _errors.specificCourierProvider.push("This is required");
-		}
-		if (!trackingNumber) _errors.trackingNumber.push("This is required");
-
-		if (!receipt) _errors.receipt.push("This is required");
-		if (!!paymentMethod && !paymentMethods.includes(paymentMethod)) _errors.paymentMethod.push("Unknown method");
-
-		if (!!Object.values(_errors).reduce((a, v) => a + v.length, 0)) {
-			toast.error("Please remove the errors to continue");
-		}
-		setErrors(_errors);
+			fr.readAsDataURL(file);
+		});
 	}
 
 	return (
@@ -188,47 +57,102 @@ export default function Verification() {
 			<Container sx={{ pt: 4 }}>
 				<Box display={"flex"} justifyContent="space-between" alignItems={"center"} sx={{ mb: 4 }}>
 					<Breadcrumbs aria-label="breadcrumb">
-						<NextLink href="/member/dashboard" prefetch={false} passHref>
+						<NextLink href="dashboard" prefetch={false} passHref>
 							<Link underline="hover" color="inherit">
 								Home
 							</Link>
 						</NextLink>
-						<NextLink href="/member/new-order" prefetch={false} passHref>
-							<Link underline="hover" color="inherit">
-								New Order
-							</Link>
-						</NextLink>
-						<Typography color="text.primary">Summary</Typography>
+						<Typography color="text.primary">New Order</Typography>
 					</Breadcrumbs>
+				</Box>
+				<NewOrderSteppers sx={{ my: 4 }} activeStep={2} />
+				{/* ORDER FORM */}
+				<Box
+					py={4}
+					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 } }}
+					display={"flex"}
+					flexDirection={"column"}
+					width={"100%"}
+					bgcolor={"white.main"}
+					borderRadius={4}
+					className={styles.dropShadow}
+				>
+					<Typography sx={{ my: 2 }}>Summary</Typography>
+					<TableContainer>
+						<Table size="small">
+							<TableBody>
+								<TableRow>
+									<TableCell component={"th"}>Purchase From</TableCell>
+									<TableCell>{newOrderData?.purchaseFrom}</TableCell>
+								</TableRow>
+								<TableRow>
+									<TableCell component={"th"}>Item Category</TableCell>
+									<TableCell>{newOrderData?.itemCategory}</TableCell>
+								</TableRow>
+								<TableRow>
+									<TableCell component={"th"}>Parcel Value</TableCell>
+									<TableCell>{`${newOrderData?.currency} ${newOrderData?.parcelValue}`}</TableCell>
+								</TableRow>
+								<TableRow>
+									<TableCell component={"th"}>Description</TableCell>
+									<TableCell>{newOrderData?.itemDescription}</TableCell>
+								</TableRow>
+								<TableRow>
+									<TableCell component={"th"}>Courier Provider</TableCell>
+									<TableCell>{newOrderData?.courierProvider == "Others" ? newOrderData?.specificCourierProvider : newOrderData?.courierProvider}</TableCell>
+								</TableRow>
+								<TableRow>
+									<TableCell component={"th"}>Tracking Number</TableCell>
+									<TableCell>{newOrderData?.trackingNumber}</TableCell>
+								</TableRow>
+								<TableRow>
+									<TableCell component={"th"}>Payment Method</TableCell>
+									<TableCell>{newOrderData?.paymentMethod == "" ? "Select Soon" : newOrderData?.paymentMethod}</TableCell>
+								</TableRow>
+								<TableRow>
+									<TableCell component={"th"}>Delivery Method</TableCell>
+									<TableCell>{newOrderData?.deliveryMethod == "" ? "Select Soon" : newOrderData?.deliveryMethod}</TableCell>
+								</TableRow>
+								{newOrderData?.deliveryMethod == "Home Delivery" && (
+									<TableRow>
+										<TableCell component={"th"}>Delivery Address</TableCell>
+										<TableCell>{newOrderData?.deliveryAddress}</TableCell>
+									</TableRow>
+								)}
+								<TableRow>
+									<TableCell component={"th"}>Remark</TableCell>
+									<TableCell>{newOrderData?.remark}</TableCell>
+								</TableRow>
+							</TableBody>
+						</Table>
+					</TableContainer>
+					<Typography sx={{ mt: 4 }}>Receipt Preview</Typography>
+					<Box
+						width="100%"
+						minHeight={"48em"}
+						border="1px dashed"
+						borderColor="secondaryAccent.main"
+						display="flex"
+						justifyContent={"center"}
+						alignItems={"center"}
+						borderRadius={1}
+						position="relative"
+						bgcolor={"lightGrey.secondary"}
+						sx={{ zIndex: 0, my: 2 }}
+					>
+						{newOrderData?.receipt && ["image/jpeg", "image/png"].includes(newOrderData?.receipt.type) ? (
+							<Image src={URL.createObjectURL(newOrderData?.receipt)} alt="receipt" layout="fill" objectFit="contain" />
+						) : (
+							["application/pdf"].includes(newOrderData?.receipt.type) && (
+								<embed src={URL.createObjectURL(newOrderData?.receipt)} width="100%" height="100%" style={{ position: "absolute", zIndex: -1 }} />
+							)
+						)}
+						<Typography sx={{ bgcolor: "secondary.main", p: 1, color: "white.main", opacity: 0.8, fontSize: {xs: "0.7rem", sm: "1rem"} }} textAlign="center">
+							{newOrderData?.receipt ? newOrderData?.receipt.name : "..."}
+						</Typography>
+					</Box>
 				</Box>
 			</Container>
 		</MemberPageTemplate>
 	);
 }
-
-const NumberFormatCustom = forwardRef((props, ref) => {
-	const { onChange, ...other } = props;
-
-	return (
-		<NumberFormat
-			{...other}
-			getInputRef={ref}
-			onValueChange={(values) => {
-				onChange({
-					target: {
-						name: props.name,
-						value: values.value,
-					},
-				});
-			}}
-			thousandsGroupStyle="thousand"
-			isNumericString
-			decimalSeparator="."
-			displayType="input"
-			type="text"
-			thousandSeparator
-			decimalScale={2}
-			allowLeadingZeros={false}
-		/>
-	);
-});

@@ -75,7 +75,7 @@ export default function CustomDrawer(props) {
 				{/* <Link href="new-order" prefetch={false}> */}
 				<Tooltip title={verifyStatus !== "verified" ? `Verify account first` : ""} placement="right" arrow enterTouchDelay={0}>
 					<span>
-						<Link prefetch={false} href="new-order" passHref>
+						<Link prefetch={false} href="/member/new-order/acknowledgement" passHref>
 							<Button
 								disabled={verifyStatus !== "verified"}
 								variant="outlined"

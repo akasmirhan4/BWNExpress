@@ -63,7 +63,7 @@ function HeroContainer(props) {
 										className={styles.dropShadow}
 										sx={{ mr: 4, py: 2, fontSize: "1.25rem", fontWeight: "bold" }}
 									>
-										Download app
+										In progress
 									</Button>
 									<Link href="/auth/register" prefetch={false} passHref>
 										<Button
