@@ -29,6 +29,7 @@
 		"react-firebase-hooks": "^4.0.1",
 		"react-hot-toast": "^2.1.1",
 		"react-imask": "^6.2.2",
+		"react-number-format": "^4.9.0",
 		"react-redux": "^7.2.6",
 		"react-twitter-embed": "^3.0.3",
 		"react-visibility-sensor": "^5.1.1",
