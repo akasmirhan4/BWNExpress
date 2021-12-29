@@ -3,10 +3,8 @@ import { Box } from "@mui/system";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import React, { Fragment, useEffect, useState } from "react";
 import styles from "styles/main.module.scss";
-import { selectOrders, selectUser } from "lib/slices/userSlice";
-import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import { getLogTracker, getOrder } from "lib/firebase";
+import { auth, getLogTracker, getOrder } from "lib/firebase";
 import toast from "react-hot-toast";
 import NextLink from "next/link";
 import {
@@ -45,7 +43,6 @@ export default function Details() {
 
 function TrackerComponent(props) {
 	const router = useRouter();
-	const user = useSelector(selectUser);
 	const [orderData, setOrderData] = useState(null);
 	const [trackerLogs, setTrackerLogs] = useState([]);
 	const orderID = router.query.orderID;
@@ -53,11 +50,12 @@ function TrackerComponent(props) {
 	const [headerTitle, setHeaderTitle] = useState("...");
 
 	useEffect(() => {
-		if (user.uid) {
+		if (auth.currentUser?.uid) {
 			(async () => {
 				const results = await Promise.all([getLogTracker(orderID), getOrder(orderID)]);
 				if (!results[0] || !results[1]) {
 					toast.error("Error getting data. Redirecting...");
+					toast.error(auth.currentUser?.uid);
 					router.push("/member/my-orders");
 				} else {
 					setTrackerLogs(results[0]);
@@ -68,7 +66,7 @@ function TrackerComponent(props) {
 				}
 			})();
 		}
-	}, [user]);
+	}, [auth.currentUser]);
 
 	return (
 		<Box
@@ -94,7 +92,7 @@ function TrackerComponent(props) {
 					bgcolor: headerColor,
 				}}
 			>
-				<Typography color="white.main" sx={{ textTransform: "uppercase" }}>
+				<Typography color="white.main" sx={{ textTransform: "uppercase" }} textAlign={"center"}>
 					{headerTitle}
 				</Typography>
 				<Typography color="white.main" fontSize={"0.8rem"}>

@@ -298,22 +298,25 @@ function EnhancedTableRow(props) {
 															</IconButton>
 														</span>
 													</Tooltip>
-													<Button
-														variant="contained"
-														sx={{
-															color: "white.main",
-															whiteSpace: "nowrap",
-															textOverflow: "ellipsis",
-															overflow: "hidden",
-															display: "block",
-															ml: 1,
-															fontSize: { xs: "0.7rem", sm: "0.9rem" },
-														}}
-														fullWidth
-														className={styles.dropShadow}
-													>
-														Track Order
-													</Button>
+													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`} prefetch={false} passHref>
+														<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
+															<Button
+																variant="contained"
+																sx={{
+																	color: "white.main",
+																	whiteSpace: "nowrap",
+																	textOverflow: "ellipsis",
+																	overflow: "hidden",
+																	ml: 1,
+																	fontSize: { xs: "0.7rem", sm: "0.9rem" },
+																}}
+																fullWidth
+																className={styles.dropShadow}
+															>
+																Track Order
+															</Button>
+														</Tooltip>
+													</Link>
 												</Box>
 											</TableCell>
 										</TableRow>

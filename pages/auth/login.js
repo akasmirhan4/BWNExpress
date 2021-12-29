@@ -46,7 +46,6 @@ function LoginContainer(props) {
 					.signInWithEmailAndPassword(email, password)
 					.then(resolve)
 					.catch((error) => {
-						console.log(error);
 						switch (error.code) {
 							case "auth/invalid-email":
 								setEmailError("The email address is badly formatted");

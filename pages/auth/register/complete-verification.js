@@ -28,7 +28,6 @@ export default function CompleteVerification(params) {
 						if (error.code == "auth/invalid-action-code") {
 							toast.error("Invalid Auth. Please ensure you use the latest email link", { style: { textAlign: "center" } });
 						}
-						console.log(error);
 
 						// Some error occurred, you can inspect the code: error.code
 						// Common errors could be invalid email and invalid or expired OTPs.

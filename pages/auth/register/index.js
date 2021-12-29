@@ -153,7 +153,6 @@ function RegisterContainer(props) {
 
 									if (isValid) {
 										const response = await auth.createUserWithEmailAndPassword(email, password).catch((error) => {
-											console.log(error);
 											switch (error.code) {
 												case "auth/invalid-email":
 													setEmailError("The email address is badly formatted");
@@ -167,7 +166,6 @@ function RegisterContainer(props) {
 												default:
 													break;
 											}
-											console.log(JSON.stringify(error));
 										});
 									}
 								}}
