@@ -287,9 +287,13 @@ function EnhancedTableRow(props) {
 															<PageviewRounded color="primary" />
 														</IconButton>
 													</Link>
-													<IconButton sx={{ mx: 1 }}>
-														<MapRounded color="primary" />
-													</IconButton>
+													<Tooltip title="In Progress" placement="top" arrow>
+														<span>
+															<IconButton sx={{ mx: 1 }} disabled={true}>
+																<MapRounded color="lightGrey.secondary" />
+															</IconButton>
+														</span>
+													</Tooltip>
 													<Button
 														variant="contained"
 														sx={{

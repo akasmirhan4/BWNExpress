@@ -51,7 +51,7 @@ export default function OrderSummary(props) {
 						</TableRow>
 						<TableRow>
 							<TableCell component={"th"}>Parcel Value</TableCell>
-							<TableCell>{`${orderData?.currency} ${orderData?.parcelValue}`}</TableCell>
+							<TableCell>{`${orderData?.currency ?? "..."} ${orderData?.parcelValue ?? "..."}`}</TableCell>
 						</TableRow>
 						<TableRow>
 							<TableCell component={"th"}>Description</TableCell>
@@ -90,19 +90,18 @@ export default function OrderSummary(props) {
 			{receiptURL && (
 				<Box
 					width="100%"
-					minHeight={"48em"}
 					display="flex"
 					justifyContent={"center"}
 					alignItems={"center"}
 					borderRadius={1}
 					position="relative"
 					bgcolor={receiptLoaded && "lightGrey.secondary"}
-					sx={{ zIndex: 0, my: 2 }}
+					sx={{ zIndex: 0, my: 2, minHeight: { md: "48em", xs: "100vw" } }}
 				>
-					{!receiptLoaded && <Skeleton variant="rectangular" width={"100%"} height={"48em"} />}
+					{!receiptLoaded && <Skeleton variant="rectangular" width={"100%"} sx={{ height: { md: "48em", xs: "100vw" } }} />}
 					<Image
 						onLoadingComplete={() => {
-							setReceiptLoaded(true)
+							setReceiptLoaded(true);
 						}}
 						src={receiptURL}
 						alt="receipt"
