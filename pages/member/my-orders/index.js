@@ -82,7 +82,7 @@ export default function MyOrders() {
 			}
 		}
 		setDisplayedRows(filteredRows);
-	}, [status, dateFilter]);
+	}, [status, dateFilter, rows]);
 
 	useEffect(() => {
 		if (user) {

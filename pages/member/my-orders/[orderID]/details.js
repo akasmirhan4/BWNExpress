@@ -17,34 +17,34 @@ export default function Details() {
 	const user = useSelector(selectUser);
 	const [orderData, setOrderData] = useState(null);
 	const [receiptURL, setReceiptURL] = useState(null);
-	const getOrderData = async () => {
-		let isCached = false;
-		let success = false;
-		if (orders) {
-			const _orderData = orders.find((order) => order.orderID == router.query.orderID);
-			if (_orderData) {
-				setOrderData(_orderData);
-				isCached = true;
-				success = true;
-			}
-		}
-		if (!isCached) {
-			const _orderData = await getOrder(router.query.orderID);
-			if (_orderData) {
-				setOrderData(_orderData);
-				success = true;
-			}
-		}
-		if (!success) {
-			toast.error("Error getting data. Redirecting...");
-			router.push("/member/my-orders");
-		} else {
-			setReceiptURL(await getReceiptURL(router.query.orderID));
-		}
-	};
+	
 	useEffect(() => {
 		if (user.uid) {
-			getOrderData();
+			(async () => {
+				let isCached = false;
+				let success = false;
+				if (orders) {
+					const _orderData = orders.find((order) => order.orderID == router.query.orderID);
+					if (_orderData) {
+						setOrderData(_orderData);
+						isCached = true;
+						success = true;
+					}
+				}
+				if (!isCached) {
+					const _orderData = await getOrder(router.query.orderID);
+					if (_orderData) {
+						setOrderData(_orderData);
+						success = true;
+					}
+				}
+				if (!success) {
+					toast.error("Error getting data. Redirecting...");
+					router.push("/member/my-orders");
+				} else {
+					setReceiptURL(await getReceiptURL(router.query.orderID));
+				}
+			})();
 		}
 	}, [user]);
 

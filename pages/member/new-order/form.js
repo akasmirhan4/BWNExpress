@@ -358,7 +358,9 @@ export default function Verification() {
 										error={!!errors.itemCategory.length}
 									>
 										{itemCategories.map((category, index) => (
-											<MenuItem value={category} key={index} children={category} />
+											<MenuItem value={category} key={index}>
+												{category}
+											</MenuItem>
 										))}
 									</Select>
 								</FormControl>
@@ -384,7 +386,9 @@ export default function Verification() {
 										error={!!errors.currency.length}
 									>
 										{currencies.map((currency, index) => (
-											<MenuItem value={currency} key={index} children={currency} />
+											<MenuItem value={currency} key={index}>
+												{currency}
+											</MenuItem>
 										))}
 									</Select>
 								</FormControl>
@@ -481,7 +485,9 @@ export default function Verification() {
 										error={!!errors.courierProvider.length}
 									>
 										{couriers.map((courier, index) => (
-											<MenuItem value={courier} key={index} children={courier} />
+											<MenuItem value={courier} key={index}>
+												{courier}
+											</MenuItem>
 										))}
 									</Select>
 								</FormControl>
@@ -564,7 +570,8 @@ export default function Verification() {
 						</Grid>
 						<Grid item xs={12} md={6} order={{ xs: 11, md: 11 }}>
 							<FormHelperText>
-								Please ensure the image/pdf capture each items and its price in the package as well as the total price. If you have another parcel, please create another form.
+								Please ensure the image/pdf capture each items and its price in the package as well as the total price. If you have another parcel, please
+								create another form.
 							</FormHelperText>
 						</Grid>
 						<Grid item xs={12} md={6} order={{ xs: 12, md: 12 }}>
@@ -586,7 +593,9 @@ export default function Verification() {
 										required
 									>
 										{paymentMethods.map((method, index) => (
-											<MenuItem value={method} key={index} children={method} />
+											<MenuItem value={method} key={index}>
+												{method}
+											</MenuItem>
 										))}
 									</Select>
 								</FormControl>
@@ -618,7 +627,9 @@ export default function Verification() {
 										required
 									>
 										{deliveryMethods.map((method, index) => (
-											<MenuItem value={method} key={index} children={method} />
+											<MenuItem value={method} key={index}>
+												{method}
+											</MenuItem>
 										))}
 									</Select>
 								</FormControl>
