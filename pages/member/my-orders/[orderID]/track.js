@@ -22,6 +22,8 @@ import {
 	TouchAppRounded,
 } from "@mui/icons-material";
 import { cloneElement } from "react";
+import { selectUser } from "lib/slices/userSlice";
+import { useSelector } from "react-redux";
 
 export default function Details() {
 	return (
@@ -48,14 +50,18 @@ function TrackerComponent(props) {
 	const orderID = router.query.orderID;
 	const [headerColor, setHeaderColor] = useState("secondary.main");
 	const [headerTitle, setHeaderTitle] = useState("...");
+	const user = useSelector(selectUser);
 
 	useEffect(() => {
-		if (auth.currentUser?.uid) {
+		if (user.uid) {
 			(async () => {
-				const results = await Promise.all([getLogTracker(orderID), getOrder(orderID)]);
+				const results = await toast.promise(Promise.all([getLogTracker(orderID), getOrder(orderID)]), {
+					loading: "fetching data...",
+					success: "data loaded",
+					error: "error fetching data",
+				});
 				if (!results[0] || !results[1]) {
-					toast.error("Error getting data. Redirecting...");
-					toast.error(auth.currentUser?.uid);
+					toast.error("Data missing. Redirecting...");
 					router.push("/member/my-orders");
 				} else {
 					setTrackerLogs(results[0]);
@@ -66,7 +72,7 @@ function TrackerComponent(props) {
 				}
 			})();
 		}
-	}, [auth.currentUser]);
+	}, [user]);
 
 	return (
 		<Box
