@@ -25,7 +25,6 @@ function MiddleComponent(props) {
 	useEffect(() => {
 		auth.onAuthStateChanged(async (user) => {
             setIsLoading(true);
-			console.log("user change: ", !!user);
 			dispatch(setUser({ uid: user?.uid, emailVerified: user?.emailVerified }));
 			let _userData;
 			if (user) {

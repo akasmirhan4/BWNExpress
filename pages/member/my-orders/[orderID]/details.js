@@ -30,7 +30,6 @@ export default function Details() {
 		}
 		if (!isCached) {
 			const _orderData = await getOrder(router.query.orderID);
-			console.log({ _orderData });
 			if (_orderData) {
 				setOrderData(_orderData);
 				success = true;

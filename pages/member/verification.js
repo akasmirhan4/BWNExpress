@@ -8,7 +8,6 @@ import { selectUserData } from "lib/slices/userSlice";
 
 export default function Verification() {
 	const userData = useSelector(selectUserData);
-	console.log(userData);
 	const { userVerifiedLevel, verified } = userData || {};
 	return (
 		<MemberPageTemplate>

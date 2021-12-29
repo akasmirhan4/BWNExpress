@@ -11,7 +11,6 @@ export default function CompleteVerification(params) {
 	const user = auth.currentUser;
 
 	useEffect(() => {
-		console.log(user, user?.emailVerified);
 		if (user?.emailVerified) {
 			if (auth.isSignInWithEmailLink(window.location.href)) {
 				let email = window.localStorage.getItem("emailForSignIn");
@@ -21,9 +20,7 @@ export default function CompleteVerification(params) {
 				auth
 					.signInWithEmailLink(email, window.location.href)
 					.then(async (result) => {
-						console.log("test");
 						window.localStorage.removeItem("emailForSignIn");
-						console.log("test");
 						await firestore.collection("users").doc(auth.currentUser.uid).update({ "verified.email": true });
 						setIsValid(true);
 					})
@@ -58,29 +55,6 @@ export default function CompleteVerification(params) {
 			>
 				<Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
 					<Typography>{isLoading ? "loading..." : isValid ? "User Verification Complete" : "Error verifying..."}</Typography>
-					<Button
-						sx={{ minWidth: "16em", color: "#FFFFFF", mt: "1em" }}
-						variant="contained"
-						disabled={isLoading || isValid}
-						className={styles.dropShadow}
-						onClick={() => {
-							// router.push("/auth/register/send-verification");
-						}}
-					>
-						Send Again
-					</Button>
-					<Button
-						sx={{ minWidth: "16em", color: "#FFFFFF", mt: "1em" }}
-						variant="contained"
-						disabled={!isValid}
-						className={styles.dropShadow}
-						onClick={() => {
-							console.log(auth.currentUser.emailVerified);
-							// router.push("/auth/register/new-user");
-						}}
-					>
-						Continue
-					</Button>
 				</Container>
 			</Box>
 		</Box>

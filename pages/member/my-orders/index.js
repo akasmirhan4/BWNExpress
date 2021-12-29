@@ -69,6 +69,7 @@ export default function MyOrders() {
 			const selectedStatus = Object.keys(status).filter((key) => status[key]);
 			filteredRows = rows.filter((row) => selectedStatus.includes(row.status));
 		}
+
 		if (isDateFilterFilled) {
 			const startingDate = dateFilter[0] ?? null;
 			const endingDate = dateFilter[1] ?? null;
@@ -80,7 +81,6 @@ export default function MyOrders() {
 				filteredRows = filteredRows.filter((row) => new Date(row.dateSubmitted) <= endingDate);
 			}
 		}
-		console.log(filteredRows);
 		setDisplayedRows(filteredRows);
 	}, [status, dateFilter]);
 
@@ -97,7 +97,6 @@ export default function MyOrders() {
 						estimatedDuration,
 					};
 				});
-				console.log(_rows);
 				setRows(_rows);
 				setDisplayedRows(_rows);
 			});
@@ -142,7 +141,8 @@ export default function MyOrders() {
 								<Typography mb={1}>DATE</Typography>
 								<LocalizationProvider dateAdapter={AdapterDateFns}>
 									<DateRangePicker
-										inputFormat="dd-MMM-yyyy"
+										mask="__-__-____"
+										inputFormat="dd-MM-yyyy"
 										startText="Start Date"
 										endText="End Date"
 										value={dateFilter}
@@ -150,11 +150,21 @@ export default function MyOrders() {
 											setDateFilter(newDate);
 										}}
 										renderInput={(startProps, endProps) => (
-											<Fragment>
-												<TextField {...startProps} />
-												<Box sx={{ mx: 2 }}> to </Box>
-												<TextField {...endProps} />
-											</Fragment>
+											<Grid container spacing={2}>
+												<Grid item xs={12} md={5}>
+													<Box>
+														<TextField {...startProps}/>
+													</Box>
+												</Grid>
+												<Grid item xs={12} md={2} display={"flex"} sx={{ justifyContent: { md: "center", xs: "flex-start" } }} alignItems={"center"}>
+													<Box>to</Box>
+												</Grid>
+												<Grid item xs={12} md={5}>
+													<Box>
+														<TextField {...endProps} />
+													</Box>
+												</Grid>
+											</Grid>
 										)}
 									/>
 								</LocalizationProvider>
@@ -167,9 +177,9 @@ export default function MyOrders() {
 					<Table size="small">
 						<TableHead>
 							<TableRow>
-								{isMdDown && <TableCell />}
-								<TableCell>ORDER ID</TableCell>
-								<TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw", overflow: "hidden" }}>DATE SUBMITTED</TableCell>
+								{isMdDown && <TableCell sx={{ width: "1em" }} />}
+								<TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>ORDER ID</TableCell>
+								<TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "15vw", overflow: "hidden" }}>DATE SUBMITTED</TableCell>
 								{!isSmDown && <TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw" }}>STATUS</TableCell>}
 								{!isMdDown && <TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "10vw" }}>ESTIMATED DURATION</TableCell>}
 								{!isMdDown && (
@@ -207,16 +217,18 @@ function EnhancedTableRow(props) {
 		<Fragment>
 			<TableRow key={row.orderID} sx={{ "& > *": { borderBottom: "unset" } }}>
 				{isMdDown && (
-					<TableCell sx={{ px: 0 }}>
+					<TableCell sx={{ px: 0, width: "1em" }}>
 						<IconButton aria-label="expand row" size="small" onClick={() => setCollapseOpen(!collapseOpen)}>
 							{collapseOpen ? <KeyboardArrowUpRounded /> : <KeyboardArrowDownRounded />}
 						</IconButton>
 					</TableCell>
 				)}
-				<TableCell component="th" scope="row">
+				<TableCell component="th" scope="row" sx={{ overflow: "hidden", fontSize: { xs: "0.7rem", sm: "0.9rem" } }}>
 					{row.orderID}
 				</TableCell>
-				<TableCell>{row.dateSubmitted}</TableCell>
+				<TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", width: "15vw", overflow: "hidden", fontSize: { xs: "0.7rem", sm: "0.9rem" } }}>
+					{row.dateSubmitted}
+				</TableCell>
 				{!isSmDown && <TableCell>{camelCaseToText(row.status)}</TableCell>}
 				{!isMdDown && <TableCell>{row.estimatedDuration ?? "-"}</TableCell>}
 				{!isMdDown && (
@@ -235,7 +247,7 @@ function EnhancedTableRow(props) {
 								</IconButton>
 							</span>
 						</Tooltip>
-						<Button variant="contained" sx={{ color: "white.main", ml: 1 }} className={styles.dropShadow}>
+						<Button variant="contained" sx={{ color: "white.main", ml: 1, fontSize: { xs: "0.7rem", sm: "0.9rem" } }} className={styles.dropShadow}>
 							Track Order
 						</Button>
 					</TableCell>
@@ -253,7 +265,7 @@ function EnhancedTableRow(props) {
 												<TableCell component={"th"} sx={{ borderBottom: "unset" }}>
 													STATUS
 												</TableCell>
-												<TableCell align="right" sx={{ borderBottom: "unset" }}>
+												<TableCell align="right" sx={{ borderBottom: "unset", fontSize: { xs: "0.7rem", sm: "0.9rem" } }}>
 													{camelCaseToText(row.status)}
 												</TableCell>
 											</TableRow>
@@ -262,7 +274,7 @@ function EnhancedTableRow(props) {
 											<TableCell component={"th"} sx={{ borderBottom: "unset" }}>
 												ESTIMATED DURATION
 											</TableCell>
-											<TableCell align="right" sx={{ borderBottom: "unset" }}>
+											<TableCell align="right" sx={{ borderBottom: "unset", fontSize: { xs: "0.7rem", sm: "0.9rem" } }}>
 												{row.estimatedDuration ?? "-"}
 											</TableCell>
 										</TableRow>
@@ -271,12 +283,7 @@ function EnhancedTableRow(props) {
 											<TableCell colSpan={isSmDown ? 2 : 1} align={!isSmDown ? "center" : "right"} sx={{ borderBottom: "unset" }}>
 												<Box display="flex" justifyContent={isSmDown ? "center" : "flex-end"} mt={1}>
 													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`} prefetch={false} passHref>
-														<IconButton
-															sx={{ mx: 1 }}
-															onClick={() => {
-																console.log(`/member/my-orders/${row.orderID}/details`);
-															}}
-														>
+														<IconButton>
 															<PageviewRounded color="primary" />
 														</IconButton>
 													</Link>
@@ -292,6 +299,7 @@ function EnhancedTableRow(props) {
 															overflow: "hidden",
 															display: "block",
 															ml: 1,
+															fontSize: { xs: "0.7rem", sm: "0.9rem" },
 														}}
 														fullWidth
 														className={styles.dropShadow}

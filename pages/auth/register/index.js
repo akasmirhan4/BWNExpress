@@ -169,7 +169,6 @@ function RegisterContainer(props) {
 											}
 											console.log(JSON.stringify(error));
 										});
-										console.log(response);
 									}
 								}}
 							>

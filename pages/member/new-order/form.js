@@ -91,7 +91,6 @@ export default function Verification() {
 		setLoaded(true);
 	}, [newOrderData]);
 	useEffect(() => {
-		console.log({ userData: !!userData, newOrderData: !!newOrderData });
 		if (userData && !newOrderData) {
 			setDeliveryAddress(userData.deliveryAddress || userData.address || "missing delivery address");
 		}
@@ -235,7 +234,6 @@ export default function Verification() {
 		if (!parcelValue) {
 			_errors.parcelValue.push("This is required");
 		} else if (!currencyRegex.test(parcelValue)) {
-			console.log(parcelValue);
 			_errors.parcelValue.push("Invalid format");
 		}
 		if (!itemDescription) {

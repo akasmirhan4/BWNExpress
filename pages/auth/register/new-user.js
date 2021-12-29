@@ -81,7 +81,6 @@ function NewUserContainer(props) {
 			address: /.{10,}/s,
 		};
 
-		console.log(phoneNo);
 		if (regexPattern.fullName.test(fullName)) {
 			validity.fullName.valid = true;
 		} else {

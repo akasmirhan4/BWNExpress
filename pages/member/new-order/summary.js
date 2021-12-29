@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Breadcrumbs, Link, Table, TableBody, TableCell, TableContainer, TableRow, Checkbox, Grid, Button } from "@mui/material";
+import { Box, Container, Typography, Breadcrumbs, Link, Checkbox, Grid, Button } from "@mui/material";
 import styles from "styles/main.module.scss";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
@@ -9,8 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectData, selectIsAcknowledged, setSuccess } from "lib/slices/newOrderSlice";
 import { useRouter } from "next/router";
 import NewOrderSteppers from "components/NewOrderSteppers";
-import Image from "next/image";
-import { selectUserData } from "lib/slices/userSlice";
 import { ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
 import { functions, auth, storage } from "lib/firebase";
 import OrderSummary from "components/OrderSummary";
@@ -22,8 +20,6 @@ export default function Summary() {
 	const [isAccurate, setIsAccurate] = useState(false);
 	const isAcknowledged = useSelector(selectIsAcknowledged);
 	const newOrderData = useSelector(selectData);
-	const userData = useSelector(selectUserData);
-	const [receiptImage, setReceiptImage] = useState(null);
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
@@ -33,29 +29,8 @@ export default function Summary() {
 		} else if (!newOrderData) {
 			toast("Redirecting...");
 			router.push("form");
-		} else {
-			console.log(newOrderData?.receipt);
-			readFileAsText(newOrderData.receipt).then((value) => {
-				setReceiptImage(value);
-			});
 		}
 	}, [newOrderData, isAcknowledged]);
-
-	function readFileAsText(file) {
-		return new Promise(function (resolve, reject) {
-			let fr = new FileReader();
-
-			fr.onload = function () {
-				resolve(fr.result);
-			};
-
-			fr.onerror = function () {
-				reject(fr);
-			};
-
-			fr.readAsDataURL(file);
-		});
-	}
 
 	return (
 		<MemberPageTemplate>

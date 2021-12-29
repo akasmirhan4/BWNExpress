@@ -80,7 +80,6 @@ export default function MyTransactions() {
 				filteredRows = filteredRows.filter((row) => new Date(row.transactionDateTime) <= endingDate);
 			}
 		}
-		console.log(filteredRows);
 		setDisplayedRows(filteredRows);
 	}, [status, dateFilter]);
 

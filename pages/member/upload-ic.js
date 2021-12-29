@@ -80,7 +80,6 @@ export default function UploadIC(params) {
 										isUploadingLater={isUploadingLater}
 										onChange={(e) => {
 											const _files = e.currentTarget.files;
-											console.log("files: ", _files);
 											let _isValid = true;
 											if (!_files.length) return;
 											if (_files.length > 1) {
@@ -134,7 +133,6 @@ export default function UploadIC(params) {
 										isUploadingLater={isUploadingLater}
 										onChange={(e) => {
 											const _files = e.currentTarget.files;
-											console.log("files: ", _files);
 											let _isValid = true;
 											if (!_files.length) return;
 											if (_files.length > 1) {
@@ -177,7 +175,6 @@ export default function UploadIC(params) {
 											let newFiles = [...selectedFiles];
 											newFiles[1] = null;
 											setSelectedFiles(newFiles);
-											console.log(newFiles);
 										}}
 									/>
 								</Grid>
