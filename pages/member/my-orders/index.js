@@ -92,7 +92,7 @@ export default function MyOrders() {
 				const _rows = orders.map(({ orderID, dateSubmitted, status, estimatedDuration }) => {
 					return {
 						orderID,
-						dateSubmitted: new Date(dateSubmitted.seconds * 1000 + dateSubmitted.nanoseconds / 1000000).toLocaleDateString(),
+						dateSubmitted: new Date(dateSubmitted.seconds * 1000 + dateSubmitted.nanoseconds / 1000000).toISOString(),
 						status,
 						estimatedDuration,
 					};
@@ -153,7 +153,7 @@ export default function MyOrders() {
 											<Grid container spacing={2}>
 												<Grid item xs={12} md={5}>
 													<Box>
-														<TextField {...startProps}/>
+														<TextField {...startProps} />
 													</Box>
 												</Grid>
 												<Grid item xs={12} md={2} display={"flex"} sx={{ justifyContent: { md: "center", xs: "flex-start" } }} alignItems={"center"}>
@@ -227,7 +227,7 @@ function EnhancedTableRow(props) {
 					{row.orderID}
 				</TableCell>
 				<TableCell sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", width: "15vw", overflow: "hidden", fontSize: { xs: "0.7rem", sm: "0.9rem" } }}>
-					{row.dateSubmitted}
+					{new Date(row.dateSubmitted).toLocaleDateString()}
 				</TableCell>
 				{!isSmDown && <TableCell>{camelCaseToText(row.status)}</TableCell>}
 				{!isMdDown && <TableCell>{row.estimatedDuration ?? "-"}</TableCell>}
