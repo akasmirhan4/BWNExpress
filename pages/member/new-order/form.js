@@ -748,7 +748,7 @@ export default function Verification() {
 	);
 }
 
-const NumberFormatCustom = forwardRef((props, ref) => {
+const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
 	const { onChange, ...other } = props;
 
 	return (
