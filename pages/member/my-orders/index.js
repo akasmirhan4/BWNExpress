@@ -247,9 +247,13 @@ function EnhancedTableRow(props) {
 								</IconButton>
 							</span>
 						</Tooltip>
-						<Button variant="contained" sx={{ color: "white.main", ml: 1, fontSize: { xs: "0.7rem", sm: "0.9rem" } }} className={styles.dropShadow}>
-							Track Order
-						</Button>
+						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`} prefetch={false} passHref>
+							<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
+								<Button variant="contained" sx={{ color: "white.main", ml: 1, fontSize: { xs: "0.7rem", sm: "0.9rem" } }} className={styles.dropShadow}>
+									Track Order
+								</Button>
+							</Tooltip>
+						</Link>
 					</TableCell>
 				)}
 			</TableRow>
