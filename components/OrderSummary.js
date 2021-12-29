@@ -1,8 +1,10 @@
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Skeleton } from "@mui/material";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function OrderSummary(props) {
 	const { orderData, receiptURL } = props || {};
+	const [receiptLoaded, setReceiptLoaded] = useState(false);
 
 	function camelCaseToText(camel) {
 		const result = camel.replace(/([A-Z])/g, " $1");
@@ -89,17 +91,24 @@ export default function OrderSummary(props) {
 				<Box
 					width="100%"
 					minHeight={"48em"}
-					border="1px dashed"
-					borderColor="secondaryAccent.main"
 					display="flex"
 					justifyContent={"center"}
 					alignItems={"center"}
 					borderRadius={1}
 					position="relative"
-					bgcolor={"lightGrey.secondary"}
+					bgcolor={receiptLoaded && "lightGrey.secondary"}
 					sx={{ zIndex: 0, my: 2 }}
 				>
-					<Image src={receiptURL} alt="receipt" layout="fill" objectFit="contain" />
+					{!receiptLoaded && <Skeleton variant="rectangular" width={"100%"} height={"48em"} />}
+					<Image
+						onLoadingComplete={() => {
+							setReceiptLoaded(true)
+						}}
+						src={receiptURL}
+						alt="receipt"
+						layout="fill"
+						objectFit="contain"
+					/>
 				</Box>
 			)}
 			{orderData?.receipt && (
