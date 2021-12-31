@@ -8,6 +8,7 @@ import { Fragment } from "react";
 import BrandWithLogo from "./BrandWithLogo";
 import Logo from "./Logo";
 import { cloneElement } from "react";
+import Link from "next/link";
 
 export default function MemberTopbar(props) {
 	const isLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("xl"));
@@ -53,11 +54,13 @@ export default function MemberTopbar(props) {
 											<ChatBubble />
 										</Badge>
 									</IconButton>
-									<IconButton sx={{ mr: 2 }}>
-										<Badge badgeContent={4} color="primary" showZero={false} variant="dot">
-											<Notifications />
-										</Badge>
-									</IconButton>
+									<Link prefetch={false} href="/member/notifications" passHref>
+										<IconButton sx={{ mr: 2 }}>
+											<Badge badgeContent={4} color="primary" showZero={false} variant="dot">
+												<Notifications />
+											</Badge>
+										</IconButton>
+									</Link>
 								</Fragment>
 							)}
 

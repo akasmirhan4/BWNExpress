@@ -31,6 +31,7 @@ import { Fragment, useEffect, useState } from "react";
 import styles from "styles/main.module.scss";
 import ImageWithSkeleton from "components/ImageWithSkeleton";
 import PendingPaymentsBox from "components/PendingPaymentBox";
+import { currencyFormatter } from "lib/formatter";
 
 export default function MyTransactions() {
 	const [status, setStatus] = useState({
@@ -163,7 +164,6 @@ function EnhancedTableRow(props) {
 	const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
 	const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
-	const currencyFormatter = new Intl.NumberFormat("en-SG", { style: "currency", currency: "SGD" });
 	function camelCaseToText(camel) {
 		const result = camel.replace(/([A-Z])/g, " $1");
 		const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
