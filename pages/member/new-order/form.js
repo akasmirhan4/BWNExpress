@@ -409,7 +409,7 @@ export default function Verification() {
 										}
 									}}
 									required
-									InputProps={{ inputComponent: NumberFormatCustom, inputMode: "numeric" }}
+									InputProps={{ inputComponent: NumberFormatCustom }}
 									error={!!errors.parcelValue.length}
 								/>
 							</Tooltip>
@@ -754,7 +754,7 @@ const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
 			isNumericString
 			decimalSeparator="."
 			displayType="input"
-			type="text"
+			inputMode="decimal"
 			thousandSeparator
 			decimalScale={2}
 			allowLeadingZeros={false}

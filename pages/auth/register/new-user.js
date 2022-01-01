@@ -140,14 +140,7 @@ function NewUserContainer(props) {
 	};
 
 	return (
-		<Box
-			{...props}
-			minHeight="100vh"
-			alignItems="center"
-			justifyContent="center"
-			display="flex"
-			sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover", backgroundColor: "grey", pb: "4em" }}
-		>
+		<Box pt={2} pb={12} minHeight="100vh" display="flex" sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover", backgroundColor: "grey" }}>
 			<Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
 				<RegisterSteppers sx={{ my: 4 }} activeStep={1} />
 				<Box
@@ -222,9 +215,8 @@ function NewUserContainer(props) {
 							<Grid item xs={12} md={4}>
 								<TextField
 									label="IC Number"
-									type="text"
+									type="tel"
 									InputProps={{
-										inputMode: "numeric",
 										disableUnderline: true,
 										sx: { bgcolor: "offWhite.secondary", borderRadius: 2 },
 										inputComponent: TextMaskIC,
@@ -308,9 +300,9 @@ function NewUserContainer(props) {
 							<Grid item xs={12} md={6}>
 								<TextField
 									label="Phone Number"
-									type="phone"
+									type="tel"
 									InputProps={{
-										inputMode: "numeric",
+										inputMode: "tel",
 										disableUnderline: true,
 										sx: { bgcolor: "offWhite.secondary", borderRadius: 2 },
 										inputComponent: TextMaskPhone,
