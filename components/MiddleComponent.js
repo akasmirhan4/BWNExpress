@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { auth, getUserData } from "lib/firebase";
+import { auth, getAvatarURL, getUserData } from "lib/firebase";
 import { useSelector, useDispatch } from "react-redux";
-import { selectUser, selectUserData, setUser, setUserData } from "lib/slices/userSlice";
+import { selectUser, selectUserData, setAvatarURL, setUser, setUserData } from "lib/slices/userSlice";
 import { routeManager } from "lib/routeManager";
 import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
@@ -24,14 +24,15 @@ function MiddleComponent(props) {
 
 	useEffect(() => {
 		auth.onAuthStateChanged(async (user) => {
-            setIsLoading(true);
+			setIsLoading(true);
 			dispatch(setUser({ uid: user?.uid, emailVerified: user?.emailVerified }));
 			let _userData;
 			if (user) {
 				_userData = await getUserData();
 				dispatch(setUserData(_userData));
+				dispatch(setAvatarURL(await getAvatarURL()));
 			}
-            setIsLoading(false);
+			setIsLoading(false);
 		});
 	}, []);
 

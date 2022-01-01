@@ -26,13 +26,13 @@ export default function Verification() {
 
 	useEffect(() => {
 		if (!recaptcha) {
-			const verifier = new authObj.RecaptchaVerifier(ref.current, {
+			const verifier = new authObj?.RecaptchaVerifier(ref.current, {
 				size: "invisible",
 			});
 			setRecaptcha(verifier);
 		}
 		return () => {
-			recaptcha?.clear();
+			if(recaptcha) recaptcha?.clear();
 		};
 	}, [recaptcha]);
 
@@ -89,14 +89,14 @@ export default function Verification() {
 						<Typography>{!userData ? "..." : userData.IC}</Typography>
 					</Grid>
 					<Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
-						<NextLink href={"/member/upload-ic"}  passHref>
-							<Tooltip
+						<Tooltip
 								title={verified?.IC == "pending" ? `We will notify you for any update on your IC verification` : ""}
 								placement="top"
 								arrow
 								enterTouchDelay={0}
 							>
 								<span style={{ width: "100%" }}>
+									<NextLink href={"/member/upload-ic"} passHref>
 									<LoadingButton
 										loading={!userData || verified?.IC !== "uploadingLater"}
 										variant="contained"
@@ -113,9 +113,9 @@ export default function Verification() {
 											? "verified"
 											: "unknown"}
 									</LoadingButton>
+								</NextLink>
 								</span>
 							</Tooltip>
-						</NextLink>
 					</Grid>
 					<Grid item xs={3} md={4} sx={{ display: "flex", alignItems: "center" }}>
 						<Typography>Email</Typography>
@@ -127,7 +127,7 @@ export default function Verification() {
 					</Grid>
 					<Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
 						<Button disabled={!userData || verified?.email} variant="contained" fullWidth endIcon={verified?.email ? <CheckRounded /> : null}>
-							{!userData ? "Loading..." : verified?.email == true ? "verified" : "verify"}
+							{!userData ? "Loading..." : verified?.email == true ? "" : "verify"}
 						</Button>
 					</Grid>
 					<Grid item xs={3} md={4} sx={{ display: "flex", alignItems: "center" }}>
@@ -182,7 +182,7 @@ export default function Verification() {
 								}
 							}}
 						>
-							{!userData ? "Loading..." : verified?.phoneNo == true ? "verified" : isVerifying ? "verifying..." : timer ? timer : "verify"}
+							{!userData ? "Loading..." : verified?.phoneNo == true ? "" : isVerifying ? "verifying..." : timer ? timer : "verify"}
 						</LoadingButton>
 					</Grid>
 				</Grid>
