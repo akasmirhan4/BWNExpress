@@ -75,8 +75,8 @@ function NewUserContainer(props) {
 			deliveryAddress: { valid: false, errorMsg: "" },
 		};
 		const regexPattern = {
-			fullName: /^([A-Za-z]{1,20})( [A-Za-z]{1,20}){1,}$/,
-			preferredName: /^([A-Za-z]{1,20})( [A-Za-z]{1,20}){0,1}$/,
+			fullName: /^(\D{1,20})(\s\D{1,20}){1,20}$/,
+			preferredName: /^[^0-9 ]{1,10}( [^0-9 ]{1,10})?$/,
 			IC: /^\d{2}-\d{6}$/,
 			gender: /^(Male)|(Female)$/,
 			phoneNo: /^\d{3} \d{4}$/,

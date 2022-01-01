@@ -7,8 +7,11 @@ import { auth, firestore, storage } from "lib/firebase";
 import { selectUserData, setUserData } from "lib/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import RegisterSteppers from "components/RegisterSteppers";
+import { LoadingButton } from "@mui/lab";
+import { useRouter } from "next/router";
 
 export default function UploadIC(params) {
+	const [isUploading, setIsUploading] = useState(false);
 	const [isUploadingLater, setIsUploadingLater] = useState(false);
 	const [selectedFiles, setSelectedFiles] = useState([]);
 	const [frontImage, setFrontImage] = useState(null);
@@ -16,6 +19,7 @@ export default function UploadIC(params) {
 	const [isValid, setIsValid] = useState(true);
 	const userData = useSelector(selectUserData);
 	const dispatch = useDispatch();
+	const router = useRouter();
 
 	function readFileAsText(file) {
 		return new Promise(function (resolve, reject) {
@@ -257,10 +261,12 @@ export default function UploadIC(params) {
 							</Link2>
 						</Grid>
 						<Grid item xs={6} display={"flex"} justifyContent={"flex-end"}>
-							<Button
+							<LoadingButton
+								loading={isUploading}
 								disabled={!isUploadingLater && (!selectedFiles.length || !selectedFiles.some((file) => file))}
 								fullWidth
 								variant="contained"
+								loadingPosition="end"
 								color="secondary"
 								size="large"
 								endIcon={<UploadFileRounded />}
@@ -279,6 +285,7 @@ export default function UploadIC(params) {
 										);
 									}
 									if (selectedFiles) {
+										setIsUploading(true);
 										const filteredFile = selectedFiles.filter((file) => file);
 										let batchPromises = [];
 										for (var i = 0; i < filteredFile.length; i++) {
@@ -286,7 +293,7 @@ export default function UploadIC(params) {
 											batchPromises.push(storageRef.put(filteredFile[i]));
 										}
 										const updateDetails = { "verified.IC": "pending", userVerifiedLevel: 1.5 };
-										return await toast.promise(
+										const results = await toast.promise(
 											Promise.all(batchPromises).then(() => {
 												firestore
 													.collection("users")
@@ -295,14 +302,17 @@ export default function UploadIC(params) {
 													.then(() => {
 														dispatch(setUserData({ ...userData, ...updateDetails }));
 													});
+												router.push("/member/dashboard");
 											}),
 											{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
 										);
+										setIsUploading(false);
+										return results;
 									}
 								}}
 							>
 								Upload
-							</Button>
+							</LoadingButton>
 						</Grid>
 					</Grid>
 				</Container>

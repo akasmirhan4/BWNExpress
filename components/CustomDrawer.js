@@ -20,21 +20,17 @@ export default function CustomDrawer(props) {
 	const [verifyStatus, setVerifyStatus] = useState("...");
 
 	useEffect(() => {
-		if (userData) {
-			let ICVerified = false;
-			switch (userData.verified.IC) {
+		if (userData?.verified) {
+			switch (userData.verified?.IC) {
 				case "pending":
 					setVerifyStatus("pending");
 					break;
-				case "unverified":
-					setVerifyStatus("unverified");
-					break;
 				case true:
-					ICVerified = true;
+					setVerifyStatus("verified");
 					break;
-			}
-			if (userData.verified.email && ICVerified) {
-				setVerifyStatus("verified");
+				case "unverified":
+				default:
+					setVerifyStatus("unverified");
 			}
 		}
 	}, [userData]);
@@ -54,7 +50,7 @@ export default function CustomDrawer(props) {
 			>
 				{/* Top part of the drawer */}
 				<Box display="flex" flexDirection="column" alignItems="center" mb={2} width="100%">
-					<Link prefetch={false} href="/member/dashboard" passHref>
+					<Link href="/member/dashboard" passHref>
 						<IconButton sx={{ borderRadius: 4, p: 1, m: 1 }}>
 							<Image src={Logo} alt="Company Logo" />
 						</IconButton>
@@ -62,7 +58,7 @@ export default function CustomDrawer(props) {
 					<Typography className={styles.companyName} color="white.main">
 						{"BWNEXPRESS"}
 					</Typography>
-					<Link prefetch={false} href="/member/verification" passHref>
+					<Link href="/member/verification" passHref>
 						<Button fullWidth sx={{ color: "secondaryAccent.main" }}>
 							<Typography variant="caption" sx={{ color: palette.white.main }}>
 								{"member"} <span className={styles[verifyStatus]}>{verifyStatus}</span>
@@ -72,10 +68,9 @@ export default function CustomDrawer(props) {
 				</Box>
 
 				{/* CTA Button */}
-				{/* <Link href="new-order" prefetch={false}> */}
 				<Tooltip title={verifyStatus !== "verified" ? `Verify account first` : ""} placement="right" arrow enterTouchDelay={0}>
 					<span>
-						<Link prefetch={false} href="/member/new-order/acknowledgement" passHref>
+						<Link href="/member/new-order/acknowledgement" passHref>
 							<Button
 								disabled={verifyStatus !== "verified"}
 								variant="outlined"
@@ -89,7 +84,6 @@ export default function CustomDrawer(props) {
 						</Link>
 					</span>
 				</Tooltip>
-				{/* </Link> */}
 
 				{/* main nav */}
 				<Box display="flex" flexDirection="column" width="100%" mt={4} flex={1}>
@@ -129,8 +123,11 @@ function DrawerButton(props) {
 
 	if (isActive) {
 		return (
-			<Link href={href} prefetch={false} passHref>
+			<Link href={href} passHref>
 				<Button
+					onClick={() => {
+						router.push(href);
+					}}
 					variant="contained"
 					startIcon={startIcon}
 					fullWidth
@@ -144,7 +141,7 @@ function DrawerButton(props) {
 		);
 	} else {
 		return (
-			<Link href={href} prefetch={false} passHref>
+			<Link href={href} passHref>
 				<Button startIcon={startIcon} fullWidth color="white" sx={{ mb: 1 }} style={{ justifyContent: "flex-start", paddingLeft: "1em" }}>
 					{label}
 				</Button>

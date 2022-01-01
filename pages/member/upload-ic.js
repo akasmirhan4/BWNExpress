@@ -10,6 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 export default function UploadIC(params) {
 	const [isUploadingLater, setIsUploadingLater] = useState(false);
 	const [selectedFiles, setSelectedFiles] = useState([]);
+	const [isUploading, setIsUploading] = useState(false);
 	const [frontImage, setFrontImage] = useState(null);
 	const [backImage, setBackImage] = useState(null);
 	const [isValid, setIsValid] = useState(true);
@@ -183,13 +184,7 @@ export default function UploadIC(params) {
 									</Typography>
 								</Grid>
 								<Grid item xs={12} md={10}>
-									<Button
-										disabled={isUploadingLater}
-										variant="contained"
-										component="label"
-										color="secondaryAccent"
-										fullWidth
-									>
+									<Button disabled={isUploadingLater} variant="contained" component="label" color="secondaryAccent" fullWidth>
 										Load File(s)
 										<input
 											type="file"
@@ -255,20 +250,14 @@ export default function UploadIC(params) {
 					<Grid container spacing={2}>
 						<Grid item xs={6}>
 							<Link2 href="/dashboard" prefetch={false}>
-								<Button
-									fullWidth
-									variant="contained"
-									color="secondary"
-									size="large"
-									startIcon={<HomeRounded />}
-								>
+								<Button fullWidth variant="contained" color="secondary" size="large" startIcon={<HomeRounded />}>
 									Home
 								</Button>
 							</Link2>
 						</Grid>
 						<Grid item xs={6} display={"flex"} justifyContent={"flex-end"}>
 							<Button
-								disabled={!isUploadingLater && (!selectedFiles.length || !selectedFiles.some((file) => file))}
+								disabled={isUploading || (!isUploadingLater && (!selectedFiles.length || !selectedFiles.some((file) => file)))}
 								fullWidth
 								variant="contained"
 								color="secondary"
@@ -287,31 +276,35 @@ export default function UploadIC(params) {
 												}),
 											{ loading: "updating user...", success: "user updated 👌", error: "error updating user 😫" }
 										);
-									}
-									if (selectedFiles) {
-										const filteredFile = selectedFiles.filter((file) => file);
-										let batchPromises = [];
-										for (var i = 0; i < filteredFile.length; i++) {
-											const storageRef = storage.ref(`users/${auth.currentUser.uid}/unverifiedIC/${new Date().getTime()}${i}`);
-											batchPromises.push(storageRef.put(filteredFile[i]));
+									} else {
+										if (selectedFiles?.length > 0) {
+											setIsUploading(true);
+											const filteredFile = selectedFiles.filter((file) => file);
+											let batchPromises = [];
+											for (var i = 0; i < filteredFile.length; i++) {
+												const storageRef = storage.ref(`users/${auth.currentUser.uid}/unverifiedIC/${new Date().getTime()}${i}`);
+												batchPromises.push(storageRef.put(filteredFile[i]));
+											}
+											const updateDetails = { "verified.IC": "pending", userVerifiedLevel: 1.5 };
+											const result = await toast.promise(
+												Promise.all(batchPromises).then(() => {
+													firestore
+														.collection("users")
+														.doc(auth.currentUser.uid)
+														.update(updateDetails)
+														.then(() => {
+															dispatch(setUserData({ ...userData, ...updateDetails }));
+														});
+												}),
+												{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
+											);
+											setIsUploading(false);
+											return result;
 										}
-										const updateDetails = { "verified.IC": "pending", userVerifiedLevel: 1.5 };
-										return await toast.promise(
-											Promise.all(batchPromises).then(() => {
-												firestore
-													.collection("users")
-													.doc(auth.currentUser.uid)
-													.update(updateDetails)
-													.then(() => {
-														dispatch(setUserData({ ...userData, ...updateDetails }));
-													});
-											}),
-											{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
-										);
 									}
 								}}
 							>
-								Upload
+								{isUploadingLater ? "Continue" : "Upload"}
 							</Button>
 						</Grid>
 					</Grid>
