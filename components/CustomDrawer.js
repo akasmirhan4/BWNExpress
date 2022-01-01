@@ -135,7 +135,6 @@ function DrawerButton(props) {
 					startIcon={startIcon}
 					fullWidth
 					color="accent"
-					sx={{ mb: 1 }}
 					sx={{ boxShadow: (theme) => theme.shadows[1], mb: 1 }}
 					style={{ justifyContent: "flex-start", paddingLeft: "1em", color: "white" }}
 				>

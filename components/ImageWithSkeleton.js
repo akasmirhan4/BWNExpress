@@ -8,6 +8,7 @@ export default function ImageWithSkeleton(props) {
 		<Box sx={props.containersx} width="100%" height="100%" position="relative">
 			{!isImageLoaded && <Skeleton variant="rectangular" width={"100%"} height={"100%"} />}
 			<Image
+				alt={props.alt ?? ""}
 				{...props}
 				onLoadingComplete={() => {
 					setIsImageLoaded(true);

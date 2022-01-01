@@ -423,9 +423,8 @@ export default function Verification() {
 									label="Item Description"
 									fullWidth
 									margin="dense"
-									sx={{ boxShadow: (theme) => theme.shadows[1] }}
+									sx={{ boxShadow: (theme) => theme.shadows[1], mt: { xs: 2, sm: 0 } }}
 									value={itemDescription}
-									sx={{ mt: { xs: 2, sm: 0 } }}
 									onChange={(e) => {
 										setItemDescription(e.target.value);
 										if (errors.itemDescription.length) {

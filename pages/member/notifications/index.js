@@ -30,7 +30,11 @@ function NotificationCard(props) {
 	const [mouseOver, setMouseOver] = useState(false);
 	const Icon = props.icon ? cloneElement(props.icon, { sx: { fontSize: "4rem" }, color: "lightGrey" }) : null;
 	return (
-		<Card onMouseOver={() => setMouseOver(true)} onMouseLeave={() => setMouseOver(false)} sx={{ cursor: "pointer", mb: 2 }} elevation={mouseOver ? 2 : 1}>
+		<Card
+			onMouseOver={() => setMouseOver(true)}
+			onMouseLeave={() => setMouseOver(false)}
+			sx={{ boxShadow: (theme) => (mouseOver ? theme.shadows[2] : theme.shadows[1]), cursor: "pointer", mb: 2 }}
+		>
 			<Box sx={{ px: 4, py: 2, display: "flex", position: "relative" }}>
 				<Box sx={{ bgcolor: "primary.main", width: "4px", height: "100%", position: "absolute", left: 0, top: 0 }} />
 				<Grid container spacing={2}>

@@ -13,8 +13,10 @@ const breakpoints = {
 };
 
 const shadows = {
+	0: "rgba(0, 0, 0, 0) 0px 2px 4px",
 	1: "rgba(0, 0, 0, 0.1) 0px 2px 4px",
 	2: "rgba(0, 0, 0, 0.4) 0px 2px 4px",
+	16: "rgba(0, 0, 0, 0.4) 0px 2px 4px",
 };
 
 const customTheme = createTheme({
