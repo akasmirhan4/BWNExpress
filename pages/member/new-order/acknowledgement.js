@@ -75,7 +75,7 @@ export default function Acknowledgement() {
 			<Container sx={{ pt: 4 }}>
 				<Box display={"flex"} justifyContent="space-between" alignItems={"center"} sx={{ mb: 4 }}>
 					<Breadcrumbs aria-label="breadcrumb">
-						<NextLink href="dashboard" prefetch={false} passHref>
+						<NextLink href="dashboard"  passHref>
 							<Link underline="hover" color="inherit">
 								Home
 							</Link>
@@ -117,7 +117,7 @@ export default function Acknowledgement() {
 							</Box>
 						</Grid>
 						<Grid item xs={12} md={4} display={"flex"} justifyContent={"flex-end"}>
-							<NextLink href="form" prefetch={false} passHref>
+							<NextLink href="form"  passHref>
 								<Button
 									disabled={!_isAcknowledged}
 									endIcon={<ChevronRightRounded />}

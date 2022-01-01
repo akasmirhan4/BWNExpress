@@ -51,7 +51,7 @@ export default function Details() {
 		<MemberPageTemplate>
 			<Container sx={{ my: 4 }}>
 				<Breadcrumbs aria-label="breadcrumb">
-					<NextLink href="/member/my-orders" prefetch={false} passHref>
+					<NextLink href="/member/my-orders"  passHref>
 						<Link underline="hover" color="inherit">
 							My Orders
 						</Link>

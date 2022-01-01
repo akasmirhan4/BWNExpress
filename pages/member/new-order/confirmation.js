@@ -56,7 +56,7 @@ export default function Summary() {
 						Sit back and relax while we do the hard work for you. Any update we will notify you via push notification.
 					</Typography>
 					<Box display="flex" justifyContent={"center"}>
-						<Link prefetch={false} href="/member/dashboard" passHref>
+						<Link  href="/member/dashboard" passHref>
 							<Button variant="contained" color="secondary" startIcon={<HomeRounded />}>
 								Home
 							</Button>

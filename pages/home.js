@@ -2,8 +2,8 @@ import { Box, Button, Container, Grid, IconButton, Typography, useMediaQuery, Sl
 
 import Link from "next/link";
 import { Facebook, Instagram, Twitter } from "@mui/icons-material";
-import LandingTopbar from "../components/LandingTopbar";
-import LandingFooter from "../components/LandingFooter";
+import LandingTopbar from "components/LandingTopbar";
+import LandingFooter from "components/LandingFooter";
 import { TwitterTweetEmbed } from "react-twitter-embed";
 import ImageWithSkeleton from "components/ImageWithSkeleton";
 import VizSensor from "react-visibility-sensor";
@@ -63,7 +63,7 @@ function HeroContainer(props) {
 									>
 										In progress
 									</Button>
-									<Link href="/auth/register" prefetch={false} passHref>
+									<Link href="/auth/register"  passHref>
 										<Button
 											variant="outlined"
 											color="secondary"
@@ -124,7 +124,7 @@ function HeroContainer(props) {
 										In progress
 										{/* Start Today */}
 									</Button>
-									<Link href="/auth/register" prefetch={false} passHref>
+									<Link href="/auth/register"  passHref>
 										<Button
 											variant="outlined"
 											color="secondary"
@@ -241,7 +241,7 @@ function PricesContainer(props) {
 					</Grid>
 					<Fade in={isVisible} timeout={1000} style={{ transitionDelay: 500 }}>
 						<Box display="flex" justifyContent="center">
-							<Link href="/resources" prefetch={false} passHref>
+							<Link href="/resources"  passHref>
 								<Button
 									disabled={true}
 									variant="contained"

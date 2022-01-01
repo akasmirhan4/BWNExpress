@@ -1,14 +1,14 @@
 import { Button, Typography, Box, useTheme, IconButton, Drawer, Tooltip } from "@mui/material";
 import Image from "next/image";
-import Logo from "../public/svgs/logo.svg";
-import styles from "../styles/main.module.scss";
+import Logo from "public/svgs/logo.svg";
+import styles from "styles/main.module.scss";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Dashboard, Inbox, Logout, Settings, SwapHoriz } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { auth } from "../lib/firebase";
+import { auth } from "lib/firebase";
 import { useEffect, useState } from "react";
 import { selectUserData } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";

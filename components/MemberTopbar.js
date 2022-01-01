@@ -48,7 +48,7 @@ export default function MemberTopbar(props) {
 						<Box display="flex" alignItems="center" justifyContent={"flex-end"} flex={1}>
 							{!isSmDown && (
 								<Fragment>
-									<Link prefetch={false} href="/member/notifications" passHref>
+									<Link  href="/member/notifications" passHref>
 										<IconButton sx={{ mr: 2 }}>
 											<Badge badgeContent={4} color="primary" showZero={false} variant="dot">
 												<Notifications />

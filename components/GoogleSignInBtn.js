@@ -1,5 +1,5 @@
 import GoogleGLogo from "./GoogleGLogo";
-import { auth, firestore, googleAuthProvider } from "../lib/firebase";
+import { auth, firestore, googleAuthProvider } from "lib/firebase";
 import toast from "react-hot-toast";
 import { Button, Box } from "@mui/material";
 

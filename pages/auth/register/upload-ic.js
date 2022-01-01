@@ -254,7 +254,7 @@ export default function UploadIC(params) {
 					</Box>
 					<Grid container spacing={2}>
 						<Grid item xs={6}>
-							<Link2 href="/auth/register/new-user" prefetch={false}>
+							<Link2 href="/auth/register/new-user" >
 								<Button fullWidth variant="contained" color="secondary" size="large" startIcon={<ChevronLeftRounded />}>
 									Back
 								</Button>

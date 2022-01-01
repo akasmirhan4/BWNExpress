@@ -19,7 +19,7 @@ import {
 import Link from "next/link";
 import BrandWithLogo from "./BrandWithLogo";
 import { cloneElement, useState } from "react";
-import { auth } from "../lib/firebase";
+import { auth } from "lib/firebase";
 import toast from "react-hot-toast";
 import {
 	CloseRounded,
@@ -53,29 +53,29 @@ export default function LandingTopbar(props) {
 				<Container sx={{ py: 2, position: "relative" }}>
 					<Grid container spacing={2} sx={{ display: { xs: "none", md: "flex" } }}>
 						<Grid item md={3} alignItems="center" display="flex">
-							<Link href="/home" prefetch={false} passHref>
+							<Link href="/home"  passHref>
 								<IconButton sx={{ borderRadius: 4 }} centerRipple={false}>
 									{isSmUp ? <BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} /> : <Logo fill={palette.secondary.main} />}
 								</IconButton>
 							</Link>
 						</Grid>
 						<Grid item md={4} justifyContent="flex-start" alignItems="center" display="flex">
-							<Link href="/home" prefetch={false} passHref>
+							<Link href="/home"  passHref>
 								<Button color={props.darkText ? "text" : "white"} sx={{ mr: 2 }}>
 									Home
 								</Button>
 							</Link>
-							<Link href="/about-us" prefetch={false} passHref>
+							<Link href="/about-us"  passHref>
 								<Button color={props.darkText ? "text" : "white"} sx={{ mr: 2 }}>
 									About Us
 								</Button>
 							</Link>
-							<Link href="/resources" prefetch={false} passHref>
+							<Link href="/resources"  passHref>
 								<Button color={props.darkText ? "text" : "white"}>Resources</Button>
 							</Link>
 						</Grid>
 						<Grid item md={5} justifyContent="flex-end" alignItems="center" display="flex">
-							<Box display="flex" alignItems="center" sx={{ mr: "2em" }}>
+							{/* <Box display="flex" alignItems="center" sx={{ mr: "2em" }}>
 								<Button
 									color={props.darkText ? "text" : "white"}
 									size="small"
@@ -101,13 +101,13 @@ export default function LandingTopbar(props) {
 								>
 									BM
 								</Button>
-							</Box>
+							</Box> */}
 							{!user.uid ? (
 								<Box>
-									<Link href="/auth/login" prefetch={false} passHref>
+									<Link href="/auth/login"  passHref>
 										<Button color={props.darkText ? "text" : "white"}>Login</Button>
 									</Link>
-									<Link href="/auth/register" prefetch={false} passHref>
+									<Link href="/auth/register"  passHref>
 										<Button variant="contained" color="secondary" sx={{ ml: 2, boxShadow: (theme) => theme.shadows[1] }} style={{ color: "white" }}>
 											Register
 										</Button>
@@ -121,7 +121,7 @@ export default function LandingTopbar(props) {
 									>
 										Logout
 									</Button>
-									<Link href="/member/dashboard" prefetch={false} passHref>
+									<Link href="/member/dashboard"  passHref>
 										<Button variant="contained" color="secondary" sx={{ ml: 2, boxShadow: (theme) => theme.shadows[1] }} style={{ color: "white" }}>
 											Dashboard
 										</Button>
@@ -234,7 +234,7 @@ function DrawerLink(props) {
 	const Icon = () => cloneElement(icon, { color: routeTitle == title ? "secondary" : "text" });
 
 	return (
-		<Link href={href} prefetch={false} passHref>
+		<Link href={href}  passHref>
 			<ListItem button>
 				<ListItemIcon>
 					<Icon />

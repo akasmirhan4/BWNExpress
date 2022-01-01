@@ -16,8 +16,8 @@ import {
 	useMediaQuery,
 } from "@mui/material";
 
-import LandingTopbar from "../components/LandingTopbar";
-import LandingFooter from "../components/LandingFooter";
+import LandingTopbar from "components/LandingTopbar";
+import LandingFooter from "components/LandingFooter";
 import ImageWithSkeleton from "components/ImageWithSkeleton";
 import { useState } from "react";
 import { Masonry } from "@mui/lab";

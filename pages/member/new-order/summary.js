@@ -36,7 +36,7 @@ export default function Summary() {
 			<Container sx={{ pt: 4 }}>
 				<Box display={"flex"} justifyContent="space-between" alignItems={"center"} sx={{ mb: 4 }}>
 					<Breadcrumbs aria-label="breadcrumb">
-						<NextLink href="dashboard" prefetch={false} passHref>
+						<NextLink href="dashboard"  passHref>
 							<Link underline="hover" color="inherit">
 								Home
 							</Link>
@@ -64,7 +64,7 @@ export default function Summary() {
 					</Box>
 					<Grid container spacing={2}>
 						<Grid item xs={6} display={"flex"} order={{ xs: 16, md: 16 }}>
-							<NextLink href="form" prefetch={false} passHref>
+							<NextLink href="form"  passHref>
 								<Button startIcon={<ChevronLeftRounded />} variant="contained" color="accent" sx={{ width: { md: "unset", xs: "100%" } }}>
 									Back
 								</Button>

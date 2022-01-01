@@ -1,8 +1,8 @@
 import { Box, Button, Container, Grid, Typography, useMediaQuery } from "@mui/material";
 import Link from "next/link";
 
-import LandingTopbar from "../components/LandingTopbar";
-import LandingFooter from "../components/LandingFooter";
+import LandingTopbar from "components/LandingTopbar";
+import LandingFooter from "components/LandingFooter";
 import ImageWithSkeleton from "components/ImageWithSkeleton";
 
 export default function AboutUsPage(params) {
@@ -166,7 +166,7 @@ function HowItWorks(props) {
 					What are you waiting for?
 				</Typography>
 				<Box display={"flex"} justifyContent={"center"}>
-					<Link href="/auth/register" prefetch={false} passHref>
+					<Link href="/auth/register"  passHref>
 						<Button
 							variant="contained"
 							style={{ color: "white" }}

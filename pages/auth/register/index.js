@@ -1,10 +1,11 @@
 import { FacebookRounded } from "@mui/icons-material";
 import { Typography, Box, Container, TextField, Button, Link } from "@mui/material";
 import LandingTopbar from "components/LandingTopbar";
+import Link2 from "next/link";
 
 import { useState } from "react";
 import GoogleSignInBtn from "components/GoogleSignInBtn";
-import { auth, FacebookAuthProvider } from "../../../lib/firebase";
+import { auth, FacebookAuthProvider } from "lib/firebase";
 
 export default function Register(params) {
 	return (
@@ -177,11 +178,6 @@ function RegisterContainer(props) {
 							>
 								Register
 							</Button>
-							<Box width="100%" maxWidth="384px" justifyContent="center" display="flex">
-								<Link color="secondary" fontWeight="bold" my="0.8em" sx={{ textAlign: { xs: "center", sm: "right" }, flex: 1 }}>
-									Forget Password
-								</Link>
-							</Box>
 						</Box>
 						<Box
 							bgcolor="primary.main"
@@ -196,6 +192,7 @@ function RegisterContainer(props) {
 						>
 							<GoogleSignInBtn />
 							<Button
+								disabled={true}
 								sx={{
 									":hover": {
 										bgcolor: "#1877F2",
@@ -221,7 +218,7 @@ function RegisterContainer(props) {
 								}}
 							>
 								<FacebookRounded fontSize="large" sx={{ mr: 3, ml: -0.5 }} />
-								Continue with Facebook
+								In Progress
 							</Button>
 							<Box maxWidth={384} mt={4}>
 								<Typography variant="body2" sx={{ color: "#FFFFFF", lineHeight: "1.5em", textAlign: { xs: "center", sm: "left" } }}>

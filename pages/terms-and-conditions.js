@@ -1,7 +1,7 @@
 import { Circle } from "@mui/icons-material";
 import { Container, Typography, Box, List, ListItem, ListItemText } from "@mui/material";
-import LandingFooter from "../components/LandingFooter";
-import LandingTopbar from "../components/LandingTopbar";
+import LandingFooter from "components/LandingFooter";
+import LandingTopbar from "components/LandingTopbar";
 
 export default function TermsAndConditions() {
 	return (

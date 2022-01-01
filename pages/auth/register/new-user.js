@@ -385,7 +385,7 @@ function NewUserContainer(props) {
 					</Box>
 				</Box>
 				<Box width="100%" display="flex" justifyContent="space-between">
-					<Link2 href="/home" prefetch={false}>
+					<Link2 href="/home" >
 						<Button disabled={isUploading} variant="contained" color="secondary" size="large" sx={{ width: "12em" }} startIcon={<HomeRounded />}>
 							Home
 						</Button>

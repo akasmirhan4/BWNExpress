@@ -271,7 +271,7 @@ export default function Verification() {
 			<Container sx={{ pt: 4 }}>
 				<Box display={"flex"} justifyContent="space-between" alignItems={"center"} sx={{ mb: 4 }}>
 					<Breadcrumbs aria-label="breadcrumb">
-						<NextLink href="dashboard" prefetch={false} passHref>
+						<NextLink href="dashboard"  passHref>
 							<Link underline="hover" color="inherit">
 								Home
 							</Link>
@@ -683,7 +683,7 @@ export default function Verification() {
 							</Tooltip>
 						</Grid>
 						<Grid item xs={6} display={"flex"} order={{ xs: 16, md: 16 }}>
-							<NextLink href="acknowledgement" prefetch={false} passHref>
+							<NextLink href="acknowledgement"  passHref>
 								<Button startIcon={<ChevronLeftRounded />} variant="contained" color="accent" sx={{ width: { md: "unset", xs: "100%" } }}>
 									Back
 								</Button>

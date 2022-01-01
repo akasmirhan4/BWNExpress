@@ -158,13 +158,16 @@ function LoginContainer(props) {
 					Log In
 				</Button>
 				<Box width="100%" maxWidth="384px" justifyContent="flex-end" display="flex">
-					<Link color="#FFFFFF" fontWeight="bold" my="0.8em">
-						Forget Password
-					</Link>
+					<Link2 href="/auth/forget-password" passHref>
+						<Link color="white.main" fontWeight="bold" my="0.8em">
+							Forget Password
+						</Link>
+					</Link2>
 				</Box>
 
 				<GoogleSignInBtn />
 				<Button
+					disabled={true}
 					sx={{
 						":hover": {
 							bgcolor: "#1877F2",
@@ -187,7 +190,7 @@ function LoginContainer(props) {
 					fullWidth
 				>
 					<FacebookRounded fontSize="large" sx={{ mr: 3, ml: -0.5 }} />
-					Continue with Facebook
+					In Progress
 				</Button>
 				<Box maxWidth={384}>
 					<Typography variant="body2" my="2em" sx={{ color: "#FFFFFF", textAlign: { sm: "left", xs: "center" } }}>
@@ -195,7 +198,7 @@ function LoginContainer(props) {
 					</Typography>
 					<Typography variant="body2" sx={{ color: "#FFFFFF", textAlign: { sm: "left", xs: "center" } }}>
 						Not a member yet?{" "}
-						<Link2 href="/auth/register" prefetch={false}>
+						<Link2 href="/auth/register">
 							<Link color="#FFFFFF" sx={{ fontWeight: 700, cursor: "pointer" }}>
 								Sign Up
 							</Link>

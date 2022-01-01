@@ -66,7 +66,7 @@ export default function Verification() {
 		<MemberPageTemplate>
 			<Container sx={{ pt: 4 }}>
 				<Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4 }}>
-					<NextLink href="/member/dashboard" prefetch={false} passHref>
+					<NextLink href="/member/dashboard"  passHref>
 						<Link underline="hover" color="inherit">
 							Home
 						</Link>
@@ -89,7 +89,7 @@ export default function Verification() {
 						<Typography>{!userData ? "..." : userData.IC}</Typography>
 					</Grid>
 					<Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
-						<NextLink href={"/member/upload-ic"} prefetch={false} passHref>
+						<NextLink href={"/member/upload-ic"}  passHref>
 							<Tooltip
 								title={verified?.IC == "pending" ? `We will notify you for any update on your IC verification` : ""}
 								placement="top"

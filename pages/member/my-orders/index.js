@@ -232,7 +232,7 @@ function EnhancedTableRow(props) {
 				{!isMdDown && <TableCell>{row.estimatedDuration ?? "-"}</TableCell>}
 				{!isMdDown && (
 					<TableCell align="right">
-						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`} prefetch={false} passHref>
+						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`}  passHref>
 							<Tooltip title="See more details" placement="top" arrow>
 								<IconButton>
 									<PageviewRounded color="primary" />
@@ -246,7 +246,7 @@ function EnhancedTableRow(props) {
 								</IconButton>
 							</span>
 						</Tooltip>
-						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`} prefetch={false} passHref>
+						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`}  passHref>
 							<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
 								<Button variant="contained" sx={{ ml: 1 }}>
 									Track Order
@@ -285,7 +285,7 @@ function EnhancedTableRow(props) {
 											{!isSmDown && <TableCell sx={{ borderBottom: "unset" }}>ACTIONS</TableCell>}
 											<TableCell colSpan={isSmDown ? 2 : 1} align={!isSmDown ? "center" : "right"} sx={{ borderBottom: "unset" }}>
 												<Box display="flex" justifyContent={isSmDown ? "center" : "flex-end"} mt={1}>
-													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`} prefetch={false} passHref>
+													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`}  passHref>
 														<IconButton>
 															<PageviewRounded color="primary" />
 														</IconButton>
@@ -297,7 +297,7 @@ function EnhancedTableRow(props) {
 															</IconButton>
 														</span>
 													</Tooltip>
-													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`} prefetch={false} passHref>
+													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`}  passHref>
 														<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
 															<Button
 																variant="contained"

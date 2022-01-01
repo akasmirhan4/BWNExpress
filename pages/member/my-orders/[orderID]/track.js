@@ -26,7 +26,7 @@ export default function Details() {
 		<MemberPageTemplate>
 			<Container sx={{ my: 4, display: "flex", flexDirection: "column" }}>
 				<Breadcrumbs aria-label="breadcrumb" sx={{ mt: 4 }}>
-					<NextLink href="/member/my-orders" prefetch={false} passHref>
+					<NextLink href="/member/my-orders"  passHref>
 						<Link underline="hover" color="inherit">
 							My Orders
 						</Link>

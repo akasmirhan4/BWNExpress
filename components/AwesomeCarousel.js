@@ -1,6 +1,6 @@
 import AwesomeSlider from "react-awesome-slider";
-import styles from "../styles/carousel.module.scss";
-import mainStyles from "../styles/main.module.scss";
+import styles from "styles/carousel.module.scss";
+import mainStyles from "styles/main.module.scss";
 
 export default function AwesomeCarousel(props) {
 	return (
