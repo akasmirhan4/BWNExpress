@@ -310,6 +310,7 @@ function NewUserContainer(props) {
 									label="Phone Number"
 									type="phone"
 									InputProps={{
+										inputMode: "numeric",
 										disableUnderline: true,
 										sx: { bgcolor: "offWhite.secondary", borderRadius: 2 },
 										inputComponent: TextMaskPhone,

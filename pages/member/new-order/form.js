@@ -409,7 +409,7 @@ export default function Verification() {
 										}
 									}}
 									required
-									InputProps={{ inputComponent: NumberFormatCustom }}
+									InputProps={{ inputComponent: NumberFormatCustom, inputMode: "numeric" }}
 									error={!!errors.parcelValue.length}
 								/>
 							</Tooltip>
@@ -440,13 +440,13 @@ export default function Verification() {
 						<Grid item xs={12} md={4} order={{ xs: 7, md: 7 }}>
 							<Tooltip
 								disableHoverListener
-								title={"Refer to your parcel receipt for the tracking number (Not Order number). E.g: NLMYA12345678"}
+								title={"Refer to your parcel receipt for the tracking ID (Not Order number/id). E.g: NLMYA12345678"}
 								placement="top"
 								arrow
 								enterTouchDelay={100}
 							>
 								<TextField
-									label="Tracking Number"
+									label="Tracking ID"
 									fullWidth
 									margin="dense"
 									sx={{ boxShadow: (theme) => theme.shadows[1] }}
