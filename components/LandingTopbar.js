@@ -12,12 +12,13 @@ import {
 	ListItemText,
 	SwipeableDrawer,
 	Typography,
+	useMediaQuery,
 	useScrollTrigger,
+	useTheme,
 } from "@mui/material";
 import Link from "next/link";
 import BrandWithLogo from "./BrandWithLogo";
 import { cloneElement, useState } from "react";
-import styles from "../styles/main.module.scss";
 import { auth } from "../lib/firebase";
 import toast from "react-hot-toast";
 import {
@@ -35,11 +36,14 @@ import { useRouter } from "next/router";
 import { selectLang, setLang } from "lib/slices/prefSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "lib/slices/userSlice";
+import Logo from "./Logo";
 
 export default function LandingTopbar(props) {
 	const lang = useSelector(selectLang);
 	const dispatch = useDispatch();
 	const user = useSelector(selectUser);
+	const isSmUp = useMediaQuery((theme) => theme.breakpoints.up("sm"));
+	const { palette } = useTheme();
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -51,7 +55,7 @@ export default function LandingTopbar(props) {
 						<Grid item md={3} alignItems="center" display="flex">
 							<Link href="/home" prefetch={false} passHref>
 								<IconButton sx={{ borderRadius: 4 }} centerRipple={false}>
-									<BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} />
+									{isSmUp ? <BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} /> : <Logo fill={palette.secondary.main} />}
 								</IconButton>
 							</Link>
 						</Grid>
@@ -104,7 +108,7 @@ export default function LandingTopbar(props) {
 										<Button color={props.darkText ? "text" : "white"}>Login</Button>
 									</Link>
 									<Link href="/auth/register" prefetch={false} passHref>
-										<Button variant="contained" color="secondary" sx={{ ml: 2 }} style={{ color: "white" }} className={styles.dropShadow}>
+										<Button variant="contained" color="secondary" sx={{ ml: 2, boxShadow: (theme) => theme.shadows[1] }} style={{ color: "white" }}>
 											Register
 										</Button>
 									</Link>
@@ -118,7 +122,7 @@ export default function LandingTopbar(props) {
 										Logout
 									</Button>
 									<Link href="/member/dashboard" prefetch={false} passHref>
-										<Button variant="contained" color="secondary" sx={{ ml: 2 }} style={{ color: "white" }} className={styles.dropShadow}>
+										<Button variant="contained" color="secondary" sx={{ ml: 2, boxShadow: (theme) => theme.shadows[1] }} style={{ color: "white" }}>
 											Dashboard
 										</Button>
 									</Link>
@@ -127,7 +131,7 @@ export default function LandingTopbar(props) {
 						</Grid>
 					</Grid>
 					<Box sx={{ display: { md: "none", xs: "flex" }, justifyContent: "center" }}>
-						<BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} />
+						{isSmUp ? <BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} /> : <Logo fill={palette.secondary.main} />}
 						<Box sx={{ right: 0, position: "absolute", mr: 2 }}>
 							<IconButton
 								color="white"
@@ -154,14 +158,9 @@ export default function LandingTopbar(props) {
 						// bgcolor={props.bgcolor ?? "primary.main"}
 					>
 						<Box p={2} bgcolor={props.bgColorScroll ?? props.bgcolor ?? "primary.main"} display="flex" justifyContent={"center"}>
-							<BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} />
+							{isSmUp ? <BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} /> : <Logo fill={palette.secondary.main} />}
 							<Box sx={{ right: 0, position: "absolute", mr: 2 }}>
-								<IconButton
-									color="white"
-									sx={{ borderRadius: "50%", height: "2em", width: "2em" }}
-									centerRipple={false}
-									onClick={() => setIsDrawerOpen(false)}
-								>
+								<IconButton color="white" sx={{ borderRadius: "50%", height: "2em", width: "2em" }} centerRipple={false} onClick={() => setIsDrawerOpen(false)}>
 									<CloseRounded color={props.darkText ? "secondaryAccent" : "white"} />
 								</IconButton>
 							</Box>
@@ -188,7 +187,7 @@ export default function LandingTopbar(props) {
 										<ListItemIcon>
 											<LogoutRounded />
 										</ListItemIcon>
-										<ListItemText disableTypography primary={<Typography type="body2">Logout</Typography>} />
+										<ListItemText disableTypography primary={<Typography>Logout</Typography>} />
 									</ListItem>
 								</>
 							)}
@@ -243,7 +242,7 @@ function DrawerLink(props) {
 				<ListItemText
 					disableTypography
 					primary={
-						<Typography type="body2" fontWeight={routeTitle == title ? "bold" : "normal"} color={routeTitle == title ? "secondary" : "text"}>
+						<Typography fontWeight={routeTitle == title ? "bold" : "normal"} color={routeTitle == title ? "secondary" : "text"} noWrap>
 							{title}
 						</Typography>
 					}
@@ -263,8 +262,10 @@ function ElevationScroll(props) {
 	});
 
 	return cloneElement(children, {
-		className: trigger ? styles.dropShadow : null,
-		sx: { bgcolor: trigger ? bgColorScroll ?? bgcolor ?? "primary.main" : bgcolor ?? "primary.main" },
+		sx: {
+			bgcolor: trigger ? bgColorScroll ?? bgcolor ?? "primary.main" : bgcolor ?? "primary.main",
+			boxShadow: (theme) => (trigger ? theme.shadows[1] : theme.shadows[0]),
+		},
 	});
 }
 

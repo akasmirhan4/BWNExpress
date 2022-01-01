@@ -4,7 +4,6 @@ import { currencyFormatter } from "lib/formatter";
 import { selectUser } from "lib/slices/userSlice";
 import { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import styles from "styles/main.module.scss";
 
 export default function PendingPaymentsBox(props) {
 	const user = useSelector(selectUser);
@@ -28,7 +27,7 @@ export default function PendingPaymentsBox(props) {
 
 	return (
 		<Container {...props}>
-			<Box sx={{ borderColor: "border.main", borderWidth: 0.5, borderStyle: "solid", borderRadius: 4, py: 2, px: 4 }} className={styles.dropShadow}>
+			<Box sx={{ borderColor: "border.main", borderWidth: 0.5, borderStyle: "solid", borderRadius: 4, py: 2, px: 4, boxShadow: (theme) => theme.shadows[1] }}>
 				<Grid container spacing={2}>
 					<Grid item md={6} xs={12}>
 						<Typography color="text.main" fontWeight="500" sx={{ textAlign: { xs: "center", md: "left" } }}>
@@ -58,7 +57,7 @@ export default function PendingPaymentsBox(props) {
 						)}
 					</Grid>
 					<Grid item mt={2} md={6} xs={12} alignItems="flex-end" justifyContent="center" display="flex" flexDirection="column">
-						<Button disabled={!pendingPayments?.length} variant="contained" sx={{ mb: 2 }} style={{ color: "white" }} fullWidth>
+						<Button disabled={!pendingPayments?.length} variant="contained" sx={{ mb: 2 }} fullWidth>
 							Pay Now
 						</Button>
 						<Button variant="outlined" fullWidth disabled={!pendingPayments?.length}>

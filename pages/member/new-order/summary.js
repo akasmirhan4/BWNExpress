@@ -1,5 +1,4 @@
 import { Box, Container, Typography, Breadcrumbs, Link, Checkbox, Grid, Button } from "@mui/material";
-import styles from "styles/main.module.scss";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import { useEffect, useState } from "react";
@@ -48,13 +47,12 @@ export default function Summary() {
 				<NewOrderSteppers sx={{ my: 4 }} activeStep={2} />
 				<Box
 					py={4}
-					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 } }}
+					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 }, boxShadow: (theme) => theme.shadows[1] }}
 					display={"flex"}
 					flexDirection={"column"}
 					width={"100%"}
 					bgcolor={"white.main"}
 					borderRadius={4}
-					className={styles.dropShadow}
 				>
 					<OrderSummary orderData={newOrderData} />
 					<Box display="flex" alignItems="center" sx={{ my: 2 }}>
@@ -67,13 +65,7 @@ export default function Summary() {
 					<Grid container spacing={2}>
 						<Grid item xs={6} display={"flex"} order={{ xs: 16, md: 16 }}>
 							<NextLink href="form" prefetch={false} passHref>
-								<Button
-									startIcon={<ChevronLeftRounded />}
-									variant="contained"
-									color="accent"
-									sx={{ color: "white.main", width: { md: "unset", xs: "100%" } }}
-									className={styles.dropShadow}
-								>
+								<Button startIcon={<ChevronLeftRounded />} variant="contained" color="accent" sx={{ width: { md: "unset", xs: "100%" } }}>
 									Back
 								</Button>
 							</NextLink>
@@ -111,8 +103,7 @@ export default function Summary() {
 								loadingPosition="end"
 								variant="contained"
 								color="accent"
-								sx={{ color: "white.main", width: { md: "unset", xs: "100%" } }}
-								className={styles.dropShadow}
+								sx={{ width: { md: "unset", xs: "100%" } }}
 							>
 								Submit
 							</LoadingButton>

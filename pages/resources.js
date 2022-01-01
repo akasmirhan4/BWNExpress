@@ -15,7 +15,6 @@ import {
 	Typography,
 	useMediaQuery,
 } from "@mui/material";
-import styles from "../styles/main.module.scss";
 
 import LandingTopbar from "../components/LandingTopbar";
 import LandingFooter from "../components/LandingFooter";

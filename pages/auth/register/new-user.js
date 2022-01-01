@@ -1,6 +1,5 @@
-import { ArrowBack, ArrowForward } from "@mui/icons-material";
+import { ArrowBack, ArrowForward, HomeRounded } from "@mui/icons-material";
 import { Typography, Box, Container, TextField, Button, Grid, MenuItem, Checkbox, InputAdornment } from "@mui/material";
-import styles from "styles/main.module.scss";
 import { forwardRef, useEffect, useState } from "react";
 import Link2 from "next/link";
 import { DatePicker, LocalizationProvider } from "@mui/lab";
@@ -10,6 +9,8 @@ import { functions } from "lib/firebase";
 import toast from "react-hot-toast";
 import { selectUserData, setUserData } from "lib/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
+import RegisterSteppers from "components/RegisterSteppers";
+import { useRouter } from "next/router";
 
 export default function NewUser(params) {
 	return (
@@ -34,6 +35,7 @@ function NewUserContainer(props) {
 	const [valid, setValid] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
 	const dispatch = useDispatch();
+	const router = useRouter();
 
 	useEffect(() => {
 		if (userData) {
@@ -147,8 +149,9 @@ function NewUserContainer(props) {
 			sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover", backgroundColor: "grey", pb: "4em" }}
 		>
 			<Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+				<RegisterSteppers sx={{ my: 4 }} activeStep={1} />
 				<Box
-					bgcolor="#FFFFFF"
+					bgcolor="white.main"
 					display="flex"
 					flexDirection="column"
 					justifyContent="center"
@@ -157,23 +160,19 @@ function NewUserContainer(props) {
 					overflow="hidden"
 					my={4}
 					width="100%"
-					className={styles.dropShadow}
+					sx={{ boxShadow: (theme) => theme.shadows[1] }}
+					mt={4}
+					mb={8}
 				>
-					<Box px={8} py={4} display="flex" flexDirection="column" width="100%">
-						<Typography
-							textAlign="center"
-							sx={{ textTransform: "uppercase", fontSize: "1.8rem", letterSpacing: "0.22em", color: "secondary.main", fontWeight: 800, lineHeight: "1em" }}
-						>
-							Complete The Form Below
+					<Box sx={{ px: { sm: 4, xs: 2 } }} py={4} display="flex" flexDirection="column" width="100%">
+						<Typography variant="h6" textAlign="center" sx={{ textTransform: "uppercase", color: "secondary.main", fontWeight: 800, lineHeight: "1em" }}>
+							Complete The Form Below:
 						</Typography>
-						<Typography
-							textAlign="center"
-							sx={{ textTransform: "uppercase", fontSize: "1.8rem", color: "secondary.main", letterSpacing: "0.22em", fontWeight: 800, mb: "1.2em" }}
-						>
+						<Typography variant="h4" textAlign="center" sx={{ textTransform: "uppercase", color: "secondary.main", fontWeight: 800, mb: "1.2em" }}>
 							To Continue:
 						</Typography>
-						<Grid container spacing={"1em"}>
-							<Grid item md={12}>
+						<Grid container columnSpacing={2} rowSpacing={1}>
+							<Grid item xs={12}>
 								<TextField
 									label="Full Name (based on IC)"
 									type="text"
@@ -196,7 +195,7 @@ function NewUserContainer(props) {
 									helperText={validity && !validity.fullName.valid ? validity.fullName.errorMsg : null}
 								/>
 							</Grid>
-							<Grid item md={4}>
+							<Grid item xs={12} md={4}>
 								<TextField
 									label="Preferred Name (Nickname)"
 									type="text"
@@ -220,11 +219,12 @@ function NewUserContainer(props) {
 									helperText={validity && !validity.preferredName.valid ? validity.preferredName.errorMsg : null}
 								/>
 							</Grid>
-							<Grid item md={4}>
+							<Grid item xs={12} md={4}>
 								<TextField
 									label="IC Number"
 									type="text"
 									InputProps={{
+										inputMode: "numeric",
 										disableUnderline: true,
 										sx: { bgcolor: "offWhite.secondary", borderRadius: 2 },
 										inputComponent: TextMaskIC,
@@ -247,7 +247,7 @@ function NewUserContainer(props) {
 									helperText={validity && !validity.IC.valid ? validity.IC.errorMsg : null}
 								/>
 							</Grid>
-							<Grid item md={4}>
+							<Grid item xs={12} md={4}>
 								<TextField
 									label="Gender"
 									type="text"
@@ -274,7 +274,7 @@ function NewUserContainer(props) {
 									<MenuItem value="Female">Female</MenuItem>
 								</TextField>
 							</Grid>
-							<Grid item md={6}>
+							<Grid item xs={12} md={6}>
 								<LocalizationProvider dateAdapter={AdapterDateFns} sx>
 									<DatePicker
 										label="Date Of Birth"
@@ -305,7 +305,7 @@ function NewUserContainer(props) {
 									/>
 								</LocalizationProvider>
 							</Grid>
-							<Grid item md={6}>
+							<Grid item xs={12} md={6}>
 								<TextField
 									label="Phone Number"
 									type="phone"
@@ -332,7 +332,7 @@ function NewUserContainer(props) {
 									helperText={validity && !validity.phoneNo.valid ? validity.phoneNo.errorMsg : null}
 								/>
 							</Grid>
-							<Grid item md={12}>
+							<Grid item xs={12}>
 								<TextField
 									label="Address (based on IC)"
 									type="text"
@@ -357,7 +357,7 @@ function NewUserContainer(props) {
 									helperText={validity && !validity.address.valid ? validity.address.errorMsg : null}
 								/>
 							</Grid>
-							<Grid item md={12}>
+							<Grid item xs={12}>
 								<Box display="flex" alignItems="center">
 									<Checkbox checked={isDifferentAddress} onChange={(e) => setIsDifferentAddress(e.target.checked)} />
 									<Typography variant="body2" sx={{ color: "text.main" }}>
@@ -393,15 +393,7 @@ function NewUserContainer(props) {
 				</Box>
 				<Box width="100%" display="flex" justifyContent="space-between">
 					<Link2 href="/home" prefetch={false}>
-						<Button
-							disabled={isUploading}
-							variant="contained"
-							color="secondary"
-							size="large"
-							sx={{ color: "#FFFFFF", width: "12em" }}
-							startIcon={<ArrowBack />}
-							className={styles.dropShadow}
-						>
+						<Button disabled={isUploading} variant="contained" color="secondary" size="large" sx={{ width: "12em" }} startIcon={<HomeRounded />}>
 							Home
 						</Button>
 					</Link2>
@@ -410,7 +402,7 @@ function NewUserContainer(props) {
 						variant="contained"
 						color="secondary"
 						size="large"
-						sx={{ color: "#FFFFFF", width: "12em" }}
+						sx={{ width: "12em" }}
 						endIcon={<ArrowForward />}
 						onClick={async () => {
 							const { isValid } = checkValidity();
@@ -434,6 +426,7 @@ function NewUserContainer(props) {
 										.then(({ data }) => {
 											dispatch(setUserData({ ...userData, ...updateDetails }));
 											if (!data.success) throw "Error in backend";
+											router.push("/auth/register/upload-ic");
 										}),
 									{ loading: "updating user...", success: "user updated 👌", error: "error updating user 😫" }
 								);
@@ -442,7 +435,6 @@ function NewUserContainer(props) {
 								toast.error("Please clear out the errors 😫");
 							}
 						}}
-						className={styles.dropShadow}
 					>
 						Continue
 					</Button>

@@ -1,5 +1,4 @@
 import { Box, Button, Container, Grid, IconButton, Typography, useMediaQuery, Slide, Fade } from "@mui/material";
-import styles from "../styles/main.module.scss";
 
 import Link from "next/link";
 import { Facebook, Instagram, Twitter } from "@mui/icons-material";
@@ -8,7 +7,8 @@ import LandingFooter from "../components/LandingFooter";
 import { TwitterTweetEmbed } from "react-twitter-embed";
 import ImageWithSkeleton from "components/ImageWithSkeleton";
 import VizSensor from "react-visibility-sensor";
-import { useRef, useState } from "react";
+import { useState } from "react";
+import styles from "styles/main.module.scss";
 
 export default function HomePage(params) {
 	return (
@@ -59,9 +59,7 @@ function HeroContainer(props) {
 										color="secondary"
 										size="large"
 										fullWidth
-										style={{ color: "white" }}
-										className={styles.dropShadow}
-										sx={{ mr: 4, py: 2, fontSize: "1.25rem", fontWeight: "bold" }}
+										sx={{ mr: 4, py: 2, fontSize: "1.25rem", fontWeight: "bold", color: "white.main", boxShadow: (theme) => theme.shadows[1] }}
 									>
 										In progress
 									</Button>
@@ -71,7 +69,6 @@ function HeroContainer(props) {
 											color="secondary"
 											size="large"
 											fullWidth
-											className={styles.dropShadow}
 											sx={{
 												mr: 4,
 												py: 2,
@@ -81,6 +78,7 @@ function HeroContainer(props) {
 												":hover": {
 													borderWidth: "2px",
 												},
+												boxShadow: (theme) => theme.shadows[1],
 											}}
 										>
 											Register Now
@@ -121,8 +119,7 @@ function HeroContainer(props) {
 										size="large"
 										fullWidth
 										style={{ color: "white" }}
-										className={styles.dropShadow}
-										sx={{ maxWidth: "90vw", mb: 2, py: 2, fontSize: "1rem", fontWeight: "bold" }}
+										sx={{ maxWidth: "90vw", mb: 2, py: 2, fontSize: "1rem", fontWeight: "bold", boxShadow: (theme) => theme.shadows[1] }}
 									>
 										In progress
 										{/* Start Today */}
@@ -133,7 +130,6 @@ function HeroContainer(props) {
 											color="secondary"
 											size="large"
 											fullWidth
-											className={styles.dropShadow}
 											sx={{
 												maxWidth: "90vw",
 												py: 2,
@@ -143,6 +139,7 @@ function HeroContainer(props) {
 												":hover": {
 													borderWidth: "2px",
 												},
+												boxShadow: (theme) => theme.shadows[1],
 											}}
 										>
 											Register Now
@@ -171,7 +168,7 @@ function FeaturesContainer(props) {
 		>
 			<Box {...props}>
 				<Container>
-					<Grid container pt={12}>
+					<Grid container sx={{ pt: { sm: 20, xs2: 17, xs: 12, md: 16 } }}>
 						<Grid item xs={12} md={7}>
 							<Typography color="secondaryAccent.main" sx={{ textAlign: { xs: "center", md: "left" } }}>
 								New Features
@@ -249,9 +246,8 @@ function PricesContainer(props) {
 									disabled={true}
 									variant="contained"
 									style={{ color: "white" }}
-									sx={{ py: "1.4em", width: "20em" }}
+									sx={{ py: "1.4em", width: "20em", boxShadow: (theme) => theme.shadows[1] }}
 									size="large"
-									className={styles.dropShadow}
 									color="secondary"
 								>
 									In progress
@@ -270,19 +266,21 @@ function PriceItem(props) {
 	const { price, weight, src, size } = props.details || {};
 
 	return (
-		<Grid item md={2.4} sm={4} xs={6}>
+		<Grid item md={2.4} sm={4} xs={12} xs2={6}>
 			<Box
-				className={styles.dropShadow}
-				bgcolor="white.main"
-				mx={1}
-				justifyContent="center"
-				alignItems="center"
-				display="flex"
-				flex={1}
-				p={4}
-				borderRadius={2}
-				flexDirection="column"
-				height={"14em"}
+				sx={{
+					mx: 1,
+					bgcolor: "white.main",
+					justifyContent: "center",
+					alignItems: "center",
+					display: "flex",
+					flex: 1,
+					padding: 4,
+					borderRadius: 2,
+					flexDirection: "column",
+					height: "14em",
+					boxShadow: (theme) => theme.shadows[1],
+				}}
 			>
 				{/* <Typography textAlign="center">{`$${price.from} to $${price.to}`}</Typography> */}
 				<Box flex={1} width="100%" alignItems={"center"} justifyContent={"center"} display={"flex"}>
@@ -292,7 +290,7 @@ function PriceItem(props) {
 						</Box>
 					</Slide>
 				</Box>
-				<Typography textAlign="center" fontWeight={"bold"}>{`${weight.from} to ${weight.to} kg`}</Typography>
+				<Typography textAlign="center" fontWeight={"bold"} variant="caption">{`${weight.from} to ${weight.to} kg`}</Typography>
 			</Box>
 		</Grid>
 	);
@@ -343,10 +341,8 @@ function ShopForMe(props) {
 								<Box justifyContent={"center"} alignItems={"center"} display={"flex"}>
 									<Button
 										variant="contained"
-										style={{ color: "white" }}
-										sx={{ py: "1.4em", width: "20em" }}
+										sx={{ py: "1.4em", width: "20em", boxShadow: (theme) => theme.shadows[1], color: "white.main" }}
 										size="large"
-										className={styles.dropShadow}
 										color="secondary"
 									>
 										Contact Us

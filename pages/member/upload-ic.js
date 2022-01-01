@@ -1,6 +1,5 @@
 import { CloseRounded, HomeRounded, UploadFileRounded } from "@mui/icons-material";
 import { Typography, Box, Container, Button, Grid, Checkbox, FormHelperText, ButtonBase, IconButton } from "@mui/material";
-import styles from "styles/main.module.scss";
 import { useRef, useState } from "react";
 import Link2 from "next/link";
 import toast from "react-hot-toast";
@@ -53,7 +52,7 @@ export default function UploadIC(params) {
 						overflow="hidden"
 						my={4}
 						width="100%"
-						className={styles.dropShadow}
+						sx={{ boxShadow: (theme) => theme.shadows[1] }}
 					>
 						<Box sx={{ px: { xs: 2, sm: 4, md: 8 } }} py={4} display="flex" flexDirection="column" width="100%">
 							<Typography
@@ -188,9 +187,7 @@ export default function UploadIC(params) {
 										disabled={isUploadingLater}
 										variant="contained"
 										component="label"
-										className={styles.dropShadow}
 										color="secondaryAccent"
-										sx={{ color: "#FFFFFF" }}
 										fullWidth
 									>
 										Load File(s)
@@ -261,10 +258,8 @@ export default function UploadIC(params) {
 								<Button
 									fullWidth
 									variant="contained"
-									className={styles.dropShadow}
 									color="secondary"
 									size="large"
-									sx={{ color: "#FFFFFF" }}
 									startIcon={<HomeRounded />}
 								>
 									Home
@@ -276,10 +271,8 @@ export default function UploadIC(params) {
 								disabled={!isUploadingLater && (!selectedFiles.length || !selectedFiles.some((file) => file))}
 								fullWidth
 								variant="contained"
-								className={styles.dropShadow}
 								color="secondary"
 								size="large"
-								sx={{ color: "#FFFFFF" }}
 								endIcon={<UploadFileRounded />}
 								onClick={async () => {
 									if (isUploadingLater) {

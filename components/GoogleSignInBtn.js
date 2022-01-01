@@ -2,8 +2,6 @@ import GoogleGLogo from "./GoogleGLogo";
 import { auth, firestore, googleAuthProvider } from "../lib/firebase";
 import toast from "react-hot-toast";
 import { Button, Box } from "@mui/material";
-import styles from "../styles/main.module.scss";
-import router from "next/router";
 
 export default function GoogleSignInBtn(params) {
 	return (
@@ -26,6 +24,7 @@ export default function GoogleSignInBtn(params) {
 				alignItems: "center",
 				display: "flex",
 				mb: 2,
+				boxShadow: (theme) => theme.shadows[1],
 			}}
 			onClick={() => {
 				toast
@@ -58,7 +57,6 @@ export default function GoogleSignInBtn(params) {
 					<GoogleGLogo size={24} />
 				</Box>
 			}
-			className={styles.dropShadow}
 		>
 			Continue With Google
 		</Button>

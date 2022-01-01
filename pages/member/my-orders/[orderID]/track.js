@@ -2,22 +2,18 @@ import { Breadcrumbs, Container, Divider, Grid, Link, Typography } from "@mui/ma
 import { Box } from "@mui/system";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import React, { Fragment, useEffect, useState } from "react";
-import styles from "styles/main.module.scss";
 import { useRouter } from "next/router";
-import { auth, getLogTracker, getOrder } from "lib/firebase";
+import { getLogTracker, getOrder } from "lib/firebase";
 import toast from "react-hot-toast";
 import NextLink from "next/link";
 import {
-	AssignmentTurnedInRounded,
 	BugReportRounded,
-	Check,
 	CheckRounded,
 	CircleRounded,
 	ErrorRounded,
 	LocalShippingRounded,
 	MoreHorizRounded,
 	PaidRounded,
-	PendingRounded,
 	PublishRounded,
 	TouchAppRounded,
 } from "@mui/icons-material";
@@ -76,7 +72,6 @@ function TrackerComponent(props) {
 
 	return (
 		<Box
-			className={styles.dropShadow}
 			sx={{
 				my: 4,
 				display: "flex",
@@ -86,6 +81,7 @@ function TrackerComponent(props) {
 				borderRadius: 2,
 				overflow: "hidden",
 				flex: 1,
+				boxShadow: (theme) => theme.shadows[1],
 			}}
 		>
 			<Box

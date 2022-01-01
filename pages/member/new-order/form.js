@@ -16,7 +16,6 @@ import {
 	IconButton,
 	Checkbox,
 } from "@mui/material";
-import styles from "styles/main.module.scss";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import { forwardRef, Fragment, useEffect, useState } from "react";
@@ -284,13 +283,12 @@ export default function Verification() {
 				{/* ORDER FORM */}
 				<Box
 					py={4}
-					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 } }}
+					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 }, boxShadow: (theme) => theme.shadows[1] }}
 					display={"flex"}
 					flexDirection={"column"}
 					width={"100%"}
 					bgcolor={"white.main"}
 					borderRadius={4}
-					className={styles.dropShadow}
 				>
 					<Grid container columnSpacing={4} rowSpacing={2}>
 						<Grid item xs={12} md={6} order={{ xs: 2, md: 1 }}>
@@ -299,7 +297,7 @@ export default function Verification() {
 									label="Purchase From"
 									fullWidth
 									margin="dense"
-									className={styles.dropShadow}
+									sx={{ boxShadow: (theme) => theme.shadows[1] }}
 									value={purchaseFrom}
 									onChange={(e) => {
 										setPurchaseFrom(e.target.value);
@@ -353,7 +351,7 @@ export default function Verification() {
 											}
 										}}
 										margin="dense"
-										className={styles.dropShadow}
+										sx={{ boxShadow: (theme) => theme.shadows[1] }}
 										required
 										error={!!errors.itemCategory.length}
 									>
@@ -381,7 +379,7 @@ export default function Verification() {
 											}
 										}}
 										margin="dense"
-										className={styles.dropShadow}
+										sx={{ boxShadow: (theme) => theme.shadows[1] }}
 										required
 										error={!!errors.currency.length}
 									>
@@ -402,7 +400,7 @@ export default function Verification() {
 									label="Parcel Value"
 									fullWidth
 									margin="dense"
-									className={styles.dropShadow}
+									sx={{ boxShadow: (theme) => theme.shadows[1] }}
 									value={parcelValue}
 									onChange={(e) => {
 										setParcelValue(e.target.value);
@@ -425,7 +423,7 @@ export default function Verification() {
 									label="Item Description"
 									fullWidth
 									margin="dense"
-									className={styles.dropShadow}
+									sx={{ boxShadow: (theme) => theme.shadows[1] }}
 									value={itemDescription}
 									sx={{ mt: { xs: 2, sm: 0 } }}
 									onChange={(e) => {
@@ -452,7 +450,7 @@ export default function Verification() {
 									label="Tracking Number"
 									fullWidth
 									margin="dense"
-									className={styles.dropShadow}
+									sx={{ boxShadow: (theme) => theme.shadows[1] }}
 									value={trackingNumber}
 									onChange={(e) => {
 										setTrackingNumber(e.target.value);
@@ -480,7 +478,7 @@ export default function Verification() {
 											}
 										}}
 										margin="dense"
-										className={styles.dropShadow}
+										sx={{ boxShadow: (theme) => theme.shadows[1] }}
 										required
 										error={!!errors.courierProvider.length}
 									>
@@ -502,7 +500,7 @@ export default function Verification() {
 											label="Other Courier Provider"
 											fullWidth
 											margin="dense"
-											className={styles.dropShadow}
+											sx={{ boxShadow: (theme) => theme.shadows[1] }}
 											value={specificCourierProvider}
 											onChange={(e) => {
 												setSpecificCourierProvider(e.target.value);
@@ -525,9 +523,7 @@ export default function Verification() {
 									color={!errors.receipt.length ? "accent" : "error"}
 									sx={{
 										color: !errors.receipt.length ? "white.main" : "error.main",
-										fontSize: { xs: "0.8rem", sm: "1rem" },
 									}}
-									className={styles.dropShadow}
 									size="large"
 									fullWidth
 									component="label"
@@ -588,7 +584,7 @@ export default function Verification() {
 											}
 										}}
 										margin="dense"
-										className={styles.dropShadow}
+										sx={{ boxShadow: (theme) => theme.shadows[1] }}
 										error={!!errors.paymentMethod.length}
 										required
 									>
@@ -622,7 +618,7 @@ export default function Verification() {
 											}
 										}}
 										margin="dense"
-										className={styles.dropShadow}
+										sx={{ boxShadow: (theme) => theme.shadows[1] }}
 										error={!!errors.deliveryMethod.length}
 										required
 									>
@@ -650,7 +646,7 @@ export default function Verification() {
 										label="Delivery Address"
 										fullWidth
 										margin="dense"
-										className={styles.dropShadow}
+										sx={{ boxShadow: (theme) => theme.shadows[1] }}
 										value={deliveryAddress}
 										onChange={(e) => {
 											setDeliveryAddress(e.target.value);
@@ -678,11 +674,10 @@ export default function Verification() {
 								<TextField
 									label="Remark"
 									multiline
-									sx={{ mt: { xs: 2, sm: 0 } }}
+									sx={{ mt: { xs: 2, sm: 0 }, boxShadow: (theme) => theme.shadows[1] }}
 									minRows={4}
 									fullWidth
 									margin="dense"
-									className={styles.dropShadow}
 									value={remark}
 									onChange={(e) => setRemark(e.target.value)}
 								/>
@@ -690,13 +685,7 @@ export default function Verification() {
 						</Grid>
 						<Grid item xs={6} display={"flex"} order={{ xs: 16, md: 16 }}>
 							<NextLink href="acknowledgement" prefetch={false} passHref>
-								<Button
-									startIcon={<ChevronLeftRounded />}
-									variant="contained"
-									color="accent"
-									sx={{ color: "white.main", width: { md: "unset", xs: "100%" } }}
-									className={styles.dropShadow}
-								>
+								<Button startIcon={<ChevronLeftRounded />} variant="contained" color="accent" sx={{ width: { md: "unset", xs: "100%" } }}>
 									Back
 								</Button>
 							</NextLink>
@@ -735,8 +724,7 @@ export default function Verification() {
 								loadingPosition="end"
 								variant="contained"
 								color="accent"
-								sx={{ color: "white.main", width: { md: "unset", xs: "100%" } }}
-								className={styles.dropShadow}
+								sx={{ width: { md: "unset", xs: "100%" } }}
 							>
 								Continue
 							</LoadingButton>

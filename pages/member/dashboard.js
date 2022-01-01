@@ -1,5 +1,4 @@
 import { Box, Container, Typography, Button } from "@mui/material";
-import styles from "styles/main.module.scss";
 import dashboardStyles from "styles/dashboard.module.scss";
 import AwesomeCarousel from "components/AwesomeCarousel";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -56,8 +55,6 @@ function PendingActionsBox(props) {
 										key={index}
 										fullWidth
 										sx={{ mx: 1, py: 2, fontSize: { xs: "0.5rem", sm: "1rem" } }}
-										style={{ color: "white" }}
-										className={styles.dropShadow}
 									>
 										{order.orderID}
 									</Button>
@@ -72,7 +69,7 @@ function PendingActionsBox(props) {
 
 	return (
 		<Container {...props}>
-			<Box sx={{ borderColor: "border.main", borderWidth: 0.5, borderStyle: "solid", borderRadius: 4, py: 2, px: 4 }} className={styles.dropShadow}>
+			<Box sx={{ borderColor: "border.main", borderWidth: 0.5, borderStyle: "solid", borderRadius: 4, py: 2, px: 4, boxShadow: (theme) => theme.shadows[1] }}>
 				<Typography color="text.main" fontWeight="500" mb={2} sx={{ textAlign: { xs: "center", sm: "left" } }}>
 					Pending Actions
 				</Typography>
@@ -101,7 +98,6 @@ function PromotionsBox(props) {
 				Promotions
 			</Typography>
 			<AwesomeCarousel
-				className={styles.dropShadow}
 				bullets={false}
 				media={promoImgs.map((img) => {
 					return {

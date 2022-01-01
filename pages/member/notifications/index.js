@@ -11,7 +11,6 @@ import { Box, Button, Card, CircularProgress, Container, Grid, IconButton, Typog
 import MemberPageTemplate from "components/MemberPageTemplate";
 import React, { useState } from "react";
 import { cloneElement } from "react";
-import styles from "styles/main.module.scss";
 
 export default function Notifications() {
 	return (
@@ -31,27 +30,24 @@ function NotificationCard(props) {
 	const [mouseOver, setMouseOver] = useState(false);
 	const Icon = props.icon ? cloneElement(props.icon, { sx: { fontSize: "4rem" }, color: "lightGrey" }) : null;
 	return (
-		<Card
-			onMouseOver={() => setMouseOver(true)}
-			onMouseLeave={() => setMouseOver(false)}
-			sx={{ cursor: "pointer", mb: 2 }}
-			className={mouseOver ? styles.dropShadow2 : styles.dropShadow}
-		>
+		<Card onMouseOver={() => setMouseOver(true)} onMouseLeave={() => setMouseOver(false)} sx={{ cursor: "pointer", mb: 2 }} elevation={mouseOver ? 2 : 1}>
 			<Box sx={{ px: 4, py: 2, display: "flex", position: "relative" }}>
 				<Box sx={{ bgcolor: "primary.main", width: "4px", height: "100%", position: "absolute", left: 0, top: 0 }} />
 				<Grid container spacing={2}>
-					<Grid item xs={12} md={1} sx={{ display: "flex", alignItems: "center" }}>
+					<Grid item xs={2} md={1} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
 						{Icon ?? <CircularProgress />}
 					</Grid>
-					<Grid item xs={12} md={7} sx={{ display: "flex", justifyContent: "center", flexDirection: "column" }}>
+					<Grid item xs={10} md={7} sx={{ display: "flex", justifyContent: "center", flexDirection: "column" }}>
 						<Box sx={{ display: "flex", alignItems: "flex-end" }}>
-							<Typography fontWeight="bold">{props.title ?? "..."}</Typography>
-							<Typography variant="caption" sx={{ ml: 1 }}>
-								{props.subtitle}
+							<Typography fontWeight="bold">
+								{props.title ?? "..."}
+								<Typography variant="caption" sx={{ ml: 1 }}>
+									{props.subtitle}
+								</Typography>
 							</Typography>
 						</Box>
 						<Typography variant="caption" fontStyle="italic">
-							{new Date().toLocaleDateString()}
+							{props.caption ?? ""}
 						</Typography>
 					</Grid>
 					<Grid item xs={12} md={4} sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>

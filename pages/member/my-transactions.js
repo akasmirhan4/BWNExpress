@@ -28,7 +28,6 @@ import {
 } from "@mui/material";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import { Fragment, useEffect, useState } from "react";
-import styles from "styles/main.module.scss";
 import ImageWithSkeleton from "components/ImageWithSkeleton";
 import PendingPaymentsBox from "components/PendingPaymentBox";
 import { currencyFormatter } from "lib/formatter";
@@ -89,7 +88,7 @@ export default function MyTransactions() {
 			<PendingPaymentsBox sx={{ my: 4 }} />
 			<Container sx={{ my: 4 }}>
 				{/* Filter Container */}
-				<Accordion className={styles.dropShadow} sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightgray", mb: 4 }}>
+				<Accordion sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightgray", mb: 4, boxShadow: (theme) => theme.shadows[1] }}>
 					<AccordionSummary expandIcon={<ExpandMoreRounded />}>
 						<Typography>Filter</Typography>
 					</AccordionSummary>
@@ -203,7 +202,7 @@ function EnhancedTableRow(props) {
 				)}
 				{!isMdDown && (
 					<TableCell align="right">
-						<Button variant="outlined" sx={{ ml: 1 }} className={styles.dropShadow}>
+						<Button variant="outlined" sx={{ ml: 1, boxShadow: (theme) => theme.shadows[1] }}>
 							View Bill
 						</Button>
 					</TableCell>
@@ -271,9 +270,9 @@ function EnhancedTableRow(props) {
 														whiteSpace: "nowrap",
 														textOverflow: "ellipsis",
 														overflow: "hidden",
+														boxShadow: (theme) => theme.shadows[1],
 													}}
 													fullWidth
-													className={styles.dropShadow}
 												>
 													View Bill
 												</Button>

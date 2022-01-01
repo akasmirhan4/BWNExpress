@@ -1,6 +1,5 @@
-import { ChatBubble, Menu, Notifications } from "@mui/icons-material";
+import { Menu, Notifications } from "@mui/icons-material";
 import { AppBar, Avatar, Badge, Box, Container, IconButton, Typography, useScrollTrigger, useTheme } from "@mui/material";
-import styles from "styles/main.module.scss";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { selectUserData } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
@@ -66,8 +65,8 @@ export default function MemberTopbar(props) {
 										height: "2.5em",
 										bgcolor: "primary.main",
 										fontSize: { xs: "0.8rem", md: "1rem" },
+										boxShadow: (theme) => theme.shadows[1],
 									}}
-									className={styles.dropShadow}
 								>
 									{userData?.preferredName ? userData?.preferredName[0] : "?"}
 								</Avatar>
@@ -90,7 +89,9 @@ function ElevationScroll(props) {
 	});
 
 	return cloneElement(children, {
-		className: trigger ? styles.dropShadow : null,
-		sx: { bgcolor: trigger ? bgColorScroll ?? bgcolor ?? "primary.main" : bgcolor ?? "primary.main" },
+		sx: {
+			bgcolor: trigger ? bgColorScroll ?? bgcolor ?? "primary.main" : bgcolor ?? "primary.main",
+			boxShadow: (theme) => (trigger ? theme.shadows[1] : theme.shadows[0]),
+		},
 	});
 }

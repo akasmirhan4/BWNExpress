@@ -1,5 +1,4 @@
 import { Box, Container, Typography, Button } from "@mui/material";
-import styles from "styles/main.module.scss";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -43,13 +42,12 @@ export default function Summary() {
 			<Container sx={{ pt: 4 }}>
 				<Box
 					py={4}
-					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 } }}
+					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 }, boxShadow: (theme) => theme.shadows[1] }}
 					display={"flex"}
 					flexDirection={"column"}
 					width={"100%"}
 					bgcolor={"white.main"}
 					borderRadius={4}
-					className={styles.dropShadow}
 				>
 					<Typography fontWeight="bold" variant={"h5"} sx={{ textTransform: "uppercase" }} textAlign={"center"} color="secondaryAccent.main">
 						THANK YOU FOR YOUR ORDER!
@@ -59,7 +57,7 @@ export default function Summary() {
 					</Typography>
 					<Box display="flex" justifyContent={"center"}>
 						<Link prefetch={false} href="/member/dashboard" passHref>
-							<Button variant="contained" color="secondary" sx={{ color: "white.main" }} className={styles.dropShadow} startIcon={<HomeRounded />}>
+							<Button variant="contained" color="secondary" startIcon={<HomeRounded />}>
 								Home
 							</Button>
 						</Link>

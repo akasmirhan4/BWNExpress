@@ -1,7 +1,6 @@
 import { FacebookRounded } from "@mui/icons-material";
 import { Typography, Box, Container, TextField, Button, Link } from "@mui/material";
 import LandingTopbar from "components/LandingTopbar";
-import styles from "styles/main.module.scss";
 
 import { useState } from "react";
 import GoogleSignInBtn from "components/GoogleSignInBtn";
@@ -46,7 +45,7 @@ function RegisterContainer(props) {
 						overflow="hidden"
 						mt={4}
 						mb={8}
-						className={styles.dropShadow}
+						sx={{ boxShadow: (theme) => theme.shadows[1] }}
 					>
 						<Box sx={{ px: { sm: 4, xs: 2 } }} py={4} display="flex" flexDirection="column" width="100%">
 							<Typography
@@ -122,10 +121,16 @@ function RegisterContainer(props) {
 							/>
 							<Button
 								variant="contained"
-								sx={{ maxWidth: 384, borderRadius: 2, mt: "2em", color: "#FFFFFF", py: 1.5, fontWeight: "800", fontSize: "1rem" }}
+								sx={{
+									maxWidth: 384,
+									borderRadius: 2,
+									mt: "2em",
+									py: 1.5,
+									fontWeight: "800",
+									fontSize: "1rem",
+								}}
 								color="secondary"
 								fullWidth
-								className={styles.dropShadow}
 								onClick={async () => {
 									let isValid = true;
 									setEmailError("");
@@ -189,27 +194,6 @@ function RegisterContainer(props) {
 							borderTop="1px dashed"
 							borderColor="secondary.main"
 						>
-							{/* <Typography
-							variant="body2"
-							fontWeight="bold"
-							color="secondary"
-							display="inline-flex"
-							sx={{
-								mt: "-1em",
-								bgcolor: "#FFFFFF",
-								borderColor: "secondary.main",
-								borderWidth: 1,
-								borderStyle: "solid",
-								justifyContent: "center",
-								borderRadius: 1,
-								alignItems: "center",
-								px: 2,
-								py: 0.5,
-							}}
-							className={styles.dropShadow}
-						>
-							{"ALTERNATIVELY  👇"}
-						</Typography> */}
 							<GoogleSignInBtn />
 							<Button
 								sx={{
@@ -229,9 +213,9 @@ function RegisterContainer(props) {
 									justifyContent: "flex-start",
 									textTransform: "uppercase",
 									fontSize: "0.8rem",
+									boxShadow: (theme) => theme.shadows[1],
 								}}
 								fullWidth
-								className={styles.dropShadow}
 								onClick={() => {
 									auth.signInWithPopup(FacebookAuthProvider);
 								}}

@@ -1,6 +1,4 @@
-import { Box, Container, Typography, Button, Grid, Breadcrumbs, Link } from "@mui/material";
-import styles from "styles/main.module.scss";
-import useMediaQuery from "@mui/material/useMediaQuery";
+import { Container, Typography, Button, Grid, Breadcrumbs, Link } from "@mui/material";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import { useSelector } from "react-redux";
@@ -41,8 +39,6 @@ export default function Verification() {
 								disabled={!userData || verified?.IC !== "uploadingLater"}
 								variant="contained"
 								fullWidth
-								sx={{ color: "white.main" }}
-								className={styles.dropShadow}
 							>
 								{!userData
 									? "..."
@@ -63,7 +59,7 @@ export default function Verification() {
 						<Typography>{!userData ? "..." : userData.email}</Typography>
 					</Grid>
 					<Grid item xs={4}>
-						<Button disabled={!userData || verified?.email} variant="contained" fullWidth sx={{ color: "white.main" }} className={styles.dropShadow}>
+						<Button disabled={!userData || verified?.email} variant="contained" fullWidth>
 							{!userData ? "Loading..." : verified?.email == true ? "verified" : "verify"}
 						</Button>
 					</Grid>
@@ -74,7 +70,11 @@ export default function Verification() {
 						<Typography>{!userData ? "..." : userData.phoneNo}</Typography>
 					</Grid>
 					<Grid item xs={4}>
-						<Button disabled={!userData || verified?.phoneNo} variant="contained" fullWidth sx={{ color: "white.main" }} className={styles.dropShadow}>
+						<Button
+							disabled={!userData || verified?.phoneNo}
+							variant="contained"
+							fullWidth
+						>
 							{!userData ? "Loading..." : verified?.phoneNo == true ? "verified" : "verify"}
 						</Button>
 					</Grid>

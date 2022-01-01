@@ -3,7 +3,6 @@ import { Box } from "@mui/system";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import OrderSummary from "components/OrderSummary";
 import React, { useEffect, useState } from "react";
-import styles from "styles/main.module.scss";
 import { selectOrders, selectUser } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
@@ -17,7 +16,7 @@ export default function Details() {
 	const user = useSelector(selectUser);
 	const [orderData, setOrderData] = useState(null);
 	const [receiptURL, setReceiptURL] = useState(null);
-	
+
 	useEffect(() => {
 		if (user.uid) {
 			(async () => {
@@ -62,13 +61,12 @@ export default function Details() {
 				<Box
 					my={4}
 					py={4}
-					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 } }}
+					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 }, boxShadow: (theme) => theme.shadows[1] }}
 					display={"flex"}
 					flexDirection={"column"}
 					width={"100%"}
 					bgcolor={"white.main"}
 					borderRadius={4}
-					className={styles.dropShadow}
 				>
 					<OrderSummary orderData={orderData} receiptURL={receiptURL} />
 				</Box>

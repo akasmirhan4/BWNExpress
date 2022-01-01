@@ -80,7 +80,7 @@ export default function CustomDrawer(props) {
 								disabled={verifyStatus !== "verified"}
 								variant="outlined"
 								color="secondaryAccent"
-								className={styles.dropShadow}
+								sx={{ boxShadow: (theme) => theme.shadows[1] }}
 								startIcon={<ShoppingCartIcon />}
 								fullWidth
 							>
@@ -136,8 +136,8 @@ function DrawerButton(props) {
 					fullWidth
 					color="accent"
 					sx={{ mb: 1 }}
+					sx={{ boxShadow: (theme) => theme.shadows[1], mb: 1 }}
 					style={{ justifyContent: "flex-start", paddingLeft: "1em", color: "white" }}
-					className={styles.dropShadow}
 				>
 					{label}
 				</Button>

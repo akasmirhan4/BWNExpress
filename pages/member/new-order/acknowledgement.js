@@ -1,5 +1,4 @@
 import { Box, Container, Typography, Button, Grid, Breadcrumbs, Link, useMediaQuery, Checkbox } from "@mui/material";
-import styles from "styles/main.module.scss";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import { Masonry } from "@mui/lab";
@@ -88,13 +87,12 @@ export default function Acknowledgement() {
 				{/* ORDER FORM */}
 				<Box
 					py={4}
-					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 } }}
+					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 }, boxShadow: (theme) => theme.shadows[1] }}
 					display={"flex"}
 					flexDirection={"column"}
 					width={"100%"}
 					bgcolor={"white.main"}
 					borderRadius={4}
-					className={styles.dropShadow}
 				>
 					<Typography fontWeight="bold" variant={"h5"} sx={{ textTransform: "uppercase", pb: 4 }} textAlign={"center"}>
 						RESTRICTED & PROHIBITED GOODS
@@ -125,8 +123,7 @@ export default function Acknowledgement() {
 									endIcon={<ChevronRightRounded />}
 									variant="contained"
 									color="accent"
-									sx={{ color: "white.main", width: { md: "unset", xs: "100%" } }}
-									className={styles.dropShadow}
+									sx={{ width: { md: "unset", xs: "100%" } }}
 									onClick={() => {
 										dispatch(setIsAcknowledged(_isAcknowledged));
 									}}

@@ -1,12 +1,12 @@
-import { CloseRounded, HomeRounded, UploadFileRounded } from "@mui/icons-material";
+import { ChevronLeftRounded, CloseRounded, HomeRounded, UploadFileRounded } from "@mui/icons-material";
 import { Typography, Box, Container, Button, Grid, Checkbox, FormHelperText, ButtonBase, IconButton } from "@mui/material";
-import styles from "styles/main.module.scss";
 import { useRef, useState } from "react";
 import Link2 from "next/link";
 import toast from "react-hot-toast";
 import { auth, firestore, storage } from "lib/firebase";
 import { selectUserData, setUserData } from "lib/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
+import RegisterSteppers from "components/RegisterSteppers";
 
 export default function UploadIC(params) {
 	const [isUploadingLater, setIsUploadingLater] = useState(false);
@@ -43,6 +43,7 @@ export default function UploadIC(params) {
 				sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover", backgroundColor: "grey" }}
 			>
 				<Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", mb: 4 }}>
+					<RegisterSteppers sx={{ my: 4 }} activeStep={2} />
 					<Box
 						bgcolor="#FFFFFF"
 						display="flex"
@@ -53,7 +54,7 @@ export default function UploadIC(params) {
 						overflow="hidden"
 						my={4}
 						width="100%"
-						className={styles.dropShadow}
+						sx={{ boxShadow: (theme) => theme.shadows[1] }}
 					>
 						<Box sx={{ px: { xs: 2, sm: 4, md: 8 } }} py={4} display="flex" flexDirection="column" width="100%">
 							<Typography
@@ -61,7 +62,7 @@ export default function UploadIC(params) {
 								sx={{
 									textTransform: "uppercase",
 									fontSize: { xs: "1em", sm: "1.3rem", md: "1.8rem" },
-									letterSpacing: { xs: "0.1em", sm: "0.2em", md: "0.3em" },
+									// letterSpacing: { xs: "0.1em", sm: "0.2em", md: "0.3em" },
 									color: "secondary.main",
 									fontWeight: 800,
 									lineHeight: "1.25em",
@@ -184,16 +185,8 @@ export default function UploadIC(params) {
 									</Typography>
 								</Grid>
 								<Grid item xs={12} md={10}>
-									<Button
-										disabled={isUploadingLater}
-										variant="contained"
-										component="label"
-										className={styles.dropShadow}
-										color="secondaryAccent"
-										sx={{ color: "#FFFFFF" }}
-										fullWidth
-									>
-										Load File(s)
+									<Button disabled={isUploadingLater} variant="contained" component="label" color="secondaryAccent" fullWidth>
+										{!selectedFiles.length ? "Load File(s)" : "Reload File(s)"}
 										<input
 											type="file"
 											hidden
@@ -257,17 +250,9 @@ export default function UploadIC(params) {
 					</Box>
 					<Grid container spacing={2}>
 						<Grid item xs={6}>
-							<Link2 href="/home" prefetch={false}>
-								<Button
-									fullWidth
-									variant="contained"
-									className={styles.dropShadow}
-									color="secondary"
-									size="large"
-									sx={{ color: "#FFFFFF" }}
-									startIcon={<HomeRounded />}
-								>
-									Home
+							<Link2 href="/auth/register/new-user" prefetch={false}>
+								<Button fullWidth variant="contained" color="secondary" size="large" startIcon={<ChevronLeftRounded />}>
+									Back
 								</Button>
 							</Link2>
 						</Grid>
@@ -276,10 +261,8 @@ export default function UploadIC(params) {
 								disabled={!isUploadingLater && (!selectedFiles.length || !selectedFiles.some((file) => file))}
 								fullWidth
 								variant="contained"
-								className={styles.dropShadow}
 								color="secondary"
 								size="large"
-								sx={{ color: "#FFFFFF" }}
 								endIcon={<UploadFileRounded />}
 								onClick={async () => {
 									if (isUploadingLater) {

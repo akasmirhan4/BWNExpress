@@ -1,7 +1,6 @@
 import { FacebookRounded } from "@mui/icons-material";
 import { Typography, Box, Container, TextField, Button, Link } from "@mui/material";
 import LandingTopbar from "components/LandingTopbar";
-import styles from "styles/main.module.scss";
 import Link2 from "next/link";
 import { useState } from "react";
 import GoogleSignInBtn from "components/GoogleSignInBtn";
@@ -107,7 +106,10 @@ function LoginContainer(props) {
 				<TextField
 					label="Email"
 					type="email"
-					InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2, ":hover": { bgcolor: "offWhite.secondary", opacity: 0.5 } } }}
+					InputProps={{
+						disableUnderline: true,
+						sx: { bgcolor: "offWhite.secondary", borderRadius: 2, ":hover": { bgcolor: "offWhite.secondary", opacity: 0.5 } },
+					}}
 					InputLabelProps={{ sx: { color: "text.secondary" } }}
 					fullWidth
 					sx={{ maxWidth: 384, borderRadius: 2, mb: 2 }}
@@ -122,7 +124,10 @@ function LoginContainer(props) {
 				<TextField
 					label="Password"
 					type="password"
-					InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2, ":hover": { bgcolor: "offWhite.secondary", opacity: 0.5 } } }}
+					InputProps={{
+						disableUnderline: true,
+						sx: { bgcolor: "offWhite.secondary", borderRadius: 2, ":hover": { bgcolor: "offWhite.secondary", opacity: 0.5 } },
+					}}
 					InputLabelProps={{ sx: { color: "text.secondary" } }}
 					fullWidth
 					sx={{ maxWidth: 384, borderRadius: 2 }}
@@ -136,10 +141,16 @@ function LoginContainer(props) {
 				/>
 				<Button
 					variant="contained"
-					sx={{ maxWidth: 384, borderRadius: 2, mt: "2em", color: "#FFFFFF", py: 1.5, fontWeight: "800", fontSize: "1rem" }}
+					sx={{
+						maxWidth: 384,
+						borderRadius: 2,
+						mt: "2em",
+						py: 1.5,
+						fontWeight: "800",
+						fontSize: "1rem",
+					}}
 					color="secondary"
 					fullWidth
-					className={styles.dropShadow}
 					onClick={() => {
 						toast.promise(logIn(), { success: "Logged In", loading: "Logging In...", error: "Error Logging In" });
 					}}
@@ -171,9 +182,9 @@ function LoginContainer(props) {
 						justifyContent: "flex-start",
 						textTransform: "uppercase",
 						fontSize: "0.8rem",
+						boxShadow: (theme) => theme.shadows[1],
 					}}
 					fullWidth
-					className={styles.dropShadow}
 				>
 					<FacebookRounded fontSize="large" sx={{ mr: 3, ml: -0.5 }} />
 					Continue with Facebook

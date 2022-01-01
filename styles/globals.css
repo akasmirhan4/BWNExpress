@@ -5,6 +5,7 @@ body {
 	font-family: Montserrat, sans-serif;
 	max-width: 100%;
 	overflow-x: hidden;
+	font-size: 14px;
 }
 a {
 	color: inherit;

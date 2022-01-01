@@ -1,5 +1,4 @@
 import { Typography, Box, Container, Button } from "@mui/material";
-import styles from "styles/main.module.scss";
 import { useEffect, useState } from "react";
 import router from "next/router";
 import toast from "react-hot-toast";

@@ -1,5 +1,4 @@
 import { Box, Button, Container, Grid, Typography, useMediaQuery } from "@mui/material";
-import styles from "../styles/main.module.scss";
 import Link from "next/link";
 
 import LandingTopbar from "../components/LandingTopbar";
@@ -57,7 +56,7 @@ function AboutUs(props) {
 									>
 										3.9K
 									</Typography>
-									<Typography variant={isSmallScreen ? "h8" : "h8"} color="white.main" textAlign={"center"}>
+									<Typography color="white.main" textAlign={"center"}>
 										Registered Members
 									</Typography>
 								</Box>
@@ -82,7 +81,7 @@ function AboutUs(props) {
 									>
 										200
 									</Typography>
-									<Typography variant={isSmallScreen ? "h8" : "h8"} color="white.main" textAlign={"center"}>
+									<Typography color="white.main" textAlign={"center"}>
 										Parcels Handled (Outbound)
 									</Typography>
 								</Box>
@@ -107,7 +106,7 @@ function AboutUs(props) {
 									>
 										40k
 									</Typography>
-									<Typography variant={isSmallScreen ? "h8" : "h8"} color="white.main" textAlign={"center"}>
+									<Typography color="white.main" textAlign={"center"}>
 										Parcels Handled (Inbound)
 									</Typography>
 								</Box>
@@ -171,9 +170,8 @@ function HowItWorks(props) {
 						<Button
 							variant="contained"
 							style={{ color: "white" }}
-							sx={{ py: "1.4em", width: "20em" }}
+							sx={{ py: "1.4em", width: "20em", boxShadow: (theme) => theme.shadows[1] }}
 							size="large"
-							className={styles.dropShadow}
 							color="secondary"
 						>
 							Register now!

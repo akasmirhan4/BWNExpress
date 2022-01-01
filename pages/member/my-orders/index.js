@@ -28,11 +28,10 @@ import {
 	useMediaQuery,
 } from "@mui/material";
 import MemberPageTemplate from "components/MemberPageTemplate";
-import { auth, getOrders } from "lib/firebase";
+import { getOrders } from "lib/firebase";
 import { selectUser, setOrders } from "lib/slices/userSlice";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import styles from "styles/main.module.scss";
 import Link from "next/link";
 
 export default function MyOrders() {
@@ -107,7 +106,7 @@ export default function MyOrders() {
 		<MemberPageTemplate>
 			<Container sx={{ my: 4 }}>
 				{/* Filter Container */}
-				<Accordion className={styles.dropShadow} sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightgray", mb: 4 }}>
+				<Accordion sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightgray", mb: 4, boxShadow: (theme) => theme.shadows[1] }}>
 					<AccordionSummary expandIcon={<ExpandMoreRounded />}>
 						<Typography>Filter</Typography>
 					</AccordionSummary>
@@ -249,7 +248,7 @@ function EnhancedTableRow(props) {
 						</Tooltip>
 						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`} prefetch={false} passHref>
 							<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
-								<Button variant="contained" sx={{ color: "white.main", ml: 1, fontSize: { xs: "0.7rem", sm: "0.9rem" } }} className={styles.dropShadow}>
+								<Button variant="contained" sx={{ ml: 1 }}>
 									Track Order
 								</Button>
 							</Tooltip>
@@ -303,15 +302,12 @@ function EnhancedTableRow(props) {
 															<Button
 																variant="contained"
 																sx={{
-																	color: "white.main",
 																	whiteSpace: "nowrap",
 																	textOverflow: "ellipsis",
 																	overflow: "hidden",
 																	ml: 1,
-																	fontSize: { xs: "0.7rem", sm: "0.9rem" },
 																}}
 																fullWidth
-																className={styles.dropShadow}
 															>
 																Track Order
 															</Button>
