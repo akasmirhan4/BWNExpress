@@ -32,11 +32,6 @@ function MiddleComponent(props) {
 		} else {
 			setPageLoaded(false);
 		}
-		const pageTrace = trace(perf, route);
-		pageTrace.start();
-		return () => {
-			pageTrace.stop();
-		};
 	}, [route, userData, auth.currentUser, isLoading]);
 
 	useEffect(() => {
@@ -70,6 +65,11 @@ function MiddleComponent(props) {
 				setIsLoading(false);
 			}
 		});
+		const pageTrace = trace(perf, route);
+		pageTrace.start();
+		return () => {
+			pageTrace.stop();
+		};
 	}, []);
 
 	useEffect(() => {
