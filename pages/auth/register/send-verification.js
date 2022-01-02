@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { auth, firestore } from "lib/firebase";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser, selectUserData, setUserData } from "lib/slices/userSlice";
+import { selectUserData } from "lib/slices/userSlice";
 import { useRouter } from "next/router";
 import RegisterSteppers from "components/RegisterSteppers";
 
@@ -12,7 +12,6 @@ export default function SendVerification(params) {
 	const router = useRouter();
 	const [counter, setCounter] = useState(TIMER);
 	const [startTimer, setStartTimer] = useState(false);
-	const user = useSelector(selectUser);
 	const userData = useSelector(selectUserData);
 	const dispatch = useDispatch();
 
@@ -40,10 +39,26 @@ export default function SendVerification(params) {
 		}
 	}, [userData]);
 
+	useEffect(() => {
+		let checkForVerifiedInterval = setInterval(() => {
+			auth.currentUser.reload();
+			if (auth.currentUser.emailVerified) {
+				(async () => {
+					console.log("verified!");
+					await firestore.collection("users").doc(auth.currentUser.uid).update({ "verified.email": true });
+					router.push("/auth/register/new-user");
+				})();
+			}
+		}, 1000);
+		return () => {
+			clearInterval(checkForVerifiedInterval);
+		};
+	}, []);
+
 	return (
 		<Box pt={2} minHeight="100vh" display="flex" sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover", backgroundColor: "grey" }}>
 			<Container sx={{ display: "flex", flexDirection: "column" }}>
-				<RegisterSteppers sx={{ my: 4 }} activeStep={0} />
+				<RegisterSteppers sx={{ my: 4 }} activestep={0} />
 				<Box
 					bgcolor="white.main"
 					display="flex"
@@ -80,15 +95,17 @@ export default function SendVerification(params) {
 							variant="contained"
 							disabled={startTimer}
 							onClick={() => {
-								auth.currentUser.sendEmailVerification({ url: `${process.env.NEXT_URL}/auth/register/complete-verification`, handleCodeInApp: true }).then(() => {
-									// The link was successfully sent. Inform the user.
-									// Save the email locally so you don't need to ask the user for it again
-									// if they open the link on the same device.
-									window.localStorage.setItem("emailForSignIn", auth.currentUser.email);
-									// ...
-									setStartTimer(true);
-									toast.success("Verification link has been sent to your email", { style: { textAlign: "center" } });
-								});
+								auth.currentUser
+									.sendEmailVerification({ url: `${process.env.NEXT_URL}/auth/register/complete-verification`, handleCodeInApp: true })
+									.then(() => {
+										// The link was successfully sent. Inform the user.
+										// Save the email locally so you don't need to ask the user for it again
+										// if they open the link on the same device.
+										window.localStorage.setItem("emailForSignIn", auth.currentUser.email);
+										// ...
+										setStartTimer(true);
+										toast.success("Verification link has been sent to your email", { style: { textAlign: "center" } });
+									});
 							}}
 						>
 							{startTimer ? counter : "Send Verification"}

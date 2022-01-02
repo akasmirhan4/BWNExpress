@@ -3,22 +3,22 @@ import { Box } from "@mui/system";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import OrderSummary from "components/OrderSummary";
 import React, { useEffect, useState } from "react";
-import { selectOrders, selectUser } from "lib/slices/userSlice";
+import { selectOrders, selectUserExists } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import { getOrder, getReceiptURL } from "lib/firebase";
+import { auth, getOrder, getReceiptURL } from "lib/firebase";
 import toast from "react-hot-toast";
 import NextLink from "next/link";
 
 export default function Details() {
 	const orders = useSelector(selectOrders);
 	const router = useRouter();
-	const user = useSelector(selectUser);
 	const [orderData, setOrderData] = useState(null);
 	const [receiptURL, setReceiptURL] = useState(null);
+	const userExist = useSelector(selectUserExists);
 
 	useEffect(() => {
-		if (user.uid) {
+		if (userExist) {
 			(async () => {
 				let isCached = false;
 				let success = false;
@@ -45,7 +45,7 @@ export default function Details() {
 				}
 			})();
 		}
-	}, [user]);
+	}, [userExist]);
 
 	return (
 		<MemberPageTemplate>

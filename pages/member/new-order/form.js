@@ -279,7 +279,7 @@ export default function Verification() {
 						<Typography color="text.primary">New Order</Typography>
 					</Breadcrumbs>
 				</Box>
-				<NewOrderSteppers sx={{ my: 4 }} activeStep={1} />
+				<NewOrderSteppers sx={{ my: 4 }} activestep={1} />
 				{/* ORDER FORM */}
 				<Box
 					py={4}

@@ -3,7 +3,7 @@ import { Box } from "@mui/system";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import React, { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { getLogTracker, getOrder } from "lib/firebase";
+import { auth, getLogTracker, getOrder } from "lib/firebase";
 import toast from "react-hot-toast";
 import NextLink from "next/link";
 import {
@@ -18,8 +18,8 @@ import {
 	TouchAppRounded,
 } from "@mui/icons-material";
 import { cloneElement } from "react";
-import { selectUser } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
+import { selectUserExists } from "lib/slices/userSlice";
 
 export default function Details() {
 	return (
@@ -46,10 +46,10 @@ function TrackerComponent(props) {
 	const orderID = router.query.orderID;
 	const [headerColor, setHeaderColor] = useState("secondary.main");
 	const [headerTitle, setHeaderTitle] = useState("...");
-	const user = useSelector(selectUser);
+	const userExist = useSelector(selectUserExists);
 
 	useEffect(() => {
-		if (user.uid) {
+		if (userExist) {
 			(async () => {
 				const results = await toast.promise(Promise.all([getLogTracker(orderID), getOrder(orderID)]), {
 					loading: "fetching data...",
@@ -68,7 +68,7 @@ function TrackerComponent(props) {
 				}
 			})();
 		}
-	}, [user]);
+	}, [userExist]);
 
 	return (
 		<Box

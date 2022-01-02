@@ -30,7 +30,7 @@ import {
 } from "@mui/material";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import { getOrders } from "lib/firebase";
-import { selectUser, setOrders } from "lib/slices/userSlice";
+import { selectUserExists, setOrders } from "lib/slices/userSlice";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
@@ -54,13 +54,13 @@ export default function MyOrders() {
 	};
 
 	const [rows, setRows] = useState([]);
-	const user = useSelector(selectUser);
 	const [displayedRows, setDisplayedRows] = useState(rows);
 	const [loading, setLoading] = useState(true);
 
 	const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
 	const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 	const dispatch = useDispatch();
+	const userExist = useSelector(selectUserExists);
 
 	useEffect(() => {
 		const isStatusSelected = Object.values(status).some((e) => e);
@@ -87,7 +87,7 @@ export default function MyOrders() {
 	}, [status, dateFilter, rows]);
 
 	useEffect(() => {
-		if (user) {
+		if (userExist) {
 			getOrders().then((orders) => {
 				if (!orders) return;
 				dispatch(setOrders(orders));
@@ -104,7 +104,7 @@ export default function MyOrders() {
 			});
 			setLoading(false);
 		}
-	}, [user]);
+	}, [userExist]);
 
 	return (
 		<MemberPageTemplate>

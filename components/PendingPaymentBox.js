@@ -1,20 +1,21 @@
 import { Box, Button, Container, Grid, Skeleton, Typography } from "@mui/material";
-import { getPendingPayments } from "lib/firebase";
+import { auth, getPendingPayments } from "lib/firebase";
 import { currencyFormatter } from "lib/formatter";
-import { selectUser } from "lib/slices/userSlice";
+import { selectUserExists } from "lib/slices/userSlice";
 import { Fragment, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 export default function PendingPaymentsBox(props) {
-	const user = useSelector(selectUser);
 	const [totalAmountDue, setTotalAmountDue] = useState(null);
 	const [amountDue, setAmountDue] = useState(null);
 	const [dueSince, setDueSince] = useState(null);
 	const [pendingPayments, setPendingPayments] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const userExist = useSelector(selectUserExists);
 
 	useEffect(() => {
-		if (user) {
+		console.log("user: ", auth.currentUser);
+		if (userExist) {
 			(async () => {
 				const _pendingPayments = await getPendingPayments();
 				setPendingPayments(_pendingPayments);
@@ -26,13 +27,13 @@ export default function PendingPaymentsBox(props) {
 				setLoading(false);
 			})();
 		}
-	}, [user]);
+	}, [userExist]);
 
 	return (
 		<Container {...props}>
 			<Box sx={{ borderColor: "border.main", borderWidth: 0.5, borderStyle: "solid", borderRadius: 4, py: 2, px: 4, boxShadow: (theme) => theme.shadows[1] }}>
 				<Grid container spacing={2}>
-					<Grid item md={6} xs={12}>
+					<Grid item md={6} xs={12} sx={{ display:"flex", flexDirection:"column", alignItems: { xs: "center", md: "left" } }}>
 						<Typography color="text.main" fontWeight="500" sx={{ textAlign: { xs: "center", md: "left" } }}>
 							Pending Payment
 						</Typography>

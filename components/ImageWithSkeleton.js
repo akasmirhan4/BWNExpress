@@ -13,6 +13,7 @@ export default function ImageWithSkeleton(props) {
 				onLoadingComplete={() => {
 					setIsImageLoaded(true);
 				}}
+				priority
 			/>
 		</Box>
 	);

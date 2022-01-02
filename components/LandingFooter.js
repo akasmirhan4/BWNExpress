@@ -11,15 +11,15 @@ export default function LandingFooter(params) {
 			<Container>
 				<Grid container spacing={2} justifyContent={"center"} display="flex">
 					<Grid item xs={12} sm={6} md={4} display="flex" flexDirection="column" justifyContent="center" order={{ xs: 2, sm: 1 }}>
-						<Link href="/home" passHref>
+						<Link href="tel:(673) 239 0782" passHref>
 							<Box display="flex" alignItems="center" sx={{ justifyContent: { xs: "center", sm: "flex-start" } }} mb={1}>
 								<Phone sx={{ color: "#FFFFFF", mr: 2 }} />
 								<Typography color="#FFFFFF" fontWeight={500}>
-									(673) 239 0782
+									+673 239 0782
 								</Typography>
 							</Box>
 						</Link>
-						<Link href="/home" passHref>
+						<Link href="https://wa.link/9ai19a" passHref>
 							<Box display="flex" alignItems="center" mb={1} sx={{ justifyContent: { xs: "center", sm: "flex-start" } }}>
 								<WhatsApp sx={{ color: "#FFFFFF", mr: 2 }} />
 								<Typography color="#FFFFFF" fontWeight={500}>

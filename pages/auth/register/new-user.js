@@ -149,7 +149,7 @@ function NewUserContainer(props) {
 			sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover", backgroundColor: "grey" }}
 		>
 			<Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-				<RegisterSteppers sx={{ my: 4 }} activeStep={1} />
+				<RegisterSteppers sx={{ my: 4 }} activestep={1} />
 				<Box
 					bgcolor="white.main"
 					display="flex"

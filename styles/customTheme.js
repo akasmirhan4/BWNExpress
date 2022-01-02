@@ -12,13 +12,6 @@ const breakpoints = {
 	},
 };
 
-const shadows = {
-	0: "rgba(0, 0, 0, 0) 0px 2px 4px",
-	1: "rgba(0, 0, 0, 0.1) 0px 2px 4px",
-	2: "rgba(0, 0, 0, 0.4) 0px 2px 4px",
-	16: "rgba(0, 0, 0, 0.4) 0px 2px 4px",
-};
-
 const customTheme = createTheme({
 	typography: {
 		fontFamily: ["Montserrat", "sans-serif"].join(","),
@@ -93,7 +86,6 @@ const customTheme = createTheme({
 			},
 		},
 	},
-	shadows,
 	breakpoints,
 	palette: {
 		primary: {
@@ -136,7 +128,7 @@ const customTheme = createTheme({
 				{
 					props: { variant: "contained" },
 					style: {
-						boxShadow: shadows[1],
+						boxShadow: "rgba(0, 0, 0, 0.1) 0px 2px 4px",
 						color: "white",
 					},
 				},
@@ -144,5 +136,8 @@ const customTheme = createTheme({
 		},
 	},
 });
+
+customTheme.shadows[1] = "rgba(0, 0, 0, 0.1) 0px 2px 4px";
+customTheme.shadows[2] = "rgba(0, 0, 0, 0.4) 0px 2px 4px";
 
 export { customTheme };

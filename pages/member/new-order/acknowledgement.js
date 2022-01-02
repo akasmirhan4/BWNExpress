@@ -83,7 +83,7 @@ export default function Acknowledgement() {
 						<Typography color="text.primary">New Order</Typography>
 					</Breadcrumbs>
 				</Box>
-				<NewOrderSteppers sx={{ my: 4 }} activeStep={0} />
+				<NewOrderSteppers sx={{ my: 4 }} activestep={0} />
 				{/* ORDER FORM */}
 				<Box
 					py={4}

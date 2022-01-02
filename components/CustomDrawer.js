@@ -10,14 +10,16 @@ import toast from "react-hot-toast";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { auth } from "lib/firebase";
 import { useEffect, useState } from "react";
-import { selectUserData } from "lib/slices/userSlice";
+import { selectUserData, setUserExists } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export default function CustomDrawer(props) {
 	const { palette } = useTheme();
 	const isLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("xl"));
 	const userData = useSelector(selectUserData);
 	const [verifyStatus, setVerifyStatus] = useState("...");
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		if (userData?.verified) {
@@ -96,6 +98,7 @@ export default function CustomDrawer(props) {
 				<Box display="flex" flexDirection="column" width="100%">
 					<Button
 						onClick={() => {
+							dispatch(setUserExists(false));
 							toast.promise(auth.signOut(), { loading: "logging out...", success: " log out successful", error: "error logging out" });
 						}}
 						startIcon={<Logout />}

@@ -6,10 +6,10 @@ import MemberPageTemplate from "components/MemberPageTemplate";
 import PendingPaymentsBox from "components/PendingPaymentBox";
 import ImageWithSkeleton from "components/ImageWithSkeleton";
 import { Fragment, useEffect, useState } from "react";
-import { getPendingActionOrders } from "lib/firebase";
-import { useSelector } from "react-redux";
-import { selectUser } from "lib/slices/userSlice";
+import { auth, getPendingActionOrders } from "lib/firebase";
 import { DoNotTouchRounded } from "@mui/icons-material";
+import { selectUserExists } from "lib/slices/userSlice";
+import { useSelector } from "react-redux";
 
 export default function Dashboard() {
 	return (
@@ -24,22 +24,21 @@ export default function Dashboard() {
 function PendingActionsBox(props) {
 	const pendingOrders = ["BWN00000001", "BWN00000002", "BWN00000003", "BWN00000004", "BWN00000005", "BWN00000006"];
 
-	const user = useSelector(selectUser);
-
 	const isLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("md2"));
 	const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 	const ordersPerSlide = isLargeScreen ? 6 : isSmallScreen ? 2 : 3;
 	const [pendingActionOrders, setPendingActionOrders] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const userExist = useSelector(selectUserExists);
 
 	useEffect(() => {
-		if (user) {
+		if (userExist) {
 			(async () => {
 				setPendingActionOrders((await getPendingActionOrders()) ?? []);
 				setLoading(false);
 			})();
 		}
-	}, [user]);
+	}, [userExist]);
 
 	const getSlides = () => {
 		let nSlides = Math.ceil(pendingActionOrders.length / ordersPerSlide);
@@ -115,8 +114,10 @@ function PromotionsBox(props) {
 						className: dashboardStyles.slide,
 						children: (
 							<Box justifyContent="center" alignItems="center" display="flex" width="100%" height="100%" zIndex={0} position="relative">
-								<Typography sx={{ fontSize: { sm: "1.5rem", md: "2rem" }, color: "#FFFFFF", bgcolor: "primary.main" }}>Your Advert Space Here!</Typography>
-								<ImageWithSkeleton src={`/pngs/promotions/${img}`} objectFit="cover" layout="fill" containersx={{ position: "absolute", zIndex: -1 }} />
+								<Typography sx={{ fontSize: { sm: "1.5rem", md: "2rem" }, color: "#FFFFFF", bgcolor: "primary.main", position: "absolute" }}>
+									Your Advert Space Here!
+								</Typography>
+								<ImageWithSkeleton src={`/pngs/promotions/${img}`} objectFit="cover" layout="fill" containersx={{ position: "relative", zIndex: -1 }} />
 							</Box>
 						),
 					};

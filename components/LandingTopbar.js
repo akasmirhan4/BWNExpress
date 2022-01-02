@@ -35,15 +35,15 @@ import {
 import { useRouter } from "next/router";
 import { selectLang, setLang } from "lib/slices/prefSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser } from "lib/slices/userSlice";
 import Logo from "./Logo";
+import { selectUserExists, setUserExists } from "lib/slices/userSlice";
 
 export default function LandingTopbar(props) {
 	const lang = useSelector(selectLang);
 	const dispatch = useDispatch();
-	const user = useSelector(selectUser);
 	const isSmUp = useMediaQuery((theme) => theme.breakpoints.up("sm"));
 	const { palette } = useTheme();
+	const userExists = useSelector(selectUserExists);
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -53,24 +53,24 @@ export default function LandingTopbar(props) {
 				<Container sx={{ py: 2, position: "relative" }}>
 					<Grid container spacing={2} sx={{ display: { xs: "none", md: "flex" } }}>
 						<Grid item md={3} alignItems="center" display="flex">
-							<Link href="/home"  passHref>
+							<Link href="/home" passHref>
 								<IconButton sx={{ borderRadius: 4 }} centerRipple={false}>
 									{isSmUp ? <BrandWithLogo textColor={props.darkText ? "secondaryAccent.main" : null} /> : <Logo fill={palette.secondary.main} />}
 								</IconButton>
 							</Link>
 						</Grid>
 						<Grid item md={4} justifyContent="flex-start" alignItems="center" display="flex">
-							<Link href="/home"  passHref>
+							<Link href="/home" passHref>
 								<Button color={props.darkText ? "text" : "white"} sx={{ mr: 2 }}>
 									Home
 								</Button>
 							</Link>
-							<Link href="/about-us"  passHref>
+							<Link href="/about-us" passHref>
 								<Button color={props.darkText ? "text" : "white"} sx={{ mr: 2 }}>
 									About Us
 								</Button>
 							</Link>
-							<Link href="/resources"  passHref>
+							<Link href="/resources" passHref>
 								<Button color={props.darkText ? "text" : "white"}>Resources</Button>
 							</Link>
 						</Grid>
@@ -102,12 +102,12 @@ export default function LandingTopbar(props) {
 									BM
 								</Button>
 							</Box> */}
-							{!user.uid ? (
+							{!userExists ? (
 								<Box>
-									<Link href="/auth/login"  passHref>
+									<Link href="/auth/login" passHref>
 										<Button color={props.darkText ? "text" : "white"}>Login</Button>
 									</Link>
-									<Link href="/auth/register"  passHref>
+									<Link href="/auth/register" passHref>
 										<Button variant="contained" color="secondary" sx={{ ml: 2, boxShadow: (theme) => theme.shadows[1] }} style={{ color: "white" }}>
 											Register
 										</Button>
@@ -117,11 +117,14 @@ export default function LandingTopbar(props) {
 								<Box>
 									<Button
 										color="white"
-										onClick={() => toast.promise(auth.signOut(), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" })}
+										onClick={() => {
+											dispatch(setUserExists(false));
+											toast.promise(auth.signOut(), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" });
+										}}
 									>
 										Logout
 									</Button>
-									<Link href="/member/dashboard"  passHref>
+									<Link href="/member/dashboard" passHref>
 										<Button variant="contained" color="secondary" sx={{ ml: 2, boxShadow: (theme) => theme.shadows[1] }} style={{ color: "white" }}>
 											Dashboard
 										</Button>
@@ -172,7 +175,7 @@ export default function LandingTopbar(props) {
 						</List>
 						<Divider />
 						<List>
-							{!user.uid ? (
+							{!userExists ? (
 								<>
 									<DrawerLink href="/auth/login" title="Login" icon={<LoginRounded />} />
 									<DrawerLink href="/auth/register" title="Register" icon={<PersonAddRounded />} />
@@ -182,7 +185,10 @@ export default function LandingTopbar(props) {
 									<DrawerLink href="/member/dashboard" title="Dashboard" icon={<DashboardRounded />} />
 									<ListItem
 										button
-										onClick={() => toast.promise(auth.signOut(), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" })}
+										onClick={() => {
+											dispatch(setUserExists(false));
+											toast.promise(auth.signOut(), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" });
+										}}
 									>
 										<ListItemIcon>
 											<LogoutRounded />
@@ -234,7 +240,7 @@ function DrawerLink(props) {
 	const Icon = () => cloneElement(icon, { color: routeTitle == title ? "secondary" : "text" });
 
 	return (
-		<Link href={href}  passHref>
+		<Link href={href} passHref>
 			<ListItem button>
 				<ListItemIcon>
 					<Icon />

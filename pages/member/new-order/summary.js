@@ -44,7 +44,7 @@ export default function Summary() {
 						<Typography color="text.primary">New Order</Typography>
 					</Breadcrumbs>
 				</Box>
-				<NewOrderSteppers sx={{ my: 4 }} activeStep={2} />
+				<NewOrderSteppers sx={{ my: 4 }} activestep={2} />
 				<Box
 					py={4}
 					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 }, boxShadow: (theme) => theme.shadows[1] }}

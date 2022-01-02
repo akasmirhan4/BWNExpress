@@ -3,24 +3,22 @@ import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import OTPPhoneDialog from "components/OTPPhoneDialog";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser, selectUserData, setUserData } from "lib/slices/userSlice";
+import { selectUser, selectUserData } from "lib/slices/userSlice";
 import { auth, authObj, firestore } from "lib/firebase";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { LoadingButton } from "@mui/lab";
-import { CheckRounded, PinRounded, SendRounded, UploadRounded } from "@mui/icons-material";
+import { CheckRounded, SendRounded, UploadRounded } from "@mui/icons-material";
 
 export default function Verification() {
-	const user = useSelector(selectUser);
 	const userData = useSelector(selectUserData);
 	const [recaptcha, setRecaptcha] = useState(null);
 	const [verificationID, setVerificationID] = useState(null);
 	const [isVerifying, setIsVerifying] = useState(false);
-	const { userVerifiedLevel, verified } = userData || {};
+	const { verified } = userData || {};
 	const [OTPSent, setOTPSent] = useState(false);
 	const [openOTPDialog, setOpenOTPDialog] = useState(false);
 	const [timer, setTimer] = useState(0);
-	const dispatch = useDispatch();
 
 	const ref = useRef(null);
 
@@ -32,7 +30,7 @@ export default function Verification() {
 			setRecaptcha(verifier);
 		}
 		return () => {
-			if(recaptcha) recaptcha?.clear();
+			if (recaptcha) recaptcha?.clear();
 		};
 	}, [recaptcha]);
 
@@ -54,7 +52,7 @@ export default function Verification() {
 		<MemberPageTemplate>
 			<Container sx={{ pt: 4 }}>
 				<Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4 }}>
-					<NextLink href="/member/dashboard"  passHref>
+					<NextLink href="/member/dashboard" passHref>
 						<Link underline="hover" color="inherit">
 							Home
 						</Link>
@@ -78,18 +76,18 @@ export default function Verification() {
 					</Grid>
 					<Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
 						<Tooltip
-								title={verified?.IC == "pending" ? `We will notify you for any update on your IC verification` : ""}
-								placement="top"
-								arrow
-								enterTouchDelay={0}
-							>
-								<span style={{ width: "100%" }}>
-									<NextLink href={"/member/upload-ic"} passHref>
+							title={verified?.IC == "pending" ? `We will notify you for any update on your IC verification` : ""}
+							placement="top"
+							arrow
+							enterTouchDelay={0}
+						>
+							<span style={{ width: "100%" }}>
+								<NextLink href={"/member/upload-ic"} passHref>
 									<LoadingButton
 										loading={!userData || verified?.IC !== "uploadingLater"}
 										variant="contained"
 										fullWidth
-										endIcon={verified?.IC == true ? <CheckRounded /> :  verified?.IC == "uploadingLater" ? <UploadRounded /> : null}
+										endIcon={verified?.IC == true ? <CheckRounded /> : verified?.IC == "uploadingLater" ? <UploadRounded /> : null}
 									>
 										{!userData
 											? "..."
@@ -102,8 +100,8 @@ export default function Verification() {
 											: "unknown"}
 									</LoadingButton>
 								</NextLink>
-								</span>
-							</Tooltip>
+							</span>
+						</Tooltip>
 					</Grid>
 					<Grid item xs={3} md={4} sx={{ display: "flex", alignItems: "center" }}>
 						<Typography>Email</Typography>
@@ -131,7 +129,7 @@ export default function Verification() {
 							disabled={verified?.phoneNo || OTPSent}
 							variant="contained"
 							fullWidth
-							endIcon={verified?.phoneNo ? <CheckRounded /> : timer > 0 ? null : <SendRounded/>}
+							endIcon={verified?.phoneNo ? <CheckRounded /> : timer > 0 ? null : <SendRounded />}
 							onClick={async () => {
 								if (!timer) {
 									setIsVerifying(true);

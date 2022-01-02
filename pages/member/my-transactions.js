@@ -33,7 +33,7 @@ import ImageWithSkeleton from "components/ImageWithSkeleton";
 import PendingPaymentsBox from "components/PendingPaymentBox";
 import { currencyFormatter } from "lib/formatter";
 import { getTransactions } from "lib/firebase";
-import { selectUser, setTransactions } from "lib/slices/userSlice";
+import { selectUser, selectUserExists, setTransactions } from "lib/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function MyTransactions() {
@@ -51,12 +51,12 @@ export default function MyTransactions() {
 	};
 
 	const [rows, setRows] = useState([]);
-	const user = useSelector(selectUser);
 	const [loading, setLoading] = useState(true);
 	const dispatch = useDispatch();
+	const userExist = useSelector(selectUserExists);
 
 	useEffect(() => {
-		if (user) {
+		if (userExist) {
 			getTransactions().then((transactions) => {
 				if (!transactions) return;
 				dispatch(setTransactions(transactions));
@@ -76,7 +76,7 @@ export default function MyTransactions() {
 			});
 			setLoading(false);
 		}
-	}, [user]);
+	}, [userExist]);
 
 	// const rows = [
 	// 	createData("BWN123456", new Date().toLocaleString(), "CHARGE", "approved", 49.97, "mastercard", 2420),

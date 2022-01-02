@@ -7,7 +7,7 @@ export default function NewOrderSteppers(props) {
 	const steps = ["Acknowledgement", "Fill In Form", "Summary"];
 	return (
 		<Stack {...props} sx={{ ...props.sx, width: "100%" }} spacing={4}>
-			<Stepper alternativeLabel activeStep={props.activeStep} connector={<QontoConnector />}>
+			<Stepper alternativeLabel activeStep={props.activestep} connector={<QontoConnector />}>
 				{steps.map((label) => (
 					<Step key={label}>
 						<StepLabel StepIconComponent={QontoStepIcon}>{label}</StepLabel>

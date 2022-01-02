@@ -183,7 +183,7 @@ function FeaturesContainer(props) {
 									<ImageWithSkeleton
 										src="/pngs/new-features.png"
 										alt="upcoming-apps"
-										containersx={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}
+										// containersx={{ display: "flex", flexDirection: "column", justifyContent: "flex-end" }}
 										objectFit="cover"
 										layout="responsive"
 										width={"100%"}

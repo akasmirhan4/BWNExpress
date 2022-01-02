@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { auth, firestore, getAvatarURL, getUserData, perf } from "lib/firebase";
+import { auth, firestore, getAvatarURL, perf } from "lib/firebase";
 import { useSelector, useDispatch } from "react-redux";
-import { selectUser, selectUserData, setAvatarURL, setNotifications, setUser, setUserData } from "lib/slices/userSlice";
+import { selectUserData, selectUserExists, setAvatarURL, setNotifications, setUserData, setUserExists } from "lib/slices/userSlice";
 import { routeManager } from "lib/routeManager";
 import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
@@ -12,11 +12,11 @@ function MiddleComponent(props) {
 	const [lang, setLang] = useState("EN");
 	const userData = useSelector(selectUserData);
 	const [isLoading, setIsLoading] = useState(true);
-	const [cacheHas, setCacheHas] = useState(false);
 	const [pageLoaded, setPageLoaded] = useState(false);
-	const user = useSelector(selectUser);
 	const router = useRouter();
 	const { route } = router;
+	const [snapshots, setSnapshots] = useState([]);
+	const userExists = useSelector(selectUserExists);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
@@ -25,7 +25,7 @@ function MiddleComponent(props) {
 
 	useEffect(() => {
 		if (!isLoading) {
-			routeManager(user, userData, route);
+			routeManager(userData, route);
 			setPageLoaded(true);
 		} else {
 			setPageLoaded(false);
@@ -35,24 +35,25 @@ function MiddleComponent(props) {
 		return () => {
 			trace.stop();
 		};
-	}, [route, userData, user, isLoading]);
+	}, [route, userData, auth.currentUser, isLoading]);
 
 	useEffect(() => {
 		auth.onAuthStateChanged(async (user) => {
 			setIsLoading(true);
-			dispatch(setUser({ uid: user?.uid, emailVerified: user?.emailVerified }));
+			console.log("user update", user);
 			if (user) {
+				dispatch(setUserExists(true));
 				dispatch(setAvatarURL(await getAvatarURL()));
-				firestore
+				const userSnapshot = firestore
 					.collection("users")
 					.doc(user.uid)
 					.onSnapshot((doc) => {
 						const userData = doc.data();
 						console.log("userData update", userData);
-						dispatch(setUserData(userData));
+						dispatch(setUserData({ ...userData, creationDate: userData?.creationDate.toDate().toISOString() }));
 						if (isLoading) setIsLoading(false);
 					});
-				firestore
+				const notificationSnapshot = firestore
 					.collection("users")
 					.doc(user.uid)
 					.collection("notifications")
@@ -66,20 +67,35 @@ function MiddleComponent(props) {
 						console.log("notifications update", notifications);
 						dispatch(setNotifications(notifications));
 					});
+				setSnapshots([userSnapshot, notificationSnapshot]);
 			} else {
+				console.log("logging out");
+				dispatch(setUserExists(false));
+				dispatch(setUserData(null));
 				setIsLoading(false);
 			}
 		});
 	}, []);
 
-	return !pageLoaded ? (
+	useEffect(() => {
+		if (!userExists && snapshots.length) {
+			snapshots.forEach((snapshot) => snapshot());
+			setSnapshots([]);
+		}
+		return () => {
+			snapshots.forEach((snapshot) => snapshot());
+		};
+	}, [userExists, snapshots]);
+
+	return (
 		<div>
-			<Backdrop sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }} open={true}>
-				<CircularProgress color="inherit" />
-			</Backdrop>
+			{!pageLoaded && (
+				<Backdrop sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }} open={true}>
+					<CircularProgress color="inherit" />
+				</Backdrop>
+			)}
+			{props.children}
 		</div>
-	) : (
-		<div>{props.children}</div>
 	);
 }
 

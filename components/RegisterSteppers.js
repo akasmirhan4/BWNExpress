@@ -6,15 +6,15 @@ import React from "react";
 export default function RegisterSteppers(props) {
 	const steps = ["Verify Email", "Fill In Form", "Upload IC"];
 
-	const { activeStep } = props || {};
+	const { activestep } = props || {};
 
 	return (
 		<Stack {...props} sx={{ ...props.sx, width: "100%" }} spacing={4}>
-			<Stepper alternativeLabel activeStep={activeStep} connector={<QontoConnector />}>
+			<Stepper alternativeLabel activeStep={activestep} connector={<QontoConnector />}>
 				{steps.map((label, i) => (
 					<Step key={i}>
 						<StepLabel StepIconComponent={QontoStepIcon}>
-							<Typography fontWeight={activeStep == i ? "bold" : "normal"} color={"white.main"}>{label}</Typography>
+							<Typography fontWeight={activestep == i ? "bold" : "normal"} color={"white.main"}>{label}</Typography>
 						</StepLabel>
 					</Step>
 				))}

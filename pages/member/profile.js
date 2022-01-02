@@ -24,11 +24,10 @@ import { forwardRef } from "react";
 import { IMaskInput } from "react-imask";
 import { DatePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import { firestore, getAvatarURL, storage } from "lib/firebase";
+import { auth, firestore, getAvatarURL, storage } from "lib/firebase";
 
 export default function Profile() {
 	const userData = useSelector(selectUserData);
-	const user = useSelector(selectUser);
 	const prevImageURL = useSelector(selectAvatarURL);
 	const dpRef = useRef(null);
 	const [imageURL, setImageURL] = useState(prevImageURL);
@@ -563,11 +562,11 @@ export default function Profile() {
 										}
 									});
 									if (avatarChanged) {
-										const storageRef = storage.ref(`users/${user.uid}/profile/avatar`);
+										const storageRef = storage.ref(`users/${auth.currentUser.uid}/profile/avatar`);
 										dispatch(setAvatarURL(imageURL));
 										batchPromises.push(storageRef.put(imgFile));
 									}
-									if (Object.keys(detailsToUpdate).length !== 0) batchPromises.push(firestore.collection("users").doc(user.uid).update(detailsToUpdate));
+									if (Object.keys(detailsToUpdate).length !== 0) batchPromises.push(firestore.collection("users").doc(auth.currentUser.uid).update(detailsToUpdate));
 
 									const result = await toast.promise(Promise.all(batchPromises), {
 										loading: "Updating...",
