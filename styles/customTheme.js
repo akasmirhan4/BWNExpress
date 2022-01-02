@@ -59,10 +59,10 @@ const customTheme = createTheme({
 		},
 		button: {
 			[`@media (max-width: ${breakpoints.values.sm}px)`]: {
-				fontSize: "1rem",
+				fontSize: "0.8rem",
 			},
 			[`@media (max-width: ${breakpoints.values.xs2}px)`]: {
-				fontSize: "0.8rem",
+				fontSize: "0.6rem",
 			},
 		},
 		caption: {

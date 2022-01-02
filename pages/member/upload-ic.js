@@ -1,4 +1,4 @@
-import { CloseRounded, HomeRounded, UploadFileRounded } from "@mui/icons-material";
+import { ChevronRightRounded, CloseRounded, HomeRounded, UploadFileRounded, UploadRounded } from "@mui/icons-material";
 import { Typography, Box, Container, Button, Grid, Checkbox, FormHelperText, ButtonBase, IconButton } from "@mui/material";
 import { useRef, useState } from "react";
 import Link2 from "next/link";
@@ -249,7 +249,7 @@ export default function UploadIC(params) {
 					</Box>
 					<Grid container spacing={2}>
 						<Grid item xs={6}>
-							<Link2 href="/dashboard" >
+							<Link2 href="/member/dashboard">
 								<Button fullWidth variant="contained" color="secondary" size="large" startIcon={<HomeRounded />}>
 									Home
 								</Button>
@@ -262,20 +262,15 @@ export default function UploadIC(params) {
 								variant="contained"
 								color="secondary"
 								size="large"
-								endIcon={<UploadFileRounded />}
+								endIcon={isUploadingLater ? <ChevronRightRounded /> : <UploadRounded />}
 								onClick={async () => {
 									if (isUploadingLater) {
 										const updateDetails = { "verified.IC": "uploadingLater", userVerifiedLevel: 1.5 };
-										await toast.promise(
-											firestore
-												.collection("users")
-												.doc(auth.currentUser.uid)
-												.update(updateDetails)
-												.then(() => {
-													dispatch(setUserData({ ...userData, ...updateDetails }));
-												}),
-											{ loading: "updating user...", success: "user updated 👌", error: "error updating user 😫" }
-										);
+										await toast.promise(firestore.collection("users").doc(auth.currentUser.uid).update(updateDetails), {
+											loading: "updating user...",
+											success: "user updated 👌",
+											error: "error updating user 😫",
+										});
 									} else {
 										if (selectedFiles?.length > 0) {
 											setIsUploading(true);
@@ -288,13 +283,7 @@ export default function UploadIC(params) {
 											const updateDetails = { "verified.IC": "pending", userVerifiedLevel: 1.5 };
 											const result = await toast.promise(
 												Promise.all(batchPromises).then(() => {
-													firestore
-														.collection("users")
-														.doc(auth.currentUser.uid)
-														.update(updateDetails)
-														.then(() => {
-															dispatch(setUserData({ ...userData, ...updateDetails }));
-														});
+													firestore.collection("users").doc(auth.currentUser.uid).update(updateDetails);
 												}),
 												{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
 											);

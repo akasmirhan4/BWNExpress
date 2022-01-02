@@ -16,6 +16,7 @@ import {
 	FormLabel,
 	Grid,
 	IconButton,
+	Skeleton,
 	Table,
 	TableBody,
 	TableCell,
@@ -55,6 +56,8 @@ export default function MyOrders() {
 	const [rows, setRows] = useState([]);
 	const user = useSelector(selectUser);
 	const [displayedRows, setDisplayedRows] = useState(rows);
+	const [loading, setLoading] = useState(true);
+
 	const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
 	const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 	const dispatch = useDispatch();
@@ -99,6 +102,7 @@ export default function MyOrders() {
 				setRows(_rows);
 				setDisplayedRows(_rows);
 			});
+			setLoading(false);
 		}
 	}, [user]);
 
@@ -195,6 +199,13 @@ export default function MyOrders() {
 						</TableBody>
 					</Table>
 				</TableContainer>
+				{loading && (
+					<Fragment>
+						<Skeleton variant="rectangular" width={"100%"} height={"2em"} sx={{ my: 1 }} />
+						<Skeleton variant="rectangular" width={"100%"} height={"2em"} sx={{ my: 1 }} />
+						<Skeleton variant="rectangular" width={"100%"} height={"2em"} sx={{ my: 1 }} />
+					</Fragment>
+				)}
 			</Container>
 		</MemberPageTemplate>
 	);
@@ -232,7 +243,7 @@ function EnhancedTableRow(props) {
 				{!isMdDown && <TableCell>{row.estimatedDuration ?? "-"}</TableCell>}
 				{!isMdDown && (
 					<TableCell align="right">
-						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`}  passHref>
+						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`} passHref>
 							<Tooltip title="See more details" placement="top" arrow>
 								<IconButton>
 									<PageviewRounded color="primary" />
@@ -246,7 +257,7 @@ function EnhancedTableRow(props) {
 								</IconButton>
 							</span>
 						</Tooltip>
-						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`}  passHref>
+						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`} passHref>
 							<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
 								<Button variant="contained" sx={{ ml: 1 }}>
 									Track Order
@@ -285,7 +296,7 @@ function EnhancedTableRow(props) {
 											{!isSmDown && <TableCell sx={{ borderBottom: "unset" }}>ACTIONS</TableCell>}
 											<TableCell colSpan={isSmDown ? 2 : 1} align={!isSmDown ? "center" : "right"} sx={{ borderBottom: "unset" }}>
 												<Box display="flex" justifyContent={isSmDown ? "center" : "flex-end"} mt={1}>
-													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`}  passHref>
+													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`} passHref>
 														<IconButton>
 															<PageviewRounded color="primary" />
 														</IconButton>
@@ -297,7 +308,7 @@ function EnhancedTableRow(props) {
 															</IconButton>
 														</span>
 													</Tooltip>
-													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`}  passHref>
+													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`} passHref>
 														<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
 															<Button
 																variant="contained"

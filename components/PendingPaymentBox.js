@@ -1,4 +1,4 @@
-import { Box, Button, Container, Grid, Typography } from "@mui/material";
+import { Box, Button, Container, Grid, Skeleton, Typography } from "@mui/material";
 import { getPendingPayments } from "lib/firebase";
 import { currencyFormatter } from "lib/formatter";
 import { selectUser } from "lib/slices/userSlice";
@@ -11,16 +11,19 @@ export default function PendingPaymentsBox(props) {
 	const [amountDue, setAmountDue] = useState(null);
 	const [dueSince, setDueSince] = useState(null);
 	const [pendingPayments, setPendingPayments] = useState([]);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		if (user) {
 			(async () => {
 				const _pendingPayments = await getPendingPayments();
 				setPendingPayments(_pendingPayments);
-				if (!_pendingPayments?.length) return;
-				setDueSince(_pendingPayments[0].timestamp.toDate());
-				setAmountDue(_pendingPayments[0].amountDue);
-				setTotalAmountDue(_pendingPayments.reduce((a, v) => a + v.amountDue, 0));
+				if (_pendingPayments?.length) {
+					setDueSince(_pendingPayments[0].timestamp.toDate());
+					setAmountDue(_pendingPayments[0].amountDue);
+					setTotalAmountDue(_pendingPayments.reduce((a, v) => a + v.amountDue, 0));
+				}
+				setLoading(false);
 			})();
 		}
 	}, [user]);
@@ -33,7 +36,13 @@ export default function PendingPaymentsBox(props) {
 						<Typography color="text.main" fontWeight="500" sx={{ textAlign: { xs: "center", md: "left" } }}>
 							Pending Payment
 						</Typography>
-						{pendingPayments?.length > 0 ? (
+						{loading ? (
+							<Fragment>
+								<Skeleton variant="text" width="8em" height="3em" />
+								<Skeleton variant="text" width="6em" />
+								<Skeleton variant="text" width="12em" />
+							</Fragment>
+						) : pendingPayments?.length > 0 ? (
 							<Fragment>
 								<Typography sx={{ textAlign: { xs: "center", md: "left" } }} variant="h4" fontWeight="500" mt={1} color="primary">
 									{totalAmountDue ? `${currencyFormatter.format(totalAmountDue)}` : "..."}

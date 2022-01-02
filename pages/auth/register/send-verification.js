@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { auth, firestore } from "lib/firebase";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUser, setUserData } from "lib/slices/userSlice";
+import { selectUser, selectUserData, setUserData } from "lib/slices/userSlice";
 import { useRouter } from "next/router";
 import RegisterSteppers from "components/RegisterSteppers";
 
@@ -13,6 +13,7 @@ export default function SendVerification(params) {
 	const [counter, setCounter] = useState(TIMER);
 	const [startTimer, setStartTimer] = useState(false);
 	const user = useSelector(selectUser);
+	const userData = useSelector(selectUserData);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
@@ -34,20 +35,10 @@ export default function SendVerification(params) {
 	}, [startTimer, counter]);
 
 	useEffect(() => {
-		if (user) {
-			firestore
-				.collection("users")
-				.doc(user.uid)
-				.onSnapshot((doc) => {
-					const userData = doc.data();
-					dispatch(setUserData(userData));
-					console.log("Current data: ", userData);
-					if (userData?.verified?.email) {
-						router.push("/auth/register/new-user");
-					}
-				});
+		if (userData?.verified?.email) {
+			router.push("/auth/register/new-user");
 		}
-	}, [user]);
+	}, [userData]);
 
 	return (
 		<Box pt={2} minHeight="100vh" display="flex" sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover", backgroundColor: "grey" }}>

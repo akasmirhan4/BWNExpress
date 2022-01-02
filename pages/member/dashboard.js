@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Button } from "@mui/material";
+import { Box, Container, Typography, Button, Skeleton } from "@mui/material";
 import dashboardStyles from "styles/dashboard.module.scss";
 import AwesomeCarousel from "components/AwesomeCarousel";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -30,11 +30,13 @@ function PendingActionsBox(props) {
 	const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 	const ordersPerSlide = isLargeScreen ? 6 : isSmallScreen ? 2 : 3;
 	const [pendingActionOrders, setPendingActionOrders] = useState([]);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		if (user) {
 			(async () => {
 				setPendingActionOrders((await getPendingActionOrders()) ?? []);
+				setLoading(false);
 			})();
 		}
 	}, [user]);
@@ -50,12 +52,7 @@ function PendingActionsBox(props) {
 							.filter((order, index) => index < ordersPerSlide * (n + 1) && index >= ordersPerSlide * n)
 							.map((order, index) => {
 								return (
-									<Button
-										variant="contained"
-										key={index}
-										fullWidth
-										sx={{ mx: 1, py: 2, fontSize: { xs: "0.5rem", sm: "1rem" } }}
-									>
+									<Button variant="contained" key={index} fullWidth sx={{ mx: 1, py: 2, fontSize: { xs: "0.5rem", sm: "1rem" } }}>
 										{order.orderID}
 									</Button>
 								);
@@ -73,7 +70,20 @@ function PendingActionsBox(props) {
 				<Typography color="text.main" fontWeight="500" mb={2} sx={{ textAlign: { xs: "center", sm: "left" } }}>
 					Pending Actions
 				</Typography>
-				{pendingActionOrders.length > 0 ? (
+				{loading ? (
+					<Fragment>
+						<Box justifyContent="center" alignItems="center" display="flex">
+							{!isSmallScreen && (
+								<Fragment>
+									<Skeleton variant="rectangular" height="4em" width="10em" sx={{ mx: 1 }} />
+									<Skeleton variant="rectangular" height="4em" width="10em" sx={{ mx: 1 }} />
+									{isLargeScreen && <Skeleton variant="rectangular" height="4em" width="10em" sx={{ mx: 1 }} />}
+								</Fragment>
+							)}
+							<Skeleton variant="rectangular" height="4em" width="10em" sx={{ mx: 1 }} />
+						</Box>
+					</Fragment>
+				) : pendingActionOrders.length > 0 ? (
 					<AwesomeCarousel cssModule={dashboardStyles} bullets={false} infinite={false} media={getSlides()} />
 				) : (
 					<Fragment>

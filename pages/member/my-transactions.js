@@ -16,6 +16,7 @@ import {
 	FormLabel,
 	Grid,
 	IconButton,
+	Skeleton,
 	Table,
 	TableBody,
 	TableCell,
@@ -31,6 +32,9 @@ import { Fragment, useEffect, useState } from "react";
 import ImageWithSkeleton from "components/ImageWithSkeleton";
 import PendingPaymentsBox from "components/PendingPaymentBox";
 import { currencyFormatter } from "lib/formatter";
+import { getTransactions } from "lib/firebase";
+import { selectUser, setTransactions } from "lib/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function MyTransactions() {
 	const [status, setStatus] = useState({
@@ -46,15 +50,40 @@ export default function MyTransactions() {
 		});
 	};
 
-	function createData(orderID, transactionDateTime, type, status, value, paymentMethod, lastCardDigits) {
-		return { orderID, transactionDateTime, type, status, value, paymentMethod, lastCardDigits };
-	}
+	const [rows, setRows] = useState([]);
+	const user = useSelector(selectUser);
+	const [loading, setLoading] = useState(true);
+	const dispatch = useDispatch();
 
-	const rows = [
-		createData("BWN123456", new Date().toLocaleString(), "CHARGE", "approved", 49.97, "mastercard", 2420),
-		createData("BWN123456", new Date().toLocaleString(), "CHARGE", "declined", 30, "idk", 2420),
-		createData("BWN123456", new Date().toLocaleString(), "CHARGE", "approved", 8, "visa", 9050),
-	];
+	useEffect(() => {
+		if (user) {
+			getTransactions().then((transactions) => {
+				if (!transactions) return;
+				dispatch(setTransactions(transactions));
+				const _rows = transactions.map(({ orderID, transactionDateTime, type, status, value, paymentMethod, lastCardDigits }) => {
+					return {
+						orderID,
+						transactionDateTime: new Date(transactionDateTime.seconds * 1000 + transactionDateTime.nanoseconds / 1000000).toISOString(),
+						type,
+						status,
+						value,
+						paymentMethod,
+						lastCardDigits,
+					};
+				});
+				setRows(_rows);
+				setDisplayedRows(_rows);
+			});
+			setLoading(false);
+		}
+	}, [user]);
+
+	// const rows = [
+	// 	createData("BWN123456", new Date().toLocaleString(), "CHARGE", "approved", 49.97, "mastercard", 2420),
+	// 	createData("BWN123456", new Date().toLocaleString(), "CHARGE", "declined", 30, "idk", 2420),
+	// 	createData("BWN123456", new Date().toLocaleString(), "CHARGE", "approved", 8, "visa", 9050),
+	// 	createData("BWN123456", new Date().toLocaleString(), "CHARGE", "pending", 8, null, null),
+	// ];
 
 	const [displayedRows, setDisplayedRows] = useState(rows);
 	const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
@@ -109,7 +138,8 @@ export default function MyTransactions() {
 								<Typography mb={1}>DATE</Typography>
 								<LocalizationProvider dateAdapter={AdapterDateFns}>
 									<DateRangePicker
-										inputFormat="dd-MMM-yyyy"
+										mask="__-__-____"
+										inputFormat="dd-MM-yyyy"
 										startText="Start Date"
 										endText="End Date"
 										value={dateFilter}
@@ -153,6 +183,13 @@ export default function MyTransactions() {
 						</TableBody>
 					</Table>
 				</TableContainer>
+				{loading && (
+					<Fragment>
+						<Skeleton variant="rectangular" width={"100%"} height={"2em"} sx={{ my: 1 }} />
+						<Skeleton variant="rectangular" width={"100%"} height={"2em"} sx={{ my: 1 }} />
+						<Skeleton variant="rectangular" width={"100%"} height={"2em"} sx={{ my: 1 }} />
+					</Fragment>
+				)}
 			</Container>
 		</MemberPageTemplate>
 	);
@@ -193,10 +230,12 @@ function EnhancedTableRow(props) {
 								<ImageWithSkeleton containersx={{ height: "unset", width: "unset", mt: 1 }} src="/svgs/mastercard.svg" width={"50"} height={"30"} />
 							) : row.paymentMethod == "visa" ? (
 								<ImageWithSkeleton containersx={{ height: "unset", width: "unset" }} src="/svgs/visa.svg" width={"50"} height={"23"} />
+							) : !row.paymentMethod ? (
+								<Typography>{"-"}</Typography>
 							) : (
 								<BugReportRounded sx={{ width: "50px" }} color="lightGrey" />
 							)}
-							{`**${row.lastCardDigits}`}
+							{row.paymentMethod ? `**${row.lastCardDigits}` : ""}
 						</Box>
 					</TableCell>
 				)}

@@ -24,7 +24,7 @@ import { forwardRef } from "react";
 import { IMaskInput } from "react-imask";
 import { DatePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import { getAvatarURL, storage } from "lib/firebase";
+import { firestore, getAvatarURL, storage } from "lib/firebase";
 
 export default function Profile() {
 	const userData = useSelector(selectUserData);
@@ -50,6 +50,7 @@ export default function Profile() {
 
 	const [loaded, setLoaded] = useState(false);
 	const [changes, setChanges] = useState([]);
+	const [avatarChanged, setAvatarChanged] = useState(false);
 	const [isUpdating, setIsUpdating] = useState(false);
 
 	const loadUserData = () => {
@@ -66,7 +67,11 @@ export default function Profile() {
 			setDeliveryAddress(deliveryAddress ?? "");
 			setEmail(email ?? "");
 			setLoaded(true);
-			setImageURL(prevImageURL);
+			if (avatarChanged) {
+				setImageURL(prevImageURL);
+				setAvatarChanged(false);
+				dpRef.current.value = null;
+			}
 		}
 	};
 
@@ -76,7 +81,7 @@ export default function Profile() {
 
 	useEffect(() => {
 		if (loaded) setChanges(checkChanges());
-	}, [fullName, preferredName, IC, gender, DOB, phoneNo, address, isDifferentAddress, deliveryAddress, loaded, imageURL]);
+	}, [fullName, preferredName, IC, gender, DOB, phoneNo, address, isDifferentAddress, deliveryAddress, loaded]);
 
 	const getAge = () => {
 		var today = new Date();
@@ -88,6 +93,10 @@ export default function Profile() {
 		}
 		return age;
 	};
+
+	useEffect(() => {
+		setImageURL(prevImageURL);
+	}, [prevImageURL]);
 
 	const checkValidity = () => {
 		let validity = {
@@ -182,7 +191,9 @@ export default function Profile() {
 		let changes = [];
 		Object.entries(allDetails).forEach(([key, value]) => {
 			if (key == "imageURL") {
-				if (prevImageURL !== imageURL) changes.push(key);
+				if (prevImageURL !== imageURL && avatarChanged) {
+					changes.push(key);
+				}
 			} else if (userData[key] !== value) changes.push(key);
 		});
 		return changes;
@@ -225,6 +236,7 @@ export default function Profile() {
 												toast.error("File exceed 5MB. Please compress before uploading the file.");
 											}
 											if (isValid) {
+												setAvatarChanged(true);
 												setImgFile(imgFile);
 												setImageURL(await readFileAsText(imgFile));
 												toast.success("Image Loaded 😎");
@@ -510,7 +522,7 @@ export default function Profile() {
 							fullWidth
 							color="secondary"
 							variant="contained"
-							disabled={!changes.length || (validity && !Object.values(validity).every((v) => v.valid === true))}
+							disabled={!(changes.length || avatarChanged) || (validity && !Object.values(validity).every((v) => v.valid === true)) || isUpdating}
 							onClick={async () => {
 								const { isValid } = checkValidity();
 								if (isValid) {
@@ -519,11 +531,6 @@ export default function Profile() {
 									let batchPromises = [];
 									changes.forEach((change) => {
 										switch (change) {
-											case "imageURL":
-												const storageRef = storage.ref(`users/${user.uid}/profile/avatar`);
-												dispatch(setAvatarURL(imageURL));
-												batchPromises.push(storageRef.put(imgFile));
-												break;
 											case "fullName":
 												detailsToUpdate[change] = fullName;
 												break;
@@ -555,14 +562,19 @@ export default function Profile() {
 												break;
 										}
 									});
-									if (Object.keys(detailsToUpdate).length !== 0)
-										batchPromises.push(firestore.collection("users").doc(auth.currentUser.uid).update(detailsToUpdate));
+									if (avatarChanged) {
+										const storageRef = storage.ref(`users/${user.uid}/profile/avatar`);
+										dispatch(setAvatarURL(imageURL));
+										batchPromises.push(storageRef.put(imgFile));
+									}
+									if (Object.keys(detailsToUpdate).length !== 0) batchPromises.push(firestore.collection("users").doc(user.uid).update(detailsToUpdate));
 
 									const result = await toast.promise(Promise.all(batchPromises), {
-										loading: "Profile updated...",
+										loading: "Updating...",
 										success: "Profile updated 👌",
 										error: "Error profile updated 😲",
 									});
+									setAvatarChanged(false);
 									setIsUpdating(false);
 									return result;
 								} else {

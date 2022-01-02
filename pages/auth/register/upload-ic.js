@@ -1,4 +1,4 @@
-import { ChevronLeftRounded, CloseRounded, HomeRounded, UploadFileRounded } from "@mui/icons-material";
+import { ChevronLeftRounded, ChevronRightRounded, CloseRounded, HomeRounded, UploadFileRounded, UploadRounded } from "@mui/icons-material";
 import { Typography, Box, Container, Button, Grid, Checkbox, FormHelperText, ButtonBase, IconButton } from "@mui/material";
 import { useRef, useState } from "react";
 import Link2 from "next/link";
@@ -254,7 +254,7 @@ export default function UploadIC(params) {
 					</Box>
 					<Grid container spacing={2}>
 						<Grid item xs={6}>
-							<Link2 href="/auth/register/new-user" >
+							<Link2 href="/auth/register/new-user">
 								<Button fullWidth variant="contained" color="secondary" size="large" startIcon={<ChevronLeftRounded />}>
 									Back
 								</Button>
@@ -269,7 +269,7 @@ export default function UploadIC(params) {
 								loadingPosition="end"
 								color="secondary"
 								size="large"
-								endIcon={<UploadFileRounded />}
+								endIcon={isUploadingLater ? <ChevronRightRounded /> : <UploadRounded />}
 								onClick={async () => {
 									if (isUploadingLater) {
 										const updateDetails = { "verified.IC": "uploadingLater", userVerifiedLevel: 1.5 };
@@ -277,41 +277,36 @@ export default function UploadIC(params) {
 											firestore
 												.collection("users")
 												.doc(auth.currentUser.uid)
-												.update(updateDetails)
-												.then(() => {
-													dispatch(setUserData({ ...userData, ...updateDetails }));
-												}),
+												.update(updateDetails),
 											{ loading: "updating user...", success: "user updated 👌", error: "error updating user 😫" }
 										);
-									}
-									if (selectedFiles) {
-										setIsUploading(true);
-										const filteredFile = selectedFiles.filter((file) => file);
-										let batchPromises = [];
-										for (var i = 0; i < filteredFile.length; i++) {
-											const storageRef = storage.ref(`users/${auth.currentUser.uid}/unverifiedIC/${new Date().getTime()}${i}`);
-											batchPromises.push(storageRef.put(filteredFile[i]));
+									} else {
+										if (selectedFiles) {
+											setIsUploading(true);
+											const filteredFile = selectedFiles.filter((file) => file);
+											let batchPromises = [];
+											for (var i = 0; i < filteredFile.length; i++) {
+												const storageRef = storage.ref(`users/${auth.currentUser.uid}/unverifiedIC/${new Date().getTime()}${i}`);
+												batchPromises.push(storageRef.put(filteredFile[i]));
+											}
+											const updateDetails = { "verified.IC": "pending", userVerifiedLevel: 1.5 };
+											const results = await toast.promise(
+												Promise.all(batchPromises).then(() => {
+													firestore
+														.collection("users")
+														.doc(auth.currentUser.uid)
+														.update(updateDetails);
+													router.push("/member/dashboard");
+												}),
+												{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
+											);
+											setIsUploading(false);
+											return results;
 										}
-										const updateDetails = { "verified.IC": "pending", userVerifiedLevel: 1.5 };
-										const results = await toast.promise(
-											Promise.all(batchPromises).then(() => {
-												firestore
-													.collection("users")
-													.doc(auth.currentUser.uid)
-													.update(updateDetails)
-													.then(() => {
-														dispatch(setUserData({ ...userData, ...updateDetails }));
-													});
-												router.push("/member/dashboard");
-											}),
-											{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
-										);
-										setIsUploading(false);
-										return results;
 									}
 								}}
 							>
-								Upload
+								{isUploadingLater ? "Continue" : "Upload"}
 							</LoadingButton>
 						</Grid>
 					</Grid>

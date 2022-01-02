@@ -8,7 +8,7 @@ import { auth, authObj, firestore } from "lib/firebase";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { LoadingButton } from "@mui/lab";
-import { CheckRounded } from "@mui/icons-material";
+import { CheckRounded, PinRounded, SendRounded, UploadRounded } from "@mui/icons-material";
 
 export default function Verification() {
 	const user = useSelector(selectUser);
@@ -50,18 +50,6 @@ export default function Verification() {
 		};
 	}, [timer]);
 
-	useEffect(() => {
-		if (user.uid) {
-			firestore
-				.collection("users")
-				.doc(user.uid)
-				.onSnapshot((doc) => {
-					const userData = doc.data();
-					dispatch(setUserData(userData));
-				});
-		}
-	}, [user]);
-
 	return (
 		<MemberPageTemplate>
 			<Container sx={{ pt: 4 }}>
@@ -101,7 +89,7 @@ export default function Verification() {
 										loading={!userData || verified?.IC !== "uploadingLater"}
 										variant="contained"
 										fullWidth
-										endIcon={verified?.IC ? <CheckRounded /> : null}
+										endIcon={verified?.IC == true ? <CheckRounded /> :  verified?.IC == "uploadingLater" ? <UploadRounded /> : null}
 									>
 										{!userData
 											? "..."
@@ -126,7 +114,7 @@ export default function Verification() {
 						</Typography>
 					</Grid>
 					<Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
-						<Button disabled={!userData || verified?.email} variant="contained" fullWidth endIcon={verified?.email ? <CheckRounded /> : null}>
+						<Button disabled={!userData || verified?.email} variant="contained" fullWidth endIcon={verified?.email == true ? <CheckRounded /> : null}>
 							{!userData ? "Loading..." : verified?.email == true ? "" : "verify"}
 						</Button>
 					</Grid>
@@ -143,7 +131,7 @@ export default function Verification() {
 							disabled={verified?.phoneNo || OTPSent}
 							variant="contained"
 							fullWidth
-							endIcon={verified?.phoneNo ? <CheckRounded /> : null}
+							endIcon={verified?.phoneNo ? <CheckRounded /> : timer > 0 ? null : <SendRounded/>}
 							onClick={async () => {
 								if (!timer) {
 									setIsVerifying(true);
@@ -182,7 +170,7 @@ export default function Verification() {
 								}
 							}}
 						>
-							{!userData ? "Loading..." : verified?.phoneNo == true ? "" : isVerifying ? "verifying..." : timer ? timer : "verify"}
+							{!userData ? "Loading..." : verified?.phoneNo == true ? "" : isVerifying ? "verifying..." : timer ? timer : "SEND OTP"}
 						</LoadingButton>
 					</Grid>
 				</Grid>

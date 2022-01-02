@@ -34,6 +34,7 @@ function NewUserContainer(props) {
 	const [validity, setValidity] = useState(null);
 	const [valid, setValid] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
+	const [loaded, setLoaded] = useState(false);
 	const dispatch = useDispatch();
 	const router = useRouter();
 
@@ -140,7 +141,13 @@ function NewUserContainer(props) {
 	};
 
 	return (
-		<Box pt={2} pb={12} minHeight="100vh" display="flex" sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover", backgroundColor: "grey" }}>
+		<Box
+			pt={2}
+			pb={12}
+			minHeight="100vh"
+			display="flex"
+			sx={{ background: "url(/svgs/background.svg) no-repeat", backgroundSize: "cover", backgroundColor: "grey" }}
+		>
 			<Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
 				<RegisterSteppers sx={{ my: 4 }} activeStep={1} />
 				<Box
@@ -385,13 +392,13 @@ function NewUserContainer(props) {
 					</Box>
 				</Box>
 				<Box width="100%" display="flex" justifyContent="space-between">
-					<Link2 href="/home" >
+					<Link2 href="/home">
 						<Button disabled={isUploading} variant="contained" color="secondary" size="large" sx={{ width: "12em" }} startIcon={<HomeRounded />}>
 							Home
 						</Button>
 					</Link2>
 					<Button
-						disabled={isUploading || (validity && !Object.values(validity).every((v) => v.valid === true))}
+						disabled={loaded || isUploading || (validity && !Object.values(validity).every((v) => v.valid === true))}
 						variant="contained"
 						color="secondary"
 						size="large"
@@ -417,8 +424,8 @@ function NewUserContainer(props) {
 									functions
 										.httpsCallable("setUserDetails")(updateDetails)
 										.then(({ data }) => {
-											dispatch(setUserData({ ...userData, ...updateDetails }));
 											if (!data.success) throw "Error in backend";
+											setLoaded(true);
 											router.push("/auth/register/upload-ic");
 										}),
 									{ loading: "updating user...", success: "user updated 👌", error: "error updating user 😫" }

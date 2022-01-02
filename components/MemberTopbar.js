@@ -1,9 +1,9 @@
 import { AccountCircleRounded, Menu as MenuIcon, Notifications, NotificationsRounded } from "@mui/icons-material";
 import { AppBar, Avatar, Badge, Box, Container, IconButton, Menu, MenuItem, Typography, useScrollTrigger, useTheme } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { selectAvatarURL, selectUser, selectUserData } from "lib/slices/userSlice";
+import { selectAvatarURL, selectNotifications, selectUser, selectUserData } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import BrandWithLogo from "./BrandWithLogo";
 import Logo from "./Logo";
 import { cloneElement } from "react";
@@ -16,7 +16,16 @@ export default function MemberTopbar(props) {
 	const userData = useSelector(selectUserData);
 	const avatarURL = useSelector(selectAvatarURL);
 	const { palette } = useTheme();
+	const notifications = useSelector(selectNotifications);
 	const [anchorEl, setAnchorEl] = useState(null);
+	const [nNotifications, setNNotifications] = useState(0);
+
+	useEffect(() => {
+		if (notifications.length > 0) {
+			const unseenNotifications = notifications.filter((notification) => !notification.seen);
+			setNNotifications(unseenNotifications.length);
+		}
+	}, [notifications]);
 
 	return (
 		<ElevationScroll bgColorScroll={props.bgColorScroll ?? "white.main"} bgcolor={props.bgcolor ?? "white.main"}>
@@ -52,7 +61,7 @@ export default function MemberTopbar(props) {
 								<Fragment>
 									<Link href="/member/notifications" passHref>
 										<IconButton sx={{ mr: 2 }}>
-											<Badge badgeContent={4} color="primary" showZero={false} variant="dot">
+											<Badge badgeContent={nNotifications} color="primary" showZero={false} variant="dot">
 												<Notifications />
 											</Badge>
 										</IconButton>
@@ -82,7 +91,7 @@ export default function MemberTopbar(props) {
 											setAnchorEl(e.currentTarget);
 										}}
 									>
-										<Badge badgeContent={4} color="primary" showZero={false} variant="dot">
+										<Badge badgeContent={nNotifications} color="primary" showZero={false} variant="dot">
 											<Avatar
 												sx={{
 													width: "3em",
@@ -121,7 +130,7 @@ export default function MemberTopbar(props) {
 												<Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
 													<Typography>Notifications</Typography>
 													<Badge
-														badgeContent={4}
+														badgeContent={nNotifications}
 														color="primary"
 														showZero={false}
 														variant="dot"
