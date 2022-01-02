@@ -110,9 +110,11 @@ export default function CustomDrawer(props) {
 					>
 						{"Logout"}
 					</Button>
-					<Button startIcon={<Settings />} fullWidth color="lightGrey" sx={{ mb: 1 }} style={{ justifyContent: "flex-start", paddingLeft: "1em" }}>
-						{"settings"}
-					</Button>
+					<Link href="/member/settings" passHref>
+						<Button startIcon={<Settings />} fullWidth color="lightGrey" sx={{ mb: 1 }} style={{ justifyContent: "flex-start", paddingLeft: "1em" }}>
+							{"settings"}
+						</Button>
+					</Link>
 				</Box>
 			</Box>
 		</Drawer>

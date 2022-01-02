@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { auth, firestore, getAvatarURL, perf } from "lib/firebase";
+import { auth, firestore, getAvatarURL, perf, setFCM } from "lib/firebase";
 import { useSelector, useDispatch } from "react-redux";
 import { selectUserData, selectUserExists, setAvatarURL, setNotifications, setUserData, setUserExists } from "lib/slices/userSlice";
 import { routeManager } from "lib/routeManager";
@@ -44,7 +44,13 @@ function MiddleComponent(props) {
 				const userSnapshot = onSnapshot(doc(firestore, "users", user.uid), (doc) => {
 					const userData = doc.data();
 					console.log("userData update", userData);
-					dispatch(setUserData({ ...userData, creationDate: userData?.creationDate.toDate().toISOString() }));
+					dispatch(
+						setUserData({
+							...userData,
+							creationDate: userData?.creationDate.toDate().toISOString(),
+							FCM: { token: userData.FCM?.token, timestamp: userData.FCM?.timestamp?.toDate().getTime() },
+						})
+					);
 					if (isLoading) setIsLoading(false);
 				});
 				const notificationSnapshot = onSnapshot(collection(firestore, "users", user.uid, "notifications"), (docs) => {
@@ -71,6 +77,19 @@ function MiddleComponent(props) {
 			pageTrace.stop();
 		};
 	}, []);
+
+	useEffect(() => {
+		if (!userData) return;
+
+		if (userData.FCM?.timestamp) {
+			console.log(userData.FCM.timestamp);
+			if (new Date().getTime() - userData.FCM.timestamp > 2 * 7 * 24 * 60 * 60 * 1000) setFCM();
+		} else {
+			(async () => {
+				await setFCM();
+			})();
+		}
+	}, [userData]);
 
 	useEffect(() => {
 		if (!userExists && snapshots.length) {
