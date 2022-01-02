@@ -80,7 +80,7 @@ export default function SendVerification(params) {
 							variant="contained"
 							disabled={startTimer}
 							onClick={() => {
-								auth.currentUser.sendEmailVerification({ url: `${process.env.NEXT_DEPLOY_URL}/auth/register/complete-verification`, handleCodeInApp: true }).then(() => {
+								auth.currentUser.sendEmailVerification({ url: `${process.env.NEXT_URL}/auth/register/complete-verification`, handleCodeInApp: true }).then(() => {
 									// The link was successfully sent. Inform the user.
 									// Save the email locally so you don't need to ask the user for it again
 									// if they open the link on the same device.
