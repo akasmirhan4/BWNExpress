@@ -150,7 +150,7 @@ function ForgetPasswordContainer(props) {
 										setSent(true);
 										const { data } = await functions.httpsCallable("resetPassword")({ IC, email });
 										if (data)
-											await auth.sendPasswordResetEmail(email, { url: "http://localhost:3000/auth/login", handleCodeInApp: true });
+											await auth.sendPasswordResetEmail(email, { url: `${process.env.NEXT_URL}/auth/login`, handleCodeInApp: true });
 										toast("Check your email");
 									}
 								}}
