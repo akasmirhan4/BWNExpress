@@ -26,7 +26,7 @@ export default function Verification() {
 
 	useEffect(() => {
 		if (!recaptcha) {
-			const verifier = new authObj?.RecaptchaVerifier(ref.current, {
+			const verifier = new authObj.RecaptchaVerifier(ref.current, {
 				size: "invisible",
 			});
 			setRecaptcha(verifier);

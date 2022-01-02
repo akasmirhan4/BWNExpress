@@ -236,28 +236,21 @@ export default function Profile() {
 									overlap="circular"
 									anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
 									badgeContent={
-										<IconButton
-											onClick={(e) => {
-												e.stopPropagation();
-												dpRef.current.click();
+										<Box
+											sx={{
+												width: "1.8em",
+												height: "1.8em",
+												borderRadius: "50%",
+												bgcolor: "white.main",
+												boxShadow: (theme) => theme.shadows[1],
+												display: "flex",
+												alignItems: "center",
+												justifyContent: "center",
+												fontSize: { xs: "1rem", sm: "2rem" },
 											}}
 										>
-											<Box
-												sx={{
-													width: "1.8em",
-													height: "1.8em",
-													borderRadius: "50%",
-													bgcolor: "white.main",
-													boxShadow: (theme) => theme.shadows[1],
-													display: "flex",
-													alignItems: "center",
-													justifyContent: "center",
-													fontSize: { xs: "1rem", sm: "2rem" },
-												}}
-											>
-												<EditRounded sx={{ fontSize: { xs: "1rem", sm: "1.6rem" } }} />
-											</Box>
-										</IconButton>
+											<EditRounded sx={{ fontSize: { xs: "1rem", sm: "1.6rem" } }} />
+										</Box>
 									}
 								>
 									<Avatar
