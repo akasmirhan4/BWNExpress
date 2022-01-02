@@ -1,7 +1,8 @@
 import GoogleGLogo from "./GoogleGLogo";
-import { auth, firestore, googleAuthProvider } from "lib/firebase";
+import { auth, googleAuthProvider } from "lib/firebase";
 import toast from "react-hot-toast";
 import { Button, Box } from "@mui/material";
+import { signInWithPopup } from "firebase/auth";
 
 export default function GoogleSignInBtn(params) {
 	return (
@@ -28,16 +29,11 @@ export default function GoogleSignInBtn(params) {
 			}}
 			onClick={() => {
 				toast
-					.promise(
-						auth.signInWithPopup(googleAuthProvider).then(({ user, additionalUserInfo }) => {
-							firestore.collection("users").doc(user.uid).get();
-						}),
-						{
-							loading: "Awaiting to sign in...",
-							success: "Signed In 👌",
-							error: "Unsuccessful",
-						}
-					)
+					.promise(signInWithPopup(auth, googleAuthProvider), {
+						loading: "Awaiting to sign in...",
+						success: "Signed In 👌",
+						error: "Unsuccessful",
+					})
 					.catch(console.warn);
 			}}
 			startIcon={

@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUserData } from "lib/slices/userSlice";
 import { useRouter } from "next/router";
 import RegisterSteppers from "components/RegisterSteppers";
+import { doc, updateDoc } from "firebase/firestore";
+import { sendEmailVerification } from "firebase/auth";
 
 export default function SendVerification(params) {
 	const TIMER = 20;
@@ -45,7 +47,7 @@ export default function SendVerification(params) {
 			if (auth.currentUser.emailVerified) {
 				(async () => {
 					console.log("verified!");
-					await firestore.collection("users").doc(auth.currentUser.uid).update({ "verified.email": true });
+					await updateDoc(doc(firestore, "users", auth.currentUser.uid), { "verified.email": true });
 					router.push("/auth/register/new-user");
 				})();
 			}
@@ -95,17 +97,10 @@ export default function SendVerification(params) {
 							variant="contained"
 							disabled={startTimer}
 							onClick={() => {
-								auth.currentUser
-									.sendEmailVerification({ url: `${process.env.NEXT_URL}/auth/register/complete-verification`, handleCodeInApp: true })
-									.then(() => {
-										// The link was successfully sent. Inform the user.
-										// Save the email locally so you don't need to ask the user for it again
-										// if they open the link on the same device.
-										window.localStorage.setItem("emailForSignIn", auth.currentUser.email);
-										// ...
-										setStartTimer(true);
-										toast.success("Verification link has been sent to your email", { style: { textAlign: "center" } });
-									});
+								sendEmailVerification(auth.currentUser, { url: `${process.env.NEXT_URL}/auth/register/new-user`, handleCodeInApp: true }).then(() => {
+									setStartTimer(true);
+									toast.success("Verification link has been sent to your email", { style: { textAlign: "center" } });
+								});
 							}}
 						>
 							{startTimer ? counter : "Send Verification"}

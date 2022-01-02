@@ -2,13 +2,15 @@ import { Container, Typography, Button, Grid, Breadcrumbs, Link, Tooltip } from 
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import OTPPhoneDialog from "components/OTPPhoneDialog";
-import { useDispatch, useSelector } from "react-redux";
-import { selectUser, selectUserData } from "lib/slices/userSlice";
-import { auth, authObj, firestore } from "lib/firebase";
+import { useSelector } from "react-redux";
+import { selectUserData } from "lib/slices/userSlice";
+import { auth, firestore } from "lib/firebase";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { LoadingButton } from "@mui/lab";
 import { CheckRounded, SendRounded, UploadRounded } from "@mui/icons-material";
+import { linkWithCredential, PhoneAuthProvider, RecaptchaVerifier } from "firebase/auth";
+import { collection, doc, updateDoc } from "firebase/firestore";
 
 export default function Verification() {
 	const userData = useSelector(selectUserData);
@@ -24,9 +26,13 @@ export default function Verification() {
 
 	useEffect(() => {
 		if (!recaptcha) {
-			const verifier = new authObj.RecaptchaVerifier(ref.current, {
-				size: "invisible",
-			});
+			const verifier = new RecaptchaVerifier(
+				ref.current,
+				{
+					size: "invisible",
+				},
+				auth
+			);
 			setRecaptcha(verifier);
 		}
 		return () => {
@@ -135,10 +141,8 @@ export default function Verification() {
 									setIsVerifying(true);
 									if (userData?.phoneNo) {
 										const phoneNo = "+673 " + userData.phoneNo;
-										console.log({ phoneNo });
-										const PhoneAuthProvider = new authObj.PhoneAuthProvider();
-										console.log({ recaptcha });
-										await PhoneAuthProvider.verifyPhoneNumber(phoneNo, recaptcha)
+										await new PhoneAuthProvider(auth)
+											.verifyPhoneNumber(phoneNo, recaptcha)
 											.then((verificationID) => {
 												console.log({ verificationID });
 												setVerificationID(verificationID);
@@ -177,12 +181,11 @@ export default function Verification() {
 					onClose={() => setOpenOTPDialog(false)}
 					onSubmit={async (OTP) => {
 						setIsVerifying(true);
-						const phoneCredential = authObj.PhoneAuthProvider.credential(verificationID, OTP);
-						await auth.currentUser
-							.linkWithCredential(phoneCredential)
+						const phoneCredential = PhoneAuthProvider.credential(verificationID, OTP);
+						await linkWithCredential(auth.currentUser, phoneCredential)
 							.then(async (usercred) => {
 								console.log({ usercred });
-								await firestore.collection("users").doc(auth.currentUser.uid).update({ "verified.phoneNo": true });
+								await updateDoc(doc(firestore, "users", auth.currentUser.uid), { "verified.phoneNo": true });
 								toast.success("Phone number linked 👍");
 							})
 							.catch((err) => {

@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { auth, firestore, storage } from "lib/firebase";
 import { selectUserData, setUserData } from "lib/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
+import { doc, updateDoc } from "firebase/firestore";
+import { ref, uploadBytes } from "firebase/storage";
 
 export default function UploadIC(params) {
 	const [isUploadingLater, setIsUploadingLater] = useState(false);
@@ -250,7 +252,7 @@ export default function UploadIC(params) {
 					<Grid container spacing={2}>
 						<Grid item xs={6}>
 							<Link2 href="/member/dashboard">
-								<Button fullWidth variant="contained" color="secondary" size="large" startIcon={<HomeRounded />}>
+								<Button disabled={isUploading} fullWidth variant="contained" color="secondary" size="large" startIcon={<HomeRounded />}>
 									Home
 								</Button>
 							</Link2>
@@ -266,7 +268,8 @@ export default function UploadIC(params) {
 								onClick={async () => {
 									if (isUploadingLater) {
 										const updateDetails = { "verified.IC": "uploadingLater", userVerifiedLevel: 1.5 };
-										await toast.promise(firestore.collection("users").doc(auth.currentUser.uid).update(updateDetails), {
+
+										await toast.promise(updateDoc(doc(firestore, "users", auth.currentUser.uid), updateDetails), {
 											loading: "updating user...",
 											success: "user updated 👌",
 											error: "error updating user 😫",
@@ -277,13 +280,12 @@ export default function UploadIC(params) {
 											const filteredFile = selectedFiles.filter((file) => file);
 											let batchPromises = [];
 											for (var i = 0; i < filteredFile.length; i++) {
-												const storageRef = storage.ref(`users/${auth.currentUser.uid}/unverifiedIC/${new Date().getTime()}${i}`);
-												batchPromises.push(storageRef.put(filteredFile[i]));
+												batchPromises.push(uploadBytes(ref(storage, `users/${auth.currentUser.uid}/unverifiedIC/${new Date().getTime()}${i}`),filteredFile[i]));
 											}
 											const updateDetails = { "verified.IC": "pending", userVerifiedLevel: 1.5 };
 											const result = await toast.promise(
 												Promise.all(batchPromises).then(() => {
-													firestore.collection("users").doc(auth.currentUser.uid).update(updateDetails);
+													updateDoc(doc(firestore, "users", auth.currentUser.uid), updateDetails);
 												}),
 												{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
 											);

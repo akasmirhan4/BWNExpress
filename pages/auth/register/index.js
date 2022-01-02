@@ -6,6 +6,7 @@ import Link2 from "next/link";
 import { useState } from "react";
 import GoogleSignInBtn from "components/GoogleSignInBtn";
 import { auth, FacebookAuthProvider } from "lib/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function Register(params) {
 	return (
@@ -158,7 +159,7 @@ function RegisterContainer(props) {
 									}
 
 									if (isValid) {
-										const response = await auth.createUserWithEmailAndPassword(email, password).catch((error) => {
+										const response = await createUserWithEmailAndPassword(auth, email, password).catch((error) => {
 											switch (error.code) {
 												case "auth/invalid-email":
 													setEmailError("The email address is badly formatted");

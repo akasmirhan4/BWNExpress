@@ -33,7 +33,7 @@ export default function PendingPaymentsBox(props) {
 		<Container {...props}>
 			<Box sx={{ borderColor: "border.main", borderWidth: 0.5, borderStyle: "solid", borderRadius: 4, py: 2, px: 4, boxShadow: (theme) => theme.shadows[1] }}>
 				<Grid container spacing={2}>
-					<Grid item md={6} xs={12} sx={{ display:"flex", flexDirection:"column", alignItems: { xs: "center", md: "left" } }}>
+					<Grid item md={6} xs={12} sx={{ display:"flex", flexDirection:"column", alignItems: { xs: "center", md: "flex-start" } }}>
 						<Typography color="text.main" fontWeight="500" sx={{ textAlign: { xs: "center", md: "left" } }}>
 							Pending Payment
 						</Typography>

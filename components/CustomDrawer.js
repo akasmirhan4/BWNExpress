@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { selectUserData, setUserExists } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
+import { signOut } from "firebase/auth";
 
 export default function CustomDrawer(props) {
 	const { palette } = useTheme();
@@ -99,7 +100,7 @@ export default function CustomDrawer(props) {
 					<Button
 						onClick={() => {
 							dispatch(setUserExists(false));
-							toast.promise(auth.signOut(), { loading: "logging out...", success: " log out successful", error: "error logging out" });
+							toast.promise(signOut(auth), { loading: "logging out...", success: " log out successful", error: "error logging out" });
 						}}
 						startIcon={<Logout />}
 						fullWidth

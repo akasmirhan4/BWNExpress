@@ -11,6 +11,8 @@ import NewOrderSteppers from "components/NewOrderSteppers";
 import { ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
 import { functions, auth, storage } from "lib/firebase";
 import OrderSummary from "components/OrderSummary";
+import { httpsCallable } from "firebase/functions";
+import { ref, uploadBytes } from "firebase/storage";
 
 export default function Summary() {
 	const dispatch = useDispatch();
@@ -36,7 +38,7 @@ export default function Summary() {
 			<Container sx={{ pt: 4 }}>
 				<Box display={"flex"} justifyContent="space-between" alignItems={"center"} sx={{ mb: 4 }}>
 					<Breadcrumbs aria-label="breadcrumb">
-						<NextLink href="dashboard"  passHref>
+						<NextLink href="dashboard" passHref>
 							<Link underline="hover" color="inherit">
 								Home
 							</Link>
@@ -64,7 +66,7 @@ export default function Summary() {
 					</Box>
 					<Grid container spacing={2}>
 						<Grid item xs={6} display={"flex"} order={{ xs: 16, md: 16 }}>
-							<NextLink href="form"  passHref>
+							<NextLink href="form" passHref>
 								<Button startIcon={<ChevronLeftRounded />} variant="contained" color="accent" sx={{ width: { md: "unset", xs: "100%" } }}>
 									Back
 								</Button>
@@ -79,14 +81,14 @@ export default function Summary() {
 									let success = false;
 									await toast
 										.promise(
-											functions
-												.httpsCallable("addNewOrder")(orderDataCopy)
-												.then(async ({ data }) => {
-													success = data.success;
-													if (!success) throw "Error adding order";
-													const storageRef = storage.ref(`users/${auth.currentUser.uid}/receipts/${data.id}`);
-													await storageRef.put(newOrderData.receipt);
-												}),
+											httpsCallable(
+												functions,
+												"addNewOrder"
+											)(orderDataCopy).then(async ({ data }) => {
+												success = data.success;
+												if (!success) throw "Error adding order";
+												await uploadBytes(ref(storage, `users/${auth.currentUser.uid}/receipts/${data.id}`), newOrderData.receipt);
+											}),
 											{ loading: "Submitting order...", success: "Order submitted 👌", error: "Error submitting order 😫" }
 										)
 										.finally(() => {

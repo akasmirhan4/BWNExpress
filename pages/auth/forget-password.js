@@ -7,6 +7,8 @@ import { LoadingButton } from "@mui/lab";
 import { useState } from "react";
 import { IMaskInput } from "react-imask";
 import { forwardRef } from "react";
+import { httpsCallable } from "firebase/functions";
+import { sendPasswordResetEmail } from "firebase/auth";
 
 export default function ForgetPassword(params) {
 	return (
@@ -148,9 +150,8 @@ function ForgetPasswordContainer(props) {
 
 									if (isValid) {
 										setSent(true);
-										const { data } = await functions.httpsCallable("resetPassword")({ IC, email });
-										if (data)
-											await auth.sendPasswordResetEmail(email, { url: `${process.env.NEXT_URL}/auth/login`, handleCodeInApp: true });
+										const { data } = await httpsCallable(functions, "resetPassword")({ IC, email });
+										if (data) await sendPasswordResetEmail(auth, email, { url: `${process.env.NEXT_URL}/auth/login`, handleCodeInApp: true });
 										toast("Check your email");
 									}
 								}}

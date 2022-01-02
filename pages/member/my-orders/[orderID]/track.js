@@ -26,7 +26,7 @@ export default function Details() {
 		<MemberPageTemplate>
 			<Container sx={{ my: 4, display: "flex", flexDirection: "column" }}>
 				<Breadcrumbs aria-label="breadcrumb" sx={{ mt: 4 }}>
-					<NextLink href="/member/my-orders"  passHref>
+					<NextLink href="/member/my-orders" passHref>
 						<Link underline="hover" color="inherit">
 							My Orders
 						</Link>
@@ -56,6 +56,7 @@ function TrackerComponent(props) {
 					success: "data loaded",
 					error: "error fetching data",
 				});
+				console.log(results);
 				if (!results[0] || !results[1]) {
 					toast.error("Data missing. Redirecting...");
 					router.push("/member/my-orders");

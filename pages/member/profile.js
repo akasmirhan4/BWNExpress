@@ -25,6 +25,8 @@ import { IMaskInput } from "react-imask";
 import { DatePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { auth, firestore, getAvatarURL, storage } from "lib/firebase";
+import { doc, updateDoc } from "firebase/firestore";
+import { ref, uploadBytes } from "firebase/storage";
 
 export default function Profile() {
 	const userData = useSelector(selectUserData);
@@ -301,7 +303,7 @@ export default function Profile() {
 					</Grid>
 					<Grid item xs={12}>
 						<TextField
-							disabled={userData ? userData.verified.IC == true : true}
+							disabled={userData?.verified.IC == true}
 							label="Full Name (based on IC)"
 							type="text"
 							value={fullName}
@@ -323,7 +325,6 @@ export default function Profile() {
 					</Grid>
 					<Grid item xs={12} md={4}>
 						<TextField
-							disabled={userData ? userData.verified.IC == true : true}
 							label="Preferred Name (Nickname)"
 							type="text"
 							onChange={(e) => {
@@ -348,7 +349,7 @@ export default function Profile() {
 					</Grid>
 					<Grid item xs={12} md={4}>
 						<TextField
-							disabled={userData ? userData.verified.IC == true : true}
+							disabled={userData?.verified.IC == true}
 							label="IC Number"
 							type="tel"
 							InputProps={{
@@ -378,6 +379,7 @@ export default function Profile() {
 						<TextField
 							label="Gender"
 							type="text"
+							disabled={userData?.verified.IC == true}
 							InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
 							InputLabelProps={{ sx: { color: "text.secondary" } }}
 							fullWidth
@@ -405,6 +407,7 @@ export default function Profile() {
 						<LocalizationProvider dateAdapter={AdapterDateFns}>
 							<DatePicker
 								label="Date Of Birth"
+								disabled={userData?.verified.IC == true}
 								value={DOB}
 								onChange={(_DOB) => {
 									setDOB(_DOB);
@@ -435,6 +438,7 @@ export default function Profile() {
 					<Grid item xs={12} md={6}>
 						<TextField
 							label="Phone Number"
+							disabled={userData?.verified.phoneNo == true}
 							type="tel"
 							InputProps={{
 								inputMode: "tel",
@@ -471,6 +475,7 @@ export default function Profile() {
 								}
 							}}
 							value={address}
+							disabled={userData?.verified.IC == true}
 							InputProps={{ disableUnderline: true, sx: { bgcolor: "offWhite.secondary", borderRadius: 2 } }}
 							InputLabelProps={{ sx: { color: "text.secondary" } }}
 							fullWidth
@@ -562,11 +567,10 @@ export default function Profile() {
 										}
 									});
 									if (avatarChanged) {
-										const storageRef = storage.ref(`users/${auth.currentUser.uid}/profile/avatar`);
 										dispatch(setAvatarURL(imageURL));
-										batchPromises.push(storageRef.put(imgFile));
+										batchPromises.push(uploadBytes(ref(storage, `users/${auth.currentUser.uid}/profile/avatar`),imgFile));
 									}
-									if (Object.keys(detailsToUpdate).length !== 0) batchPromises.push(firestore.collection("users").doc(auth.currentUser.uid).update(detailsToUpdate));
+									if (Object.keys(detailsToUpdate).length !== 0) batchPromises.push(updateDoc(doc(firestore, "users", auth.currentUser.uid), detailsToUpdate));
 
 									const result = await toast.promise(Promise.all(batchPromises), {
 										loading: "Updating...",

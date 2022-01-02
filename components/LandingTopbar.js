@@ -37,6 +37,7 @@ import { selectLang, setLang } from "lib/slices/prefSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Logo from "./Logo";
 import { selectUserExists, setUserExists } from "lib/slices/userSlice";
+import { signOut } from "firebase/auth";
 
 export default function LandingTopbar(props) {
 	const lang = useSelector(selectLang);
@@ -119,7 +120,7 @@ export default function LandingTopbar(props) {
 										color="white"
 										onClick={() => {
 											dispatch(setUserExists(false));
-											toast.promise(auth.signOut(), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" });
+											toast.promise(signOut(auth), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" });
 										}}
 									>
 										Logout
@@ -187,7 +188,7 @@ export default function LandingTopbar(props) {
 										button
 										onClick={() => {
 											dispatch(setUserExists(false));
-											toast.promise(auth.signOut(), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" });
+											toast.promise(signOut(auth), { loading: "Logging out...", success: "Logged Out", error: "Error logging out" });
 										}}
 									>
 										<ListItemIcon>

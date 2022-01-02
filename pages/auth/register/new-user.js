@@ -11,6 +11,7 @@ import { selectUserData, setUserData } from "lib/slices/userSlice";
 import { useSelector, useDispatch } from "react-redux";
 import RegisterSteppers from "components/RegisterSteppers";
 import { useRouter } from "next/router";
+import { httpsCallable } from "firebase/functions";
 
 export default function NewUser(params) {
 	return (
@@ -421,13 +422,14 @@ function NewUserContainer(props) {
 								};
 								setIsUploading(true);
 								await toast.promise(
-									functions
-										.httpsCallable("setUserDetails")(updateDetails)
-										.then(({ data }) => {
-											if (!data.success) throw "Error in backend";
-											setLoaded(true);
-											router.push("/auth/register/upload-ic");
-										}),
+									httpsCallable(
+										functions,
+										"setUserDetails"
+									)(updateDetails).then(({ data }) => {
+										if (!data.success) throw "Error in backend";
+										setLoaded(true);
+										router.push("/auth/register/upload-ic");
+									}),
 									{ loading: "updating user...", success: "user updated 👌", error: "error updating user 😫" }
 								);
 								setIsUploading(false);

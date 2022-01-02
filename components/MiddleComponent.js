@@ -7,6 +7,8 @@ import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
 import { Backdrop, CircularProgress } from "@mui/material";
 import toast from "react-hot-toast";
+import { trace } from "firebase/performance";
+import { collection, doc, onSnapshot } from "firebase/firestore";
 
 function MiddleComponent(props) {
 	const [lang, setLang] = useState("EN");
@@ -30,10 +32,10 @@ function MiddleComponent(props) {
 		} else {
 			setPageLoaded(false);
 		}
-		const trace = perf.trace(route);
-		trace.start();
+		const pageTrace = trace(perf, route);
+		pageTrace.start();
 		return () => {
-			trace.stop();
+			pageTrace.stop();
 		};
 	}, [route, userData, auth.currentUser, isLoading]);
 
@@ -44,29 +46,22 @@ function MiddleComponent(props) {
 			if (user) {
 				dispatch(setUserExists(true));
 				dispatch(setAvatarURL(await getAvatarURL()));
-				const userSnapshot = firestore
-					.collection("users")
-					.doc(user.uid)
-					.onSnapshot((doc) => {
-						const userData = doc.data();
-						console.log("userData update", userData);
-						dispatch(setUserData({ ...userData, creationDate: userData?.creationDate.toDate().toISOString() }));
-						if (isLoading) setIsLoading(false);
+				const userSnapshot = onSnapshot(doc(firestore, "users", user.uid), (doc) => {
+					const userData = doc.data();
+					console.log("userData update", userData);
+					dispatch(setUserData({ ...userData, creationDate: userData?.creationDate.toDate().toISOString() }));
+					if (isLoading) setIsLoading(false);
+				});
+				const notificationSnapshot = onSnapshot(collection(firestore, "users", user.uid, "notifications"), (docs) => {
+					if (docs.empty) return;
+					let notifications = [];
+					docs.forEach((doc) => {
+						const data = doc.data();
+						notifications.push({ ...data, timestamp: data.timestamp.toDate().toISOString(), id: doc.id });
 					});
-				const notificationSnapshot = firestore
-					.collection("users")
-					.doc(user.uid)
-					.collection("notifications")
-					.onSnapshot((docs) => {
-						if (docs.empty) return;
-						let notifications = [];
-						docs.forEach((doc) => {
-							const data = doc.data();
-							notifications.push({ ...data, timestamp: data.timestamp.toDate().toISOString(), id: doc.id });
-						});
-						console.log("notifications update", notifications);
-						dispatch(setNotifications(notifications));
-					});
+					console.log("notifications update", notifications);
+					dispatch(setNotifications(notifications));
+				});
 				setSnapshots([userSnapshot, notificationSnapshot]);
 			} else {
 				console.log("logging out");
