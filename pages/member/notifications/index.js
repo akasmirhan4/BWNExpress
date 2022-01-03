@@ -13,6 +13,7 @@ import {
 } from "@mui/icons-material";
 import {
 	Box,
+	Breadcrumbs,
 	Button,
 	Card,
 	CircularProgress,
@@ -24,6 +25,7 @@ import {
 	DialogTitle,
 	Grid,
 	IconButton,
+	Link,
 	Typography,
 } from "@mui/material";
 import MemberPageTemplate from "components/MemberPageTemplate";
@@ -34,6 +36,7 @@ import { useRouter } from "next/router";
 import React, { Fragment, useEffect, useState } from "react";
 import { cloneElement } from "react";
 import { useSelector } from "react-redux";
+import NextLink from "next/link";
 
 export default function Notifications() {
 	const notifications = useSelector(selectNotifications);
@@ -55,8 +58,16 @@ export default function Notifications() {
 	return (
 		<MemberPageTemplate>
 			<Container>
-				<Box sx={{ display: "flex", justifyContent: "flex-end", my: 4 }}>
-					<Button onClick={() => setSeeArchives(!seeArchives)} startIcon={seeArchives ? <ChevronLeft /> : <ArchiveRounded />}>
+				<Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+					<Breadcrumbs aria-label="breadcrumb">
+						<NextLink href="dashboard" passHref>
+							<Link underline="hover" color="inherit">
+								Home
+							</Link>
+						</NextLink>
+						<Typography color="text.primary">Notifications</Typography>
+					</Breadcrumbs>
+					<Button onClick={() => setSeeArchives(!seeArchives)} startIcon={seeArchives ? <ChevronLeft /> : <ArchiveRounded />} sx={{ mt: -1 }}>
 						{seeArchives ? "Go Back" : "See Archive"}
 					</Button>
 				</Box>
@@ -86,7 +97,7 @@ export default function Notifications() {
 							key={notification.id}
 							title={notification.title}
 							subtitle={notification.subtitle}
-							timestamp={moment(notification.timestamp).fromNow()}
+							timestamp={moment(notification.timestamp).fromNow(true)}
 							icon={icon}
 							href={notification.href}
 							id={notification.id}
@@ -139,7 +150,7 @@ function NotificationCard(props) {
 									<Typography fontWeight="bold">{props.title ?? "..."}</Typography>
 								</Grid>
 								<Grid item xs={4} sx={{ display: "flex", justifyContent: "flex-end" }}>
-									<Typography variant="caption" fontStyle="italic">
+									<Typography variant="caption" fontStyle="italic" textAlign={"right"}>
 										{props.timestamp}
 									</Typography>
 								</Grid>

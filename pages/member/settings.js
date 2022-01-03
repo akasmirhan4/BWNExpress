@@ -3,6 +3,7 @@ import {
 	Avatar,
 	Badge,
 	Box,
+	Breadcrumbs,
 	Button,
 	ButtonBase,
 	Checkbox,
@@ -47,7 +48,10 @@ export default function Settings() {
 
 	return (
 		<MemberPageTemplate>
-			<Container sx={{ pt: 4 }}>
+			<Container>
+				<Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+					<Typography color="text.primary">Settings</Typography>
+				</Breadcrumbs>
 				{notificationPermission == "default" && (
 					<Button
 						onClick={() => {

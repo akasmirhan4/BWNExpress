@@ -97,6 +97,7 @@ export default function CustomDrawer(props) {
 
 				{/* setting nav */}
 				<Box display="flex" flexDirection="column" width="100%">
+					<DrawerButton startIcon={<Settings />} href="/member/settings" label="Settings" />
 					<Button
 						onClick={() => {
 							dispatch(setUserExists(false));
@@ -110,11 +111,6 @@ export default function CustomDrawer(props) {
 					>
 						{"Logout"}
 					</Button>
-					<Link href="/member/settings" passHref>
-						<Button startIcon={<Settings />} fullWidth color="lightGrey" sx={{ mb: 1 }} style={{ justifyContent: "flex-start", paddingLeft: "1em" }}>
-							{"settings"}
-						</Button>
-					</Link>
 				</Box>
 			</Box>
 		</Drawer>
@@ -124,7 +120,7 @@ export default function CustomDrawer(props) {
 function DrawerButton(props) {
 	const { startIcon, href, label } = props;
 	const { route } = useRouter();
-	const isActive = route.substring(1).split("/")[1] == href;
+	const isActive = route == href;
 	const { palette } = useTheme();
 
 	if (isActive) {

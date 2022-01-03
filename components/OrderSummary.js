@@ -1,6 +1,6 @@
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Skeleton } from "@mui/material";
 import Image from "next/image";
-import { useState } from "react";
+import { memo, useState } from "react";
 
 export default function OrderSummary(props) {
 	const { orderData, receiptURL } = props || {};
@@ -124,8 +124,10 @@ export default function OrderSummary(props) {
 					bgcolor={"lightGrey.secondary"}
 					sx={{ zIndex: 0, my: 2 }}
 				>
-					{orderData?.receipt && ["image/jpeg", "image/png"].includes(orderData?.receipt.type) && (
+					{orderData?.receipt && ["image/jpeg", "image/png"].includes(orderData?.receipt.type) ? (
 						<Image src={URL.createObjectURL(orderData?.receipt)} alt="receipt" layout="fill" objectFit="contain" />
+					) : (
+						["application/pdf"].includes(orderData?.receipt.type) && <PDFViewer src={URL.createObjectURL(orderData?.receipt)} />
 					)}
 					<Typography sx={{ bgcolor: "secondary.main", p: 1, color: "white.main", opacity: 0.8, fontSize: { xs: "0.7rem", sm: "1rem" } }} textAlign="center">
 						{orderData?.receipt ? orderData?.receipt.name : "..."}
@@ -135,3 +137,7 @@ export default function OrderSummary(props) {
 		</Box>
 	);
 }
+
+const PDFViewer = memo(function PDFViewer(props) {
+	return <embed src={`${props.src}#toolbar=0&navpanes=0&scrollbar=0`} width="100%" height="100%" style={{ position: "absolute", zIndex: -1 }} />;
+});

@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Button, Skeleton } from "@mui/material";
+import { Box, Container, Typography, Button, Skeleton, Breadcrumbs } from "@mui/material";
 import dashboardStyles from "styles/dashboard.module.scss";
 import AwesomeCarousel from "components/AwesomeCarousel";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -14,6 +14,11 @@ import { useSelector } from "react-redux";
 export default function Dashboard() {
 	return (
 		<MemberPageTemplate>
+			<Container>
+				<Breadcrumbs aria-label="breadcrumb">
+					<Typography color="text.primary">Dashboard</Typography>
+				</Breadcrumbs>
+			</Container>
 			<PendingPaymentsBox sx={{ mt: 4 }} />
 			<PendingActionsBox sx={{ mt: 4 }} />
 			<PromotionsBox sx={{ mt: 4 }} />

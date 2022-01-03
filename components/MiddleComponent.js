@@ -44,13 +44,15 @@ function MiddleComponent(props) {
 				const userSnapshot = onSnapshot(doc(firestore, "users", user.uid), (doc) => {
 					const userData = doc.data();
 					console.log("userData update", userData);
-					dispatch(
-						setUserData({
-							...userData,
-							creationDate: userData?.creationDate.toDate().toISOString(),
-							FCM: { token: userData.FCM?.token, timestamp: userData.FCM?.timestamp?.toDate().getTime() },
-						})
-					);
+					if (!userData) return;
+					const dispatchData = {
+						...userData,
+						creationDate: userData?.creationDate.toDate().toISOString(),
+					};
+					if (userData.FCM) {
+						dispatchData.FCM = { token: userData.FCM?.token, timestamp: userData.FCM?.timestamp?.toDate().getTime() };
+					}
+					dispatch(setUserData(dispatchData));
 					if (isLoading) setIsLoading(false);
 				});
 				const notificationSnapshot = onSnapshot(collection(firestore, "users", user.uid, "notifications"), (docs) => {
@@ -79,16 +81,16 @@ function MiddleComponent(props) {
 	}, []);
 
 	useEffect(() => {
-		if (!userData) return;
+		(async () => {
+			if (!userData) return;
 
-		if (userData.FCM?.timestamp) {
-			console.log(userData.FCM.timestamp);
-			if (new Date().getTime() - userData.FCM.timestamp > 2 * 7 * 24 * 60 * 60 * 1000) setFCM();
-		} else {
-			(async () => {
+			if (userData.FCM) {
+				console.log(userData.FCM?.timestamp);
+				if (new Date().getTime() - userData.FCM?.timestamp > 2 * 7 * 24 * 60 * 60 * 1000) setFCM();
+			} else {
 				await setFCM();
-			})();
-		}
+			}
+		})();
 	}, [userData]);
 
 	useEffect(() => {

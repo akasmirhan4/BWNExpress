@@ -3,6 +3,7 @@ import {
 	Avatar,
 	Badge,
 	Box,
+	Breadcrumbs,
 	Button,
 	ButtonBase,
 	Checkbox,
@@ -10,6 +11,7 @@ import {
 	Grid,
 	IconButton,
 	InputAdornment,
+	Link,
 	MenuItem,
 	Skeleton,
 	TextField,
@@ -27,6 +29,7 @@ import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { auth, firestore, getAvatarURL, storage } from "lib/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes } from "firebase/storage";
+import NextLink from "next/link";
 
 export default function Profile() {
 	const userData = useSelector(selectUserData);
@@ -202,7 +205,15 @@ export default function Profile() {
 
 	return (
 		<MemberPageTemplate>
-			<Container sx={{ pt: 4 }}>
+			<Container>
+				<Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+					<NextLink href="dashboard" passHref>
+						<Link underline="hover" color="inherit">
+							Home
+						</Link>
+					</NextLink>
+					<Typography color="text.primary">Profile</Typography>
+				</Breadcrumbs>
 				<Grid container rowSpacing={1} columnSpacing={2}>
 					<Grid item xs={12} sm={4} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
 						{!userData ? (
@@ -230,7 +241,7 @@ export default function Profile() {
 											const imgFile = imgFiles[0];
 											if (!["image/jpeg", "image/png"].includes(imgFile.type)) {
 												isValid = false;
-												toast.error("Upload jpg, png or pdf files only");
+												toast.error("Upload image files only");
 											}
 											if (imgFile.size > 5 * 1024 * 1024) {
 												isValid = false;
@@ -568,7 +579,7 @@ export default function Profile() {
 									});
 									if (avatarChanged) {
 										dispatch(setAvatarURL(imageURL));
-										batchPromises.push(uploadBytes(ref(storage, `users/${auth.currentUser.uid}/profile/avatar`),imgFile));
+										batchPromises.push(uploadBytes(ref(storage, `users/${auth.currentUser.uid}/profile/avatar`), imgFile));
 									}
 									if (Object.keys(detailsToUpdate).length !== 0) batchPromises.push(updateDoc(doc(firestore, "users", auth.currentUser.uid), detailsToUpdate));
 

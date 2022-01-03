@@ -56,9 +56,9 @@ export default function Verification() {
 
 	return (
 		<MemberPageTemplate>
-			<Container sx={{ pt: 4 }}>
+			<Container>
 				<Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4 }}>
-					<NextLink href="/member/dashboard" passHref>
+				<NextLink href="/member/dashboard" passHref>
 						<Link underline="hover" color="inherit">
 							Home
 						</Link>

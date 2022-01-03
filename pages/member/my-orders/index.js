@@ -6,6 +6,7 @@ import {
 	AccordionDetails,
 	AccordionSummary,
 	Box,
+	Breadcrumbs,
 	Button,
 	Checkbox,
 	Collapse,
@@ -109,6 +110,9 @@ export default function MyOrders() {
 	return (
 		<MemberPageTemplate>
 			<Container sx={{ my: 4 }}>
+				<Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+					<Typography color="text.primary">My Orders</Typography>
+				</Breadcrumbs>
 				{/* Filter Container */}
 				<Accordion sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightgray", mb: 4, boxShadow: (theme) => theme.shadows[1] }}>
 					<AccordionSummary expandIcon={<ExpandMoreRounded />}>
