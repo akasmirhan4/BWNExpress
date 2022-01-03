@@ -38,6 +38,10 @@ export default function Settings() {
 	const dispatch = useDispatch();
 
 	useEffect(() => {
+		if (!("Notification" in window)) {
+			toast("This browser does not support desktop notification");
+			return;
+		}
 		setNotificationPermission(Notification.permission);
 	}, []);
 
@@ -50,6 +54,7 @@ export default function Settings() {
 							// Let's check if the browser supports notifications
 							if (!("Notification" in window)) {
 								toast("This browser does not support desktop notification");
+								return;
 							}
 							Notification.requestPermission().then(function (permission) {
 								// If the user accepts, let's create a notification
