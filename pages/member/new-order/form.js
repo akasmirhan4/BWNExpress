@@ -267,11 +267,11 @@ export default function Verification() {
 	}
 
 	return (
-		<MemberPageTemplate>
+		<MemberPageTemplate hideFAB>
 			<Container sx={{ pt: 4 }}>
 				<Box display={"flex"} justifyContent="space-between" alignItems={"center"} sx={{ mb: 4 }}>
 					<Breadcrumbs aria-label="breadcrumb">
-						<NextLink href="dashboard"  passHref>
+						<NextLink href="/member/dashboard"  passHref>
 							<Link underline="hover" color="inherit">
 								Home
 							</Link>

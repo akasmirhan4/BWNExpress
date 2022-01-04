@@ -60,7 +60,7 @@ export default function Notifications() {
 			<Container>
 				<Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
 					<Breadcrumbs aria-label="breadcrumb">
-						<NextLink href="dashboard" passHref>
+						<NextLink href="/member/dashboard" passHref>
 							<Link underline="hover" color="inherit">
 								Home
 							</Link>

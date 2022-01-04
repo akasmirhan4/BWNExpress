@@ -207,7 +207,7 @@ export default function Profile() {
 		<MemberPageTemplate>
 			<Container>
 				<Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-					<NextLink href="dashboard" passHref>
+					<NextLink href="/member/dashboard" passHref>
 						<Link underline="hover" color="inherit">
 							Home
 						</Link>
