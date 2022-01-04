@@ -198,7 +198,7 @@ function NewUserContainer(props) {
 							</Grid>
 							<Grid item xs={12} md={4}>
 								<TextField
-									label="Preferred Name (Nickname)"
+									label="Nickname"
 									type="text"
 									onChange={(e) => {
 										setPreferredName(e.target.value);
