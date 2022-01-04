@@ -288,10 +288,6 @@ function PermitTax(props) {
 function RestrictedGoods(props) {
 	const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 	const restrictedGoods = [
-		// {
-		// 	category: "General",
-		// 	details: "Power banks, batteries, standalone batteries, metal detector, radar detector, lock picks, telescopes, magnets, tattoo machine and equipment.",
-		// },
 		{
 			category: "Dangerous Items",
 			details:
@@ -303,7 +299,8 @@ function RestrictedGoods(props) {
 		},
 		{
 			category: "Perishables",
-			details: "Foodstuffs, food articles and beverages requiring refrigeration or other environmental control. Meat products that contains chicken, beef, duck, pork and others are not permitted to be brought through.",
+			details:
+				"Foodstuffs, food articles and beverages requiring refrigeration or other environmental control. Meat products that contains chicken, beef, duck, pork and others are not permitted to be brought through.",
 		},
 		{
 			category: "Drug",
@@ -319,13 +316,9 @@ function RestrictedGoods(props) {
 		},
 		{
 			category: "Sharp Tools or Weapons",
-			details: "Scissors, knives, cartridges, guns and gun accessories, slingshots, stun gun, pepper spray. Bows and arrows for recreational use are also not permitted to be brought through.",
+			details:
+				"Scissors, knives, cartridges, guns and gun accessories, slingshots, stun gun, pepper spray. Bows and arrows for recreational use are also not permitted to be brought through.",
 		},
-		// {
-		// 	category: "Electronics",
-		// 	details:
-		// 		"Shipments containing laser (laser hair removals or laser pens), walkie-talkie, used laptops manufactured before 2008, smart watches containing sim slots or/and cameras.",
-		// },
 		{
 			category: "Tobacco",
 			details: "Cigarettes, cigars, electronic cigarettes and accessories, tobacco, hookah and hookah accessories.",
