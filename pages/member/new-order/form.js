@@ -75,7 +75,6 @@ export default function Verification() {
 			setItemCategory(newOrderData.itemCategory || "");
 			setParcelValue(newOrderData.parcelValue || null);
 			setCurrency(newOrderData.currency || "MYR");
-			setCurrency(newOrderData.currency || "MYR");
 			setItemDescription(newOrderData.itemDescription || "");
 			setCourierProvider(newOrderData.courierProvider || "");
 			setSpecificCourierProvider(newOrderData.specificCourierProvider || "");
@@ -187,7 +186,7 @@ export default function Verification() {
 		"Sports Equipment",
 		"Medical Use",
 	].sort();
-	const currencies = ["MYR", "BND", "SGD", "USD"];
+	const currencies = ["MYR", "BND", "SGD", "USD", "CNY", "JPY"];
 	const couriers = [
 		"ABX Express",
 		"After5",
@@ -267,11 +266,11 @@ export default function Verification() {
 	}
 
 	return (
-		<MemberPageTemplate>
+		<MemberPageTemplate hideFAB>
 			<Container sx={{ pt: 4 }}>
 				<Box display={"flex"} justifyContent="space-between" alignItems={"center"} sx={{ mb: 4 }}>
 					<Breadcrumbs aria-label="breadcrumb">
-						<NextLink href="dashboard"  passHref>
+						<NextLink href="/member/dashboard"  passHref>
 							<Link underline="hover" color="inherit">
 								Home
 							</Link>
