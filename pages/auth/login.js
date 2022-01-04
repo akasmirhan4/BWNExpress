@@ -6,6 +6,7 @@ import { useState } from "react";
 import GoogleSignInBtn from "components/GoogleSignInBtn";
 import { auth } from "lib/firebase";
 import toast from "react-hot-toast";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default function Login(params) {
 	return (
@@ -41,8 +42,7 @@ function LoginContainer(props) {
 				setPasswordError("Passwords are 6 characters min");
 			}
 			if (isValid) {
-				await auth
-					.signInWithEmailAndPassword(email, password)
+				await signInWithEmailAndPassword(auth, email, password)
 					.then(resolve)
 					.catch((error) => {
 						switch (error.code) {
