@@ -75,7 +75,6 @@ export default function Verification() {
 			setItemCategory(newOrderData.itemCategory || "");
 			setParcelValue(newOrderData.parcelValue || null);
 			setCurrency(newOrderData.currency || "MYR");
-			setCurrency(newOrderData.currency || "MYR");
 			setItemDescription(newOrderData.itemDescription || "");
 			setCourierProvider(newOrderData.courierProvider || "");
 			setSpecificCourierProvider(newOrderData.specificCourierProvider || "");
@@ -187,7 +186,7 @@ export default function Verification() {
 		"Sports Equipment",
 		"Medical Use",
 	].sort();
-	const currencies = ["MYR", "BND", "SGD", "USD"];
+	const currencies = ["MYR", "BND", "SGD", "USD", "CNY", "JPY"];
 	const couriers = [
 		"ABX Express",
 		"After5",
