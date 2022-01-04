@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Button, Skeleton, Breadcrumbs } from "@mui/material";
+import { Box, Container, Typography, Button, Skeleton, Breadcrumbs, Slide, Grid, Fade } from "@mui/material";
 import dashboardStyles from "styles/dashboard.module.scss";
 import AwesomeCarousel from "components/AwesomeCarousel";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -10,6 +10,9 @@ import { auth, getPendingActionOrders } from "lib/firebase";
 import { DoNotTouchRounded } from "@mui/icons-material";
 import { selectUserExists } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
+import Link from "next/link";
+
+import VizSensor from "react-visibility-sensor";
 
 export default function Dashboard() {
 	return (
@@ -22,7 +25,80 @@ export default function Dashboard() {
 			<PendingPaymentsBox sx={{ mt: 4 }} />
 			<PendingActionsBox sx={{ mt: 4 }} />
 			<PromotionsBox sx={{ mt: 4 }} />
+			<PricesContainer sx={{ mt: 4 }} />
 		</MemberPageTemplate>
+	);
+}
+
+function PricesContainer(props) {
+	const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("md"));
+	const [isVisible, setIsVisible] = useState(false);
+
+	const pricingDetails = [
+		{ price: { from: "6", to: "10" }, weight: { from: "0.1", to: "1.99" }, src: "/pngs/mail.png" },
+		{ price: { from: "14", to: "18" }, weight: { from: "2.0", to: "7.99" }, src: "/pngs/envelope.png" },
+		{ price: { from: "23", to: "27" }, weight: { from: "8.0", to: "13.99" }, src: "/pngs/box.png", size: "40%" },
+		{ price: { from: "31", to: "35" }, weight: { from: "14", to: "19.99" }, src: "/pngs/box.png", size: "60%" },
+		{ price: { from: "39", to: "43" }, weight: { from: "20", to: "25.99" }, src: "/pngs/box.png", size: "80%" },
+	];
+
+	return (
+		<VizSensor
+			partialVisibility
+			onChange={(visible) => {
+				if (visible) setIsVisible(visible);
+			}}
+		>
+			<Container {...props} sx={{ display: "flex", flexDirection: "column", ...props.sx }}>
+				<Box bgcolor="#DEC3E6" pt={4} pb={4} px={2} borderRadius={4}>
+					<Typography color="white.main" sx={{ textAlign: { xs: "center", md: "left" } }}>
+						Prices
+					</Typography>
+					<Typography variant={isSmallScreen ? "h5" : "h4"} fontWeight="bold" color="white.main" mb={2} sx={{ textAlign: { xs: "center", md: "left" } }}>
+						Affordable choice of delivery to your doorstep.
+					</Typography>
+					<Grid container display="flex" spacing={2} my={4} justifyContent={"center"}>
+						{pricingDetails.map((details, index) => (
+							<PriceItem details={details} isVisible={isVisible} index={index} key={index} />
+						))}
+					</Grid>
+				</Box>
+			</Container>
+		</VizSensor>
+	);
+}
+
+function PriceItem(props) {
+	const { price, weight, src, size } = props.details || {};
+
+	return (
+		<Grid item md={2.4} sm={4} xs={12} xs2={6}>
+			<Box
+				sx={{
+					mx: 1,
+					bgcolor: "white.main",
+					justifyContent: "center",
+					alignItems: "center",
+					display: "flex",
+					flex: 1,
+					padding: 4,
+					borderRadius: 2,
+					flexDirection: "column",
+					height: "14em",
+					boxShadow: (theme) => theme.shadows[1],
+				}}
+			>
+				<Typography textAlign="center">{`$${price.from} to $${price.to}`}</Typography>
+				<Box flex={1} width="100%" alignItems={"center"} justifyContent={"center"} display={"flex"}>
+					<Slide direction="up" in={props.isVisible} timeout={1000} style={{ transitionDelay: props.index * 100 }}>
+						<Box height={size ?? "60%"} width="100%" position="relative" my={2}>
+							<ImageWithSkeleton src={src} alt="upcoming-apps" objectFit="contain" layout="fill" />
+						</Box>
+					</Slide>
+				</Box>
+				<Typography textAlign="center" fontWeight={"bold"} variant="caption">{`${weight.from} to ${weight.to} kg`}</Typography>
+			</Box>
+		</Grid>
 	);
 }
 
