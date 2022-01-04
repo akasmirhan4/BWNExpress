@@ -229,9 +229,9 @@ function PermitTax(props) {
 								TAX
 							</Typography>
 							<Typography sx={{ pb: 2, textAlign: { xs: "center", md: "left" } }}>
-								All parcels are to be declared through Royal Brunei Customs' Brunei Darussalam National Single Window portal. It is important that you provide
-								us with all the information needed through the Order Form. Do note that there are certain category of items that are subjected to Brunei
-								Customs' Duty tax or Excise Duty Tax, payment will be required when the tax amount is determined.
+								{
+									"All parcels are to be declared through Royal Brunei Customs' Brunei Darussalam National Single Window portal. It is important that you provide us with all the information needed through the Order Form. Do note that there are certain category of items that are subjected to Brunei Customs' Duty tax or Excise Duty Tax, payment will be required when the tax amount is determined."
+								}
 							</Typography>
 							<Typography
 								fontWeight="bold"
@@ -243,11 +243,9 @@ function PermitTax(props) {
 							</Typography>
 
 							<Typography sx={{ pb: 2, textAlign: { xs: "center", md: "left" } }}>
-								Royal Brunei Customs has enforced permits to be applied for all make up, skincare, hair care products, perfume/fragrances, essential oils,
-								supplements and books regardless of quantity. Electronic items that utilises or requires Bluetooth, Wifi or any radio frequencies are required
-								to have an approved AITI approval prior to the parcel being declared to be brought through to Brunei Darussalam. For permit application services
-								through bwnexpress.com, payments are required in order for the permit/s being applied. Food items are not to be brought through using
-								bwnexpress.com unless a permit has already been gained by a customer.
+								{
+									"Royal Brunei Customs has enforced permits to be applied for all make up, skincare, hair care products, perfume/fragrances, essential oils, supplements and books regardless of quantity. Electronic items that utilises or requires Bluetooth, Wifi or any radio frequencies are required to have an approved AITI approval prior to the parcel being declared to be brought through to Brunei Darussalam. For permit application services through bwnexpress.com, payments are required in order for the permit/s being applied. Food items are not to be brought through using bwnexpress.com unless a permit has already been gained by a customer."
+								}
 							</Typography>
 							<Typography sx={{ pb: 2, textAlign: { xs: "center", md: "left" } }}>
 								For more information on Permit License, please visit the{" "}
