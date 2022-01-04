@@ -219,18 +219,35 @@ function PermitTax(props) {
 			<Container>
 				<Grid container spacing={2} position="relative" zIndex={0}>
 					<Grid item xs={12} md={8}>
-						<Box display={"flex"} justifyContent={"center"} flexDirection={"column"} py={8}>
+						<Box display={"flex"} justifyContent={"center"} flexDirection={"column"} pt={4} pb={8}>
 							<Typography
 								fontWeight="bold"
 								variant={"h5"}
 								sx={{ textTransform: "uppercase", pb: 2, textAlign: { xs: "center", md: "left" } }}
 								color={"white.main"}
 							>
-								Permit/tax
+								TAX
 							</Typography>
 							<Typography sx={{ pb: 2, textAlign: { xs: "center", md: "left" } }}>
-								All parcels are to be declared to Brunei Customs. So, it is important that you must declare all items for the permit application, the original
-								invoice from seller and declaration conducted by the courier service provider. All payments are to be made prior to permit being applied.
+								All parcels are to be declared through Royal Brunei Customs' Brunei Darussalam National Single Window portal. It is important that you provide
+								us with all the information needed through the Order Form. Do note that there are certain category of items that are subjected to Brunei
+								Customs' Duty tax or Excise Duty Tax, payment will be required when the tax amount is determined.
+							</Typography>
+							<Typography
+								fontWeight="bold"
+								variant={"h5"}
+								sx={{ textTransform: "uppercase", pb: 2, textAlign: { xs: "center", md: "left" } }}
+								color={"white.main"}
+							>
+								PERMIT
+							</Typography>
+
+							<Typography sx={{ pb: 2, textAlign: { xs: "center", md: "left" } }}>
+								Royal Brunei Customs has enforced permits to be applied for all make up, skincare, hair care products, perfume/fragrances, essential oils,
+								supplements and books regardless of quantity. Electronic items that utilises or requires Bluetooth, Wifi or any radio frequencies are required
+								to have an approved AITI approval prior to the parcel being declared to be brought through to Brunei Darussalam. For permit application services
+								through bwnexpress.com, payments are required in order for the permit/s being applied. Food items are not to be brought through using
+								bwnexpress.com unless a permit has already been gained by a customer.
 							</Typography>
 							<Typography sx={{ pb: 2, textAlign: { xs: "center", md: "left" } }}>
 								For more information on Permit License, please visit the{" "}
@@ -271,14 +288,14 @@ function PermitTax(props) {
 function RestrictedGoods(props) {
 	const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 	const restrictedGoods = [
-		{
-			category: "General",
-			details: "Power banks, batteries, standalone batteries, metal detector, radar detector, lock picks, telescopes, magnets, tattoo machine and equipment.",
-		},
+		// {
+		// 	category: "General",
+		// 	details: "Power banks, batteries, standalone batteries, metal detector, radar detector, lock picks, telescopes, magnets, tattoo machine and equipment.",
+		// },
 		{
 			category: "Dangerous Items",
 			details:
-				"Including all types of aerosols (hairspray, deodorant, perfumes, etc.) gases, and pressurised containers, corrosives, explosives, flammable solids, and radioactive materials, oxidising substances and organic peroxides solids, flammable chemicals, monoxide hair growth treatments..",
+				"Including certain types of aerosols gases,  pressurised containers, corrosives, explosives, flammable solids, radioactive materials, oxidising substances, organic peroxides solids and flammable chemicals.",
 		},
 		{
 			category: "Plants",
@@ -286,14 +303,14 @@ function RestrictedGoods(props) {
 		},
 		{
 			category: "Perishables",
-			details: "Foodstuffs and persihable food articles and beverages requiring refrigeration or other environmental control.",
+			details: "Foodstuffs, food articles and beverages requiring refrigeration or other environmental control. Meat products that contains chicken, beef, duck, pork and others are not permitted to be brought through.",
 		},
 		{
 			category: "Drug",
 			details: "Cocaine, cannabis resin, LSD, narcotics, morphine, opium, psychotropic substances, etc.",
 		},
 		{
-			category: "Pornography",
+			category: "Pornography and indecent items or peripherals",
 			details: "Foul materials, pornography and/or obscene material, any unsolicited indecent item or representation of any kind.",
 		},
 		{
@@ -302,13 +319,13 @@ function RestrictedGoods(props) {
 		},
 		{
 			category: "Sharp Tools or Weapons",
-			details: "Scissors, knives needles and cartidges, guns and gun accessories, slingshots, stun gun, pepper spray.",
+			details: "Scissors, knives, cartridges, guns and gun accessories, slingshots, stun gun, pepper spray. Bows and arrows for recreational use are also not permitted to be brought through.",
 		},
-		{
-			category: "Electronics",
-			details:
-				"Shipments containing laser (laser hair removals or laser pens), walkie-talkie, used laptops manufactured before 2008, smart watches containing sim slots or/and cameras.",
-		},
+		// {
+		// 	category: "Electronics",
+		// 	details:
+		// 		"Shipments containing laser (laser hair removals or laser pens), walkie-talkie, used laptops manufactured before 2008, smart watches containing sim slots or/and cameras.",
+		// },
 		{
 			category: "Tobacco",
 			details: "Cigarettes, cigars, electronic cigarettes and accessories, tobacco, hookah and hookah accessories.",

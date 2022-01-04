@@ -10,14 +10,14 @@ import { selectIsAcknowledged, setIsAcknowledged } from "lib/slices/newOrderSlic
 
 export default function Acknowledgement() {
 	const restrictedGoods = [
-		{
-			category: "General",
-			details: "Power banks, batteries, standalone batteries, metal detector, radar detector, lock picks, telescopes, magnets, tattoo machine and equipment.",
-		},
+		// {
+		// 	category: "General",
+		// 	details: "Power banks, batteries, standalone batteries, metal detector, radar detector, lock picks, telescopes, magnets, tattoo machine and equipment.",
+		// },
 		{
 			category: "Dangerous Items",
 			details:
-				"Including all types of aerosols (hairspray, deodorant, perfumes, etc.) gases, and pressurised containers, corrosives, explosives, flammable solids, and radioactive materials, oxidising substances and organic peroxides solids, flammable chemicals, monoxide hair growth treatments..",
+				"Including certain types of aerosols gases,  pressurised containers, corrosives, explosives, flammable solids, radioactive materials, oxidising substances, organic peroxides solids and flammable chemicals.",
 		},
 		{
 			category: "Plants",
@@ -25,14 +25,14 @@ export default function Acknowledgement() {
 		},
 		{
 			category: "Perishables",
-			details: "Foodstuffs and persihable food articles and beverages requiring refrigeration or other environmental control.",
+			details: "Foodstuffs, food articles and beverages requiring refrigeration or other environmental control. Meat products that contains chicken, beef, duck, pork and others are not permitted to be brought through.",
 		},
 		{
 			category: "Drug",
 			details: "Cocaine, cannabis resin, LSD, narcotics, morphine, opium, psychotropic substances, etc.",
 		},
 		{
-			category: "Pornography",
+			category: "Pornography and indecent items or peripherals",
 			details: "Foul materials, pornography and/or obscene material, any unsolicited indecent item or representation of any kind.",
 		},
 		{
@@ -41,13 +41,13 @@ export default function Acknowledgement() {
 		},
 		{
 			category: "Sharp Tools or Weapons",
-			details: "Scissors, knives needles and cartidges, guns and gun accessories, slingshots, stun gun, pepper spray.",
+			details: "Scissors, knives, cartridges, guns and gun accessories, slingshots, stun gun, pepper spray. Bows and arrows for recreational use are also not permitted to be brought through.",
 		},
-		{
-			category: "Electronics",
-			details:
-				"Shipments containing laser (laser hair removals or laser pens), walkie-talkie, used laptops manufactured before 2008, smart watches containing sim slots or/and cameras.",
-		},
+		// {
+		// 	category: "Electronics",
+		// 	details:
+		// 		"Shipments containing laser (laser hair removals or laser pens), walkie-talkie, used laptops manufactured before 2008, smart watches containing sim slots or/and cameras.",
+		// },
 		{
 			category: "Tobacco",
 			details: "Cigarettes, cigars, electronic cigarettes and accessories, tobacco, hookah and hookah accessories.",
