@@ -50,7 +50,7 @@ function LoginContainer(props) {
 								setEmailError("The email address is badly formatted");
 								break;
 							case "auth/user-not-found":
-								setEmailError("No user exist. Register instead if you are new");
+								setEmailError("No user exist. Sign up instead if you are new");
 								break;
 							case "auth/wrong-password":
 								setPasswordError("The password is invalid");
@@ -155,7 +155,7 @@ function LoginContainer(props) {
 						toast.promise(logIn(), { success: "Logged In", loading: "Logging In...", error: "Error Logging In" });
 					}}
 				>
-					Log In
+					Sign In
 				</Button>
 				<Box width="100%" maxWidth="384px" justifyContent="flex-end" display="flex">
 					<Link2 href="/auth/forget-password" passHref>

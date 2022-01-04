@@ -177,7 +177,7 @@ function RegisterContainer(props) {
 									}
 								}}
 							>
-								Register
+								Sign Up
 							</Button>
 						</Box>
 						<Box

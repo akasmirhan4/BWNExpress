@@ -106,11 +106,11 @@ export default function LandingTopbar(props) {
 							{!userExists ? (
 								<Box>
 									<Link href="/auth/login" passHref>
-										<Button color={props.darkText ? "text" : "white"}>Login</Button>
+										<Button color={props.darkText ? "text" : "white"}>Sign In</Button>
 									</Link>
 									<Link href="/auth/register" passHref>
 										<Button variant="contained" color="secondary" sx={{ ml: 2, boxShadow: (theme) => theme.shadows[1] }} style={{ color: "white" }}>
-											Register
+											Sign Up
 										</Button>
 									</Link>
 								</Box>
@@ -178,8 +178,8 @@ export default function LandingTopbar(props) {
 						<List>
 							{!userExists ? (
 								<>
-									<DrawerLink href="/auth/login" title="Login" icon={<LoginRounded />} />
-									<DrawerLink href="/auth/register" title="Register" icon={<PersonAddRounded />} />
+									<DrawerLink href="/auth/login" title="Sign In" icon={<LoginRounded />} />
+									<DrawerLink href="/auth/register" title="Sign Up" icon={<PersonAddRounded />} />
 								</>
 							) : (
 								<>

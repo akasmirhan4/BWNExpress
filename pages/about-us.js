@@ -12,7 +12,7 @@ export default function AboutUsPage(params) {
 			<AboutUs pt={"5em"} />
 			<HowItWorks />
 			<Location />
-			<Management />
+			{/* <Management /> */}
 			<LandingFooter />
 		</Box>
 	);
@@ -57,7 +57,7 @@ function AboutUs(props) {
 										3.9K
 									</Typography>
 									<Typography color="white.main" textAlign={"center"}>
-										Registered Members
+										Members Signed Up
 									</Typography>
 								</Box>
 							</Grid>
@@ -132,7 +132,7 @@ function HowItWorks(props) {
 							<ImageWithSkeleton src="/svgs/register-with-us.svg" objectFit="contain" layout="fill" />
 						</Box>
 						<Typography fontWeight="bold" variant={"h6"} sx={{ py: 2 }} textAlign={"center"}>
-							Register with us and get your BWNExpress address.
+							Sign Up and get your BWNExpress address.
 						</Typography>
 						<Typography textAlign={"center"}>
 							Then, you are ready to shop at your favourite sites such as Uniqlo Malaysia, Lazada, Shopee, and many more!
@@ -174,7 +174,7 @@ function HowItWorks(props) {
 							size="large"
 							color="secondary"
 						>
-							Register now!
+							Sign up now!
 						</Button>
 					</Link>
 				</Box>

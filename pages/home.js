@@ -81,7 +81,7 @@ function HeroContainer(props) {
 												boxShadow: (theme) => theme.shadows[1],
 											}}
 										>
-											Register Now
+											Sign Up Now
 										</Button>
 									</Link>
 								</Box>
@@ -142,7 +142,7 @@ function HeroContainer(props) {
 												boxShadow: (theme) => theme.shadows[1],
 											}}
 										>
-											Register Now
+											Sign Up Now
 										</Button>
 									</Link>
 								</Box>
