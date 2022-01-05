@@ -23,33 +23,32 @@ import { ChevronLeftRounded, ChevronRightRounded, InfoRounded } from "@mui/icons
 import toast from "react-hot-toast";
 import NumberFormat from "react-number-format";
 import { LoadingButton } from "@mui/lab";
-import { useDispatch, useSelector } from "react-redux";
-import { selectData, selectIsAcknowledged, setData } from "lib/slices/newOrderSlice";
+import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import NewOrderSteppers from "components/NewOrderSteppers";
 import { selectUserData } from "lib/slices/userSlice";
 
 export default function Verification() {
-	const dispatch = useDispatch();
 	const router = useRouter();
-	const newOrderData = useSelector(selectData);
 	const userData = useSelector(selectUserData);
 	const [purchaseFrom, setPurchaseFrom] = useState("");
-	const [weightRange, setWeightRange] = useState("")
+	const [weightRange, setWeightRange] = useState("");
 	const [itemCategory, setItemCategory] = useState("");
-	const [parcelValue, setParcelValue] = useState(null);
+	const [parcelValue, setParcelValue] = useState("");
 	const [currency, setCurrency] = useState("MYR");
 	const [itemDescription, setItemDescription] = useState("");
 	const [courierProvider, setCourierProvider] = useState("");
 	const [specificCourierProvider, setSpecificCourierProvider] = useState("");
 	const [trackingNumber, setTrackingNumber] = useState("");
 	const [receipt, setReceipt] = useState(null);
+	const [receiptMetadata, setReceiptMetadata] = useState(null);
 	const [paymentMethod, setPaymentMethod] = useState("");
 	const [deliveryMethod, setDeliveryMethod] = useState("");
+	const [bankTransfer, setBankTransfer] = useState(null);
+	const [bankTransferMetadata, setBankTransferMetadata] = useState(null);
 	const [isDifferentAddress, setIsDifferentAddress] = useState(false);
 	const [deliveryAddress, setDeliveryAddress] = useState("");
 	const [remark, setRemark] = useState("");
-	const [isTouchDevice, setIsTouchDevice] = useState(false);
 
 	const [errors, setErrors] = useState({
 		purchaseFrom: [],
@@ -62,6 +61,7 @@ export default function Verification() {
 		specificCourierProvider: [],
 		trackingNumber: [],
 		receipt: [],
+		bankTransfer: [],
 		paymentMethod: [],
 		deliveryMethod: [],
 		deliveryAddress: [],
@@ -69,45 +69,102 @@ export default function Verification() {
 	const [loaded, setLoaded] = useState(false);
 	const [loading, setLoading] = useState(false);
 
-	const isAcknowledged = useSelector(selectIsAcknowledged);
+	const reset = () => {
+		setPurchaseFrom("");
+		setWeightRange("");
+		setItemCategory("");
+		setParcelValue("");
+		setCurrency("MYR");
+		setItemDescription("");
+		setCourierProvider("");
+		setSpecificCourierProvider("");
+		setTrackingNumber("");
+		setReceipt(null);
+		setReceiptMetadata(null);
+		setBankTransfer(null);
+		setBankTransferMetadata(null);
+		setPaymentMethod("");
+		setDeliveryMethod("");
+		setIsDifferentAddress(false);
+		setDeliveryAddress(userData.deliveryAddress || userData.address || "missing delivery address");
+		setRemark("");
+	};
 
 	useEffect(() => {
-		if (newOrderData) {
-			setPurchaseFrom(newOrderData.purchaseFrom || "");
-			setWeightRange(newOrderData.weightRange || "");
-			setItemCategory(newOrderData.itemCategory || "");
-			setParcelValue(newOrderData.parcelValue || null);
-			setCurrency(newOrderData.currency || "MYR");
-			setItemDescription(newOrderData.itemDescription || "");
-			setCourierProvider(newOrderData.courierProvider || "");
-			setSpecificCourierProvider(newOrderData.specificCourierProvider || "");
-			setTrackingNumber(newOrderData.trackingNumber || "");
-			setReceipt(newOrderData.receipt || null);
-			setPaymentMethod(newOrderData.paymentMethod || "");
-			setDeliveryMethod(newOrderData.deliveryMethod || "");
-			setIsDifferentAddress(newOrderData.isDifferentAddress ?? false);
-			setDeliveryAddress(newOrderData.deliveryAddress || "");
-			setRemark(newOrderData.remark || "");
-		}
-		setLoaded(true);
-	}, [newOrderData]);
-	useEffect(() => {
-		if (userData && !newOrderData) {
-			setDeliveryAddress(userData.deliveryAddress || userData.address || "missing delivery address");
+		if (userData) {
+			setPurchaseFrom(window.sessionStorage.getItem("purchaseFrom") ?? "");
+			setWeightRange(window.sessionStorage.getItem("weightRange") ?? "");
+			setItemCategory(window.sessionStorage.getItem("itemCategory") ?? "");
+			setParcelValue(window.sessionStorage.getItem("parcelValue") ?? "");
+			setCurrency(window.sessionStorage.getItem("currency") ?? "MYR");
+			setItemDescription(window.sessionStorage.getItem("itemDescription") ?? "");
+			setCourierProvider(window.sessionStorage.getItem("courierProvider") ?? "");
+			setSpecificCourierProvider(window.sessionStorage.getItem("specificCourierProvider") ?? "");
+			setTrackingNumber(window.sessionStorage.getItem("trackingNumber") ?? "");
+			setReceipt(window.sessionStorage.getItem("receipt"));
+			setReceiptMetadata(window.sessionStorage.getItem("receiptMetadata") ?? "");
+			setBankTransfer(window.sessionStorage.getItem("bankTransfer") ?? "");
+			setBankTransferMetadata(window.sessionStorage.getItem("bankTransferMetadata") ?? "");
+			setPaymentMethod(window.sessionStorage.getItem("paymentMethod") ?? "");
+			setDeliveryMethod(window.sessionStorage.getItem("deliveryMethod") ?? "");
+			setIsDifferentAddress(window.sessionStorage.getItem("isDifferentAddress") ?? false);
+			setDeliveryAddress(window.sessionStorage.getItem("deliveryAddress") ?? (userData.deliveryAddress || userData.address || "missing delivery address"));
+			setRemark(window.sessionStorage.getItem("remark") ?? "");
+			setLoaded(true);
 		}
 	}, [userData]);
 
 	useEffect(() => {
-		if (!isAcknowledged) {
+		if (!loaded) return;
+		let data = {
+			purchaseFrom,
+			weightRange,
+			itemCategory,
+			parcelValue,
+			currency,
+			itemDescription,
+			courierProvider,
+			specificCourierProvider,
+			trackingNumber,
+			receiptMetadata,
+			receipt,
+			bankTransfer,
+			bankTransferMetadata,
+			paymentMethod,
+			deliveryMethod,
+			isDifferentAddress,
+			deliveryAddress,
+			remark,
+		};
+		Object.entries(data).forEach(([key, value]) => {
+			window.sessionStorage.setItem(key, value);
+		});
+	}, [
+		purchaseFrom,
+		weightRange,
+		itemCategory,
+		parcelValue,
+		currency,
+		itemDescription,
+		courierProvider,
+		specificCourierProvider,
+		trackingNumber,
+		receiptMetadata,
+		receipt,
+		bankTransfer,
+		bankTransferMetadata,
+		paymentMethod,
+		deliveryMethod,
+		isDifferentAddress,
+		deliveryAddress,
+		remark,
+		loaded,
+	]);
+
+	useEffect(() => {
+		if (window.sessionStorage.getItem("isAcknowledged") != "true") {
 			toast("Redirecting...");
 			router.push("acknowledgement");
-		}
-		function isTouchScreendevice() {
-			return "ontouchstart" in window || navigator.maxTouchPoints;
-		}
-
-		if (isTouchScreendevice()) {
-			setIsTouchDevice(true);
 		}
 	}, []);
 
@@ -225,6 +282,7 @@ export default function Verification() {
 			specificCourierProvider: [],
 			trackingNumber: [],
 			receipt: [],
+			bankTransfer: [],
 			paymentMethod: [],
 			deliveryMethod: [],
 			deliveryAddress: [],
@@ -251,6 +309,7 @@ export default function Verification() {
 		if (!trackingNumber) _errors.trackingNumber.push("This is required");
 
 		if (!receipt) _errors.receipt.push("This is required");
+		if (!bankTransfer) _errors.bankTransfer.push("This is required");
 		if (!!paymentMethod && !paymentMethods.includes(paymentMethod)) _errors.paymentMethod.push("Unknown method");
 		if (!!deliveryMethod && !deliveryMethods.includes(deliveryMethod)) {
 			_errors.deliveryMethod.push("Unknown method");
@@ -331,7 +390,7 @@ export default function Verification() {
 										margin="dense"
 										sx={{ boxShadow: (theme) => theme.shadows[1] }}
 										required
-										error={!!errors.itemCategory.length}
+										error={!!errors.weightRange.length}
 									>
 										{weightRanges.map((weight, index) => (
 											<MenuItem value={weight} key={index}>
@@ -526,7 +585,7 @@ export default function Verification() {
 								</Fragment>
 							)}
 						</Grid>
-						<Grid item xs={12} md={6} order={{ xs: 10, md: 10 }}>
+						<Grid item xs={12} md={6}>
 							<Tooltip disableHoverListener title={"Accepts only images/pdf with max 5MB size"} placement="top" arrow enterTouchDelay={100}>
 								<Button
 									variant={!errors.receipt.length ? "contained" : "outlined"}
@@ -565,21 +624,31 @@ export default function Verification() {
 											if (errors.receipt.length) {
 												setErrors({ ...errors, receipt: [] });
 											}
-											setReceipt(files[0]);
-											toast.success("File selected 😎");
+											const reader = new FileReader();
+											reader.addEventListener(
+												"load",
+												function () {
+													setReceipt(reader.result);
+													console.log(reader.result);
+													toast.success("File selected 😎");
+													setReceiptMetadata(JSON.stringify({ name: files[0].name, type: files[0].type }));
+												},
+												false
+											);
+											reader.readAsDataURL(files[0]);
 										}}
 									/>
 								</Button>
 							</Tooltip>
-							<FormHelperText sx={{ mb: 2 }}>{receipt && `File selected: ${receipt.name}`}</FormHelperText>
+							<FormHelperText sx={{ mb: 2 }}>{receiptMetadata && `File selected: ${JSON.parse(receiptMetadata).name}`}</FormHelperText>
 							<FormHelperText error>{errors.receipt.join(" , ")}</FormHelperText>
 						</Grid>
-						<Grid item xs={12} md={6} order={{ xs: 11, md: 11 }}>
+						<Grid item xs={12} md={6}>
 							<FormHelperText>
 								Please ensure a complete itemized receipt / invoice / screenshot that clearly indicating the price and shipment cost.
 							</FormHelperText>
 						</Grid>
-						<Grid item xs={12} md={6} order={{ xs: 12, md: 12 }}>
+						<Grid item xs={12} md={6}>
 							<Tooltip disableHoverListener title={"Specify how you want to pay. You may select soon"} placement="top" arrow enterTouchDelay={100}>
 								<FormControl fullWidth sx={{ mt: { xs: 3, sm: 1 } }}>
 									<InputLabel>Payment Method (Optional)</InputLabel>
@@ -607,7 +676,7 @@ export default function Verification() {
 							</Tooltip>
 							<FormHelperText error>{errors.paymentMethod.join(" , ")}</FormHelperText>
 						</Grid>
-						<Grid item xs={12} md={6} order={{ xs: 13, md: 13 }}>
+						<Grid item xs={12} md={6}>
 							<Tooltip
 								disableHoverListener
 								title={"Specify how you want your parcel to be received. You may select soon"}
@@ -641,8 +710,8 @@ export default function Verification() {
 							</Tooltip>
 							<FormHelperText error>{errors.deliveryMethod.join(" , ")}</FormHelperText>
 						</Grid>
-						{deliveryMethod == "Home Delivery" && (
-							<Grid item xs={12} order={{ xs: 14, md: 14 }}>
+						{/* {paymentMethod == "Bank Transfer" && (
+							<Grid item xs={12}>
 								<Box display="flex" alignItems="center">
 									<Checkbox checked={isDifferentAddress} onChange={(e) => setIsDifferentAddress(e.target.checked)} />
 									<Typography variant="body2" sx={{ color: "text.main" }}>
@@ -671,8 +740,76 @@ export default function Verification() {
 								</Tooltip>
 								<FormHelperText error>{errors.deliveryAddress.join(" , ")}</FormHelperText>
 							</Grid>
+						)} */}
+						{paymentMethod == "Bank Transfer" && (
+							<Fragment>
+								<Grid item xs={12} md={6}>
+									<Tooltip disableHoverListener title={"Accepts only images/pdf with max 5MB size"} placement="top" arrow enterTouchDelay={100}>
+										<Button
+											variant={!errors.receipt.length ? "contained" : "outlined"}
+											color={!errors.receipt.length ? "accent" : "error"}
+											sx={{
+												color: !errors.receipt.length ? "white.main" : "error.main",
+												mt: { xs: 3, sm: 1 },
+											}}
+											size="large"
+											fullWidth
+											component="label"
+										>
+											upload bank transfer screenshot*
+											<input
+												type="file"
+												hidden
+												accept="image/jpeg,image/png,application/pdf"
+												onChange={(e) => {
+													const { files } = e.currentTarget;
+													if (!files.length) {
+														toast.error("No file selected");
+														return;
+													}
+													if (files.length > 1) {
+														toast.error("Please select 1 files only");
+														return;
+													}
+
+													if (files[0].size > 5 * 1024 * 1024) {
+														toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
+														return;
+													}
+													if (!["image/jpeg", "image/png", "application/pdf"].includes(files[0].type)) {
+														toast.error("Upload jpg, png or pdf files only");
+														return;
+													}
+													if (errors.bankTransfer.length) {
+														setErrors({ ...errors, bankTransfer: [] });
+													}
+													const reader = new FileReader();
+													reader.addEventListener(
+														"load",
+														function () {
+															setBankTransfer(reader.result);
+															console.log(reader.result);
+															toast.success("File selected 😎");
+															setBankTransferMetadata(JSON.stringify({ name: files[0].name, type: files[0].type }));
+														},
+														false
+													);
+													reader.readAsDataURL(files[0]);
+												}}
+											/>
+										</Button>
+									</Tooltip>
+									<FormHelperText sx={{ mb: 2 }}>{bankTransferMetadata && `File selected: ${JSON.parse(bankTransferMetadata).name}`}</FormHelperText>
+									<FormHelperText error>{errors.bankTransfer.join(" , ")}</FormHelperText>
+								</Grid>
+								<Grid item xs={12} md={6} sx={{ mt: { xs: 0, sm: 1 } }}>
+									<Typography fontWeight={"bold"}>Bank transfer details:</Typography>
+									<Typography>BIBD - 00001011111189</Typography>
+									<Typography>Baiduri Bank - 0200110484980</Typography>
+								</Grid>
+							</Fragment>
 						)}
-						<Grid item xs={12} order={{ xs: 15, md: 15 }}>
+						<Grid item xs={12}>
 							<Tooltip
 								disableHoverListener
 								title={"Add remarks for declaration purpose or if theres anything you want to notify us regarding your parcel"}
@@ -688,47 +825,29 @@ export default function Verification() {
 									fullWidth
 									margin="dense"
 									value={remark}
-									onChange={(e) => setRemark(e.target.value)}
+									onChange={(e) => {
+										setRemark(e.target.value);
+									}}
 								/>
 							</Tooltip>
 						</Grid>
-						<Grid item xs={6} display={"flex"} order={{ xs: 16, md: 16 }}>
-							<NextLink href="acknowledgement" passHref>
-								<Button startIcon={<ChevronLeftRounded />} variant="contained" color="accent" sx={{ width: { md: "unset", xs: "100%" } }}>
+						<Grid item xs={12} sm={6} display={"flex"}>
+							<NextLink href="/member/new-order/acknowledgement" passHref>
+								<Button startIcon={<ChevronLeftRounded />} variant="contained" color="accent" sx={{ width: { sm: "unset", xs: "100%" } }}>
 									Back
 								</Button>
 							</NextLink>
-							<NextLink href="acknowledgement"  passHref>
-								<Button ariant="outlined" color="accent" sx={{ width: { md: "unset", xs: "100%", ml: "2em" } }}>
-									Reset
-								</Button>
-							</NextLink>
+							<Button variant="outlined" color="accent" sx={{ width: { sm: "unset", xs: "100%" }, ml: "2em" }} onClick={reset}>
+								Reset
+							</Button>
 						</Grid>
-						<Grid item xs={6} display={"flex"} justifyContent={"flex-end"} order={{ xs: 17, md: 17 }}>
+						<Grid item xs={12} sm={6} display={"flex"} justifyContent={"flex-end"}>
 							<LoadingButton
 								onClick={() => {
 									setLoading(true);
 									const { nErrors } = validateInputs();
 									setLoading(false);
 									if (!nErrors) {
-										dispatch(
-											setData({
-												purchaseFrom,
-												itemCategory,
-												currency,
-												parcelValue,
-												itemDescription,
-												courierProvider,
-												specificCourierProvider,
-												trackingNumber,
-												receipt,
-												paymentMethod,
-												deliveryMethod,
-												isDifferentAddress,
-												deliveryAddress,
-												remark,
-											})
-										);
 										router.push("summary");
 									}
 								}}

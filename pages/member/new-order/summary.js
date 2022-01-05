@@ -4,8 +4,6 @@ import MemberPageTemplate from "components/MemberPageTemplate";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { LoadingButton } from "@mui/lab";
-import { useDispatch, useSelector } from "react-redux";
-import { selectData, selectIsAcknowledged, setSuccess } from "lib/slices/newOrderSlice";
 import { useRouter } from "next/router";
 import NewOrderSteppers from "components/NewOrderSteppers";
 import { ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
@@ -15,23 +13,45 @@ import { httpsCallable } from "firebase/functions";
 import { ref, uploadBytes } from "firebase/storage";
 
 export default function Summary() {
-	const dispatch = useDispatch();
 	const router = useRouter();
-
 	const [isAccurate, setIsAccurate] = useState(false);
-	const isAcknowledged = useSelector(selectIsAcknowledged);
-	const newOrderData = useSelector(selectData);
 	const [loading, setLoading] = useState(false);
+	const [newOrderData, setNewOrderData] = useState(null);
 
 	useEffect(() => {
-		if (!isAcknowledged) {
+		if (window.sessionStorage.getItem("isAcknowledged") != "true") {
 			toast("Redirecting...");
 			router.push("acknowledgement");
-		} else if (!newOrderData) {
-			toast("Redirecting...");
-			router.push("form");
+		} else {
+			let details = {};
+			let keys = [
+				"purchaseFrom",
+				"weightRange",
+				"itemCategory",
+				"parcelValue",
+				"currency",
+				"itemDescription",
+				"courierProvider",
+				"specificCourierProvider",
+				"trackingNumber",
+				"receiptMetadata",
+				"receipt",
+				"bankTransferMetadata",
+				"bankTransfer",
+				"paymentMethod",
+				"deliveryMethod",
+				"isDifferentAddress",
+				"deliveryAddress",
+				"remark",
+			];
+
+			keys.forEach((key) => {
+				const value = window.sessionStorage.getItem(key);
+				details[key] = value;
+			});
+			setNewOrderData(details);
 		}
-	}, [newOrderData, isAcknowledged]);
+	}, []);
 
 	return (
 		<MemberPageTemplate hideFAB>
@@ -78,6 +98,7 @@ export default function Summary() {
 									setLoading(true);
 									const orderDataCopy = { ...newOrderData };
 									delete orderDataCopy.receipt;
+									delete orderDataCopy.bankTransfer;
 									let success = false;
 									await toast
 										.promise(
@@ -87,7 +108,17 @@ export default function Summary() {
 											)(orderDataCopy).then(async ({ data }) => {
 												success = data.success;
 												if (!success) throw "Error adding order";
-												await uploadBytes(ref(storage, `users/${auth.currentUser.uid}/receipts/${data.id}`), newOrderData.receipt);
+												const receiptMetadata = JSON.parse(newOrderData.receiptMetadata);
+												const receipt = new File([await (await fetch(newOrderData.receipt)).blob()], receiptMetadata.name, { type: receiptMetadata.type });
+
+												const bankTransferMetadata = JSON.parse(newOrderData.bankTransferMetadata);
+												const bankTransfer = new File([await (await fetch(newOrderData.bankTransfer)).blob()], bankTransferMetadata.name, {
+													type: bankTransferMetadata.type,
+												});
+												console.log({ bankTransfer });
+												await uploadBytes(ref(storage, `users/${auth.currentUser.uid}/orders/${data.id}/receipt`), receipt);
+												await uploadBytes(ref(storage, `users/${auth.currentUser.uid}/orders/${data.id}/bankTransfer`), bankTransfer);
+												window.sessionStorage.setItem("success", "true");
 											}),
 											{ loading: "Submitting order...", success: "Order submitted 👌", error: "Error submitting order 😫" }
 										)
@@ -95,7 +126,6 @@ export default function Summary() {
 											setLoading(false);
 										});
 									if (success) {
-										dispatch(setSuccess(true));
 										router.push("confirmation");
 									}
 								}}

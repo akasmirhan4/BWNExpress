@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { selectOrders, selectUserExists } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import { auth, getOrder, getReceiptURL } from "lib/firebase";
+import { auth, getbankTransferURL, getOrder, getReceiptURL } from "lib/firebase";
 import toast from "react-hot-toast";
 import NextLink from "next/link";
 
@@ -15,6 +15,7 @@ export default function Details() {
 	const router = useRouter();
 	const [orderData, setOrderData] = useState(null);
 	const [receiptURL, setReceiptURL] = useState(null);
+	const [bankTransferURL, setBankTransferURL] = useState(null);
 	const userExist = useSelector(selectUserExists);
 
 	useEffect(() => {
@@ -42,6 +43,7 @@ export default function Details() {
 					router.push("/member/my-orders");
 				} else {
 					setReceiptURL(await getReceiptURL(router.query.orderID));
+					setBankTransferURL(await getbankTransferURL(router.query.orderID));
 				}
 			})();
 		}
@@ -68,7 +70,7 @@ export default function Details() {
 					bgcolor={"white.main"}
 					borderRadius={4}
 				>
-					<OrderSummary orderData={orderData} receiptURL={receiptURL} />
+					<OrderSummary orderData={orderData} receiptURL={receiptURL} bankTransferURL={bankTransferURL} />
 				</Box>
 			</Container>
 		</MemberPageTemplate>

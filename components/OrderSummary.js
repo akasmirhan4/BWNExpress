@@ -3,8 +3,10 @@ import Image from "next/image";
 import { memo, useState } from "react";
 
 export default function OrderSummary(props) {
-	const { orderData, receiptURL } = props || {};
+	const { orderData, receiptURL, bankTransferURL } = props || {};
 	const [receiptLoaded, setReceiptLoaded] = useState(false);
+	const [bankTransferLoaded, setBankTransferLoaded] = useState(false);
+	console.log(bankTransferURL, receiptURL);
 
 	function camelCaseToText(camel) {
 		const result = camel.replace(/([A-Z])/g, " $1");
@@ -86,31 +88,8 @@ export default function OrderSummary(props) {
 					</TableBody>
 				</Table>
 			</TableContainer>
-			<Typography sx={{ mt: 4 }}>Receipt Preview</Typography>
-			{receiptURL && (
-				<Box
-					width="100%"
-					display="flex"
-					justifyContent={"center"}
-					alignItems={"center"}
-					borderRadius={1}
-					position="relative"
-					bgcolor={receiptLoaded && "lightGrey.secondary"}
-					sx={{ zIndex: 0, my: 2, minHeight: { md: "48em", xs: "100vw" } }}
-				>
-					{!receiptLoaded && <Skeleton variant="rectangular" width={"100%"} sx={{ height: { md: "48em", xs: "100vw" } }} />}
-					<Image
-						onLoadingComplete={() => {
-							setReceiptLoaded(true);
-						}}
-						src={receiptURL}
-						alt="receipt"
-						layout="fill"
-						objectFit="contain"
-					/>
-				</Box>
-			)}
-			{orderData?.receipt && (
+			{(!!receiptURL || orderData?.receipt) && <Typography sx={{ mt: 4 }}>Receipt Preview</Typography>}
+			{(!!receiptURL || orderData?.receipt) && (
 				<Box
 					width="100%"
 					minHeight={"48em"}
@@ -124,13 +103,38 @@ export default function OrderSummary(props) {
 					bgcolor={"lightGrey.secondary"}
 					sx={{ zIndex: 0, my: 2 }}
 				>
-					{orderData?.receipt && ["image/jpeg", "image/png"].includes(orderData?.receipt.type) ? (
-						<Image src={URL.createObjectURL(orderData?.receipt)} alt="receipt" layout="fill" objectFit="contain" />
+					{["application/pdf"].includes(JSON.parse(orderData?.receiptMetadata).type) ? (
+						<PDFViewer src={receiptURL ?? orderData?.receipt} />
 					) : (
-						["application/pdf"].includes(orderData?.receipt.type) && <PDFViewer src={URL.createObjectURL(orderData?.receipt)} />
+						<Image src={receiptURL ?? orderData?.receipt} alt="receipt" layout="fill" objectFit="contain" />
 					)}
 					<Typography sx={{ bgcolor: "secondary.main", p: 1, color: "white.main", opacity: 0.8, fontSize: { xs: "0.7rem", sm: "1rem" } }} textAlign="center">
-						{orderData?.receipt ? orderData?.receipt.name : "..."}
+					{JSON.parse(orderData?.receiptMetadata).name ?? orderData.receiptMetadata.name ?? "..."}
+					</Typography>
+				</Box>
+			)}
+			{(!!bankTransferURL || orderData?.bankTransfer) && <Typography sx={{ mt: 4 }}>Bank Transfer Preview</Typography>}
+			{(!!bankTransferURL || orderData?.bankTransfer) && (
+				<Box
+					width="100%"
+					minHeight={"48em"}
+					border="1px dashed"
+					borderColor="secondaryAccent.main"
+					display="flex"
+					justifyContent={"center"}
+					alignItems={"center"}
+					borderRadius={1}
+					position="relative"
+					bgcolor={"lightGrey.secondary"}
+					sx={{ zIndex: 0, my: 2 }}
+				>
+					{["application/pdf"].includes(JSON.parse(orderData?.bankTransferMetadata).type) ? (
+						<PDFViewer src={bankTransferURL ?? orderData?.bankTransfer} />
+					) : (
+						<Image src={bankTransferURL ?? orderData?.bankTransfer} alt="bankTransfer" layout="fill" objectFit="contain" priority />
+					)}
+					<Typography sx={{ bgcolor: "secondary.main", p: 1, color: "white.main", opacity: 0.8, fontSize: { xs: "0.7rem", sm: "1rem" } }} textAlign="center">
+						{JSON.parse(orderData?.bankTransferMetadata).name ?? orderData.bankTransferMetadata.name ?? "..."}
 					</Typography>
 				</Box>
 			)}

@@ -2,11 +2,10 @@ import { Box, Container, Typography, Button, Grid, Breadcrumbs, Link, useMediaQu
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import { Masonry } from "@mui/lab";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronRightRounded } from "@mui/icons-material";
 import NewOrderSteppers from "components/NewOrderSteppers";
-import { useDispatch, useSelector } from "react-redux";
-import { selectIsAcknowledged, setIsAcknowledged } from "lib/slices/newOrderSlice";
+import { useDispatch } from "react-redux";
 
 export default function Acknowledgement() {
 	const restrictedGoods = [
@@ -58,17 +57,20 @@ export default function Acknowledgement() {
 			details: "Liquids in large quantities nail polish, paint and ink.",
 		},
 	];
-	const isAcknowledged = useSelector(selectIsAcknowledged);
 	const dispatch = useDispatch();
-	const [_isAcknowledged, _setIsAcknowledged] = useState(isAcknowledged);
+	const [isAcknowledged, setIsAcknowledged] = useState(false);
 	const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
+
+	useEffect(() => {
+		setIsAcknowledged(window.sessionStorage.getItem("isAcknowledged") == "true");
+	}, []);
 
 	return (
 		<MemberPageTemplate hideFAB>
 			<Container sx={{ pt: 4 }}>
 				<Box display={"flex"} justifyContent="space-between" alignItems={"center"} sx={{ mb: 4 }}>
 					<Breadcrumbs aria-label="breadcrumb">
-						<NextLink href="/member/dashboard"  passHref>
+						<NextLink href="/member/dashboard" passHref>
 							<Link underline="hover" color="inherit">
 								Home
 							</Link>
@@ -103,23 +105,26 @@ export default function Acknowledgement() {
 					<Grid container spacing={2}>
 						<Grid item xs={12} md={8}>
 							<Box display="flex" alignItems="center">
-								<Checkbox checked={_isAcknowledged} onChange={(e) => _setIsAcknowledged(e.target.checked)} />
+								<Checkbox
+									checked={isAcknowledged}
+									onChange={(e) => {
+										window.sessionStorage.setItem("isAcknowledged", e.target.checked);
+										setIsAcknowledged(e.target.checked);
+									}}
+								/>
 								<Typography variant="body2" sx={{ color: "text.main" }}>
 									By ticking this box, you understand that BWNExpress is unable to ship prohibited and non-approved restricted items.
 								</Typography>
 							</Box>
 						</Grid>
 						<Grid item xs={12} md={4} display={"flex"} justifyContent={"flex-end"}>
-							<NextLink href="form"  passHref>
+							<NextLink href="form" passHref>
 								<Button
-									disabled={!_isAcknowledged}
+									disabled={!isAcknowledged}
 									endIcon={<ChevronRightRounded />}
 									variant="contained"
 									color="accent"
 									sx={{ width: { md: "unset", xs: "100%" } }}
-									onClick={() => {
-										dispatch(setIsAcknowledged(_isAcknowledged));
-									}}
 								>
 									Continue
 								</Button>

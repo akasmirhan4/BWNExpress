@@ -1,41 +1,25 @@
 import { Box, Container, Typography, Button } from "@mui/material";
 import MemberPageTemplate from "components/MemberPageTemplate";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { selectData, selectIsAcknowledged, selectSuccess, setData, setIsAcknowledged, setSuccess } from "lib/slices/newOrderSlice";
 import { useRouter } from "next/router";
 import { HomeRounded } from "@mui/icons-material";
 import Link from "next/link";
 
 export default function Summary() {
-	const dispatch = useDispatch();
 	const router = useRouter();
 
-	const isAcknowledged = useSelector(selectIsAcknowledged);
-	const success = useSelector(selectSuccess);
-	const newOrderData = useSelector(selectData);
-	const [loaded, setLoaded] = useState(false);
-
 	useEffect(() => {
-		if (!loaded) {
-			if (!isAcknowledged) {
-				toast("Redirecting...");
-				router.push("acknowledgement");
-			} else if (!newOrderData) {
-				toast("Redirecting...");
-				router.push("form");
-			} else if (!success) {
-				toast("Redirecting...");
-				router.push("summary");
-			} else {
-				dispatch(setIsAcknowledged(false));
-				dispatch(setData(null));
-				dispatch(setSuccess(false));
-				setLoaded(true);
-			}
+		if (!window.sessionStorage.getItem("isAcknowledged")) {
+			toast("Redirecting...");
+			router.push("acknowledgement");
+		} else if (!window.sessionStorage.getItem("success")) {
+			toast("Redirecting...");
+			router.push("form");
+		} else {
+			window.sessionStorage.clear();
 		}
-	}, [newOrderData, isAcknowledged]);
+	}, []);
 
 	return (
 		<MemberPageTemplate>
@@ -56,7 +40,7 @@ export default function Summary() {
 						Sit back and relax while we do the hard work for you. Any update we will notify you via push notification.
 					</Typography>
 					<Box display="flex" justifyContent={"center"}>
-						<Link  href="/member/dashboard" passHref>
+						<Link href="/member/dashboard" passHref>
 							<Button variant="contained" color="secondary" startIcon={<HomeRounded />}>
 								Home
 							</Button>

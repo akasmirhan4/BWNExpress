@@ -1,3 +1,6 @@
+import { Box, Container, Typography, Button, Skeleton, Breadcrumbs, Slide, Grid, Fade } from "@mui/material";
+import dashboardStyles from "styles/dashboard.module.scss";
+import AwesomeCarousel from "components/AwesomeCarousel";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import PendingPaymentsBox from "components/PendingPaymentBox";
 import ImageWithSkeleton from "components/ImageWithSkeleton";
@@ -8,6 +11,7 @@ import { selectUserExists } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
 import Link from "next/link";
 import VizSensor from "react-visibility-sensor";
+import MemberPageTemplate from "components/MemberPageTemplate";
 
 export default function Dashboard() {
 	return (
@@ -21,7 +25,6 @@ export default function Dashboard() {
 			<PendingActionsBox sx={{ mt: 4 }} />
 			<PricesContainer sx={{ mt: 4 }} />
 			<PromotionsBox sx={{ mt: 4 }} />
-			<PricesContainer sx={{ mt: 4 }} />
 		</MemberPageTemplate>
 	);
 }
