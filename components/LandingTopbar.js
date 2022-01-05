@@ -60,7 +60,7 @@ export default function LandingTopbar(props) {
 								</IconButton>
 							</Link>
 						</Grid>
-						<Grid item md={4} justifyContent="flex-start" alignItems="center" display="flex">
+						<Grid item md={5} justifyContent="flex-start" alignItems="center" display="flex">
 							<Link href="/home" passHref>
 								<Button color={props.darkText ? "text" : "white"} sx={{ mr: 2 }}>
 									Home
@@ -72,10 +72,15 @@ export default function LandingTopbar(props) {
 								</Button>
 							</Link>
 							<Link href="/resources" passHref>
-								<Button color={props.darkText ? "text" : "white"}>Resources</Button>
+								<Button color={props.darkText ? "text" : "white"} sx={{ mr: 2 }}>
+									Resources
+								</Button>
 							</Link>
+							{/* <Link href="/collab" passHref>
+								<Button color={props.darkText ? "text" : "white"}>Let's Collab</Button>
+							</Link> */}
 						</Grid>
-						<Grid item md={5} justifyContent="flex-end" alignItems="center" display="flex">
+						<Grid item md={4} justifyContent="flex-end" alignItems="center" display="flex">
 							{/* <Box display="flex" alignItems="center" sx={{ mr: "2em" }}>
 								<Button
 									color={props.darkText ? "text" : "white"}

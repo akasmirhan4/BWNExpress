@@ -1,8 +1,4 @@
-import { Box, Container, Typography, Button, Skeleton, Breadcrumbs, Slide, Grid, Fade } from "@mui/material";
-import dashboardStyles from "styles/dashboard.module.scss";
-import AwesomeCarousel from "components/AwesomeCarousel";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import MemberPageTemplate from "components/MemberPageTemplate";
 import PendingPaymentsBox from "components/PendingPaymentBox";
 import ImageWithSkeleton from "components/ImageWithSkeleton";
 import { Fragment, useEffect, useState } from "react";
@@ -11,7 +7,6 @@ import { DoNotTouchRounded } from "@mui/icons-material";
 import { selectUserExists } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
 import Link from "next/link";
-
 import VizSensor from "react-visibility-sensor";
 
 export default function Dashboard() {
@@ -24,6 +19,7 @@ export default function Dashboard() {
 			</Container>
 			<PendingPaymentsBox sx={{ mt: 4 }} />
 			<PendingActionsBox sx={{ mt: 4 }} />
+			<PricesContainer sx={{ mt: 4 }} />
 			<PromotionsBox sx={{ mt: 4 }} />
 			<PricesContainer sx={{ mt: 4 }} />
 		</MemberPageTemplate>
@@ -49,8 +45,8 @@ function PricesContainer(props) {
 				if (visible) setIsVisible(visible);
 			}}
 		>
-			<Container {...props} sx={{ display: "flex", flexDirection: "column", ...props.sx }}>
-				<Box bgcolor="#DEC3E6" pt={4} pb={4} px={2} borderRadius={4}>
+			<Container {...props}>
+				<Box sx={{ display: "flex", flexDirection: "column", bgcolor: "#DEC3E6", px: 2, py: 2, borderRadius: 4 }}>
 					<Typography color="white.main" sx={{ textAlign: { xs: "center", md: "left" } }}>
 						Prices
 					</Typography>

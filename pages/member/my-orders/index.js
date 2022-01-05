@@ -39,6 +39,8 @@ import Link from "next/link";
 export default function MyOrders() {
 	const [status, setStatus] = useState({
 		awaitingParcel: false,
+		readyForCollection: false,
+		atCollectionCenter: false,
 		pendingAction: false,
 		processingPermit: false,
 		delivering: false,

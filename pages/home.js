@@ -16,6 +16,7 @@ export default function HomePage(params) {
 			<LandingTopbar />
 			<HeroContainer pt={"4em"} />
 			<FeaturesContainer />
+			{/* <PricesContainer /> */}
 			<ShopForMe />
 			<SocialMediasContainer />
 			<LandingFooter />

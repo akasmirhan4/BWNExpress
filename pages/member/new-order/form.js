@@ -35,6 +35,7 @@ export default function Verification() {
 	const newOrderData = useSelector(selectData);
 	const userData = useSelector(selectUserData);
 	const [purchaseFrom, setPurchaseFrom] = useState("");
+	const [weightRange, setWeightRange] = useState("")
 	const [itemCategory, setItemCategory] = useState("");
 	const [parcelValue, setParcelValue] = useState(null);
 	const [currency, setCurrency] = useState("MYR");
@@ -52,6 +53,7 @@ export default function Verification() {
 
 	const [errors, setErrors] = useState({
 		purchaseFrom: [],
+		weightRange: [],
 		itemCategory: [],
 		currency: [],
 		parcelValue: [],
@@ -72,6 +74,7 @@ export default function Verification() {
 	useEffect(() => {
 		if (newOrderData) {
 			setPurchaseFrom(newOrderData.purchaseFrom || "");
+			setWeightRange(newOrderData.weightRange || "");
 			setItemCategory(newOrderData.itemCategory || "");
 			setParcelValue(newOrderData.parcelValue || null);
 			setCurrency(newOrderData.currency || "MYR");
@@ -189,7 +192,6 @@ export default function Verification() {
 	const currencies = ["MYR", "BND", "SGD", "USD", "CNY", "JPY"];
 	const couriers = [
 		"ABX Express",
-		"After5",
 		"Airpak Express",
 		"ARAMEX",
 		"Asiaxpress",
@@ -206,13 +208,15 @@ export default function Verification() {
 		"J&T",
 		"Others",
 	];
-	const paymentMethods = ["Card Transfer", "Bank Transfer", "Cash Payment", "Select Soon"];
-	const deliveryMethods = ["Self-Pickup", "Home Delivery", "Select Soon"];
+	const paymentMethods = ["Bank Transfer", "Cash Payment", "Select Soon"];
+	const deliveryMethods = ["Self-Pickup", "Select Soon"];
+	const weightRanges = ["0.1 - 1.99kg ($6)", "2 - 7.99kg ($14)", "8 - 13.99kg ($23)", "14 - 19.99kg ($31)", "20 - 25.99kg ($43)"];
 
 	function validateInputs() {
 		const currencyRegex = /^\d*(\.\d{2})?$/;
 		let _errors = {
 			purchaseFrom: [],
+			weightRange: [],
 			itemCategory: [],
 			currency: [],
 			parcelValue: [],
@@ -227,6 +231,7 @@ export default function Verification() {
 		};
 
 		if (!purchaseFrom) _errors.purchaseFrom.push("This is required");
+		if (!weightRange) _errors.weightRange.push("This is required");
 		if (!itemCategory) _errors.itemCategory.push("This is required");
 		if (!currency) _errors.currency.push("This is required");
 		if (!parcelValue) {
@@ -270,7 +275,7 @@ export default function Verification() {
 			<Container sx={{ pt: 4 }}>
 				<Box display={"flex"} justifyContent="space-between" alignItems={"center"} sx={{ mb: 4 }}>
 					<Breadcrumbs aria-label="breadcrumb">
-						<NextLink href="/member/dashboard"  passHref>
+						<NextLink href="/member/dashboard" passHref>
 							<Link underline="hover" color="inherit">
 								Home
 							</Link>
@@ -290,7 +295,7 @@ export default function Verification() {
 					borderRadius={4}
 				>
 					<Grid container columnSpacing={4} rowSpacing={2}>
-						<Grid item xs={12} md={6} order={{ xs: 2, md: 1 }}>
+						<Grid item xs={12} md={6}>
 							<Tooltip disableHoverListener title={"E.g: Lazada, UNIQLO, H&M"} placement="top" arrow enterTouchDelay={100}>
 								<TextField
 									label="Purchase From"
@@ -310,27 +315,34 @@ export default function Verification() {
 							</Tooltip>
 							<FormHelperText error>{errors.purchaseFrom.join(" , ")}</FormHelperText>
 						</Grid>
-						<Grid item xs={12} md={6} display="flex" justifyContent={"flex-end"} order={{ xs: 1, md: 2 }}>
-							<Box>
-								{isTouchDevice && (
-									<IconButton
-										onClick={() => {
-											toast("Tap & hold to get more info for each field", {
-												icon: "👆",
-												style: {
-													borderRadius: "10px",
-													background: "#333",
-													color: "#fff",
-												},
-											});
+						<Grid item xs={12} md={6} display="flex" justifyContent={"flex-end"}>
+							<Tooltip disableHoverListener title={"Ensure you declare the correct parcel weight"} placement="top" arrow enterTouchDelay={100}>
+								<FormControl fullWidth sx={{ mt: { xs: 0, sm: 1 } }}>
+									<InputLabel error={!!errors.weightRange.length}>Weight Range</InputLabel>
+									<Select
+										value={weightRange}
+										label="Weight Range"
+										onChange={(e) => {
+											setWeightRange(e.target.value);
+											if (errors.weightRange.length) {
+												setErrors({ ...errors, weightRange: [] });
+											}
 										}}
+										margin="dense"
+										sx={{ boxShadow: (theme) => theme.shadows[1] }}
+										required
+										error={!!errors.itemCategory.length}
 									>
-										<InfoRounded />
-									</IconButton>
-								)}
-							</Box>
+										{weightRanges.map((weight, index) => (
+											<MenuItem value={weight} key={index}>
+												{weight}
+											</MenuItem>
+										))}
+									</Select>
+								</FormControl>
+							</Tooltip>
 						</Grid>
-						<Grid item xs={12} md={6} order={{ xs: 3, md: 3 }}>
+						<Grid item xs={12} md={6}>
 							<Tooltip
 								disableHoverListener
 								title={"Ensure you declare the correct item category. This will be used to apply for permit"}
@@ -364,7 +376,7 @@ export default function Verification() {
 							</Tooltip>
 							<FormHelperText error>{errors.itemCategory.join(" , ")}</FormHelperText>
 						</Grid>
-						<Grid item xs={12} sm={4} md={2} order={{ xs: 4, md: 4 }}>
+						<Grid item xs={12} sm={4} md={2}>
 							<Tooltip disableHoverListener title={"Select the currency used to purchase your parcel"} placement="top" arrow enterTouchDelay={100}>
 								<FormControl fullWidth sx={{ mt: 1 }}>
 									<InputLabel error={!!errors.currency.length}>Currency</InputLabel>
@@ -392,7 +404,7 @@ export default function Verification() {
 							</Tooltip>
 							<FormHelperText error>{errors.currency.join(" , ")}</FormHelperText>
 						</Grid>
-						<Grid item xs={12} sm={8} md={4} order={{ xs: 5, md: 5 }}>
+						<Grid item xs={12} sm={8} md={4}>
 							<Tooltip disableHoverListener title={"Match the exact amount in your receipt"} placement="top" arrow enterTouchDelay={100}>
 								<TextField
 									name="numberformat"
@@ -414,7 +426,7 @@ export default function Verification() {
 							</Tooltip>
 							<FormHelperText error>{errors.parcelValue.join(" , ")}</FormHelperText>
 						</Grid>
-						<Grid item xs={12} order={{ xs: 6, md: 6 }}>
+						<Grid item xs={12}>
 							<Tooltip disableHoverListener title={"Give a brief description of parcel content"} placement="top" arrow enterTouchDelay={100}>
 								<TextField
 									multiline
@@ -436,7 +448,7 @@ export default function Verification() {
 							</Tooltip>
 							<FormHelperText error>{errors.itemDescription.join(" , ")}</FormHelperText>
 						</Grid>
-						<Grid item xs={12} md={4} order={{ xs: 7, md: 7 }}>
+						<Grid item xs={12} md={4}>
 							<Tooltip
 								disableHoverListener
 								title={"Refer to your parcel receipt for the tracking ID (Not Order number/id). E.g: NLMYA12345678"}
@@ -462,7 +474,7 @@ export default function Verification() {
 							</Tooltip>
 							<FormHelperText error>{errors.trackingNumber.join(" , ")}</FormHelperText>
 						</Grid>
-						<Grid item xs={12} sm={6} md={4} order={{ xs: 8, md: 8 }}>
+						<Grid item xs={12} sm={6} md={4}>
 							<Tooltip disableHoverListener title={"Select the courier to be handling your parcel"} placement="top" arrow enterTouchDelay={100}>
 								<FormControl fullWidth sx={{ mt: { xs: 3, sm: 1 } }}>
 									<InputLabel error={!!errors.courierProvider.length}>Courier Provider *</InputLabel>
@@ -490,7 +502,7 @@ export default function Verification() {
 							</Tooltip>
 							<FormHelperText error>{errors.courierProvider.join(" , ")}</FormHelperText>
 						</Grid>
-						<Grid item xs={12} sm={6} md={4} order={{ xs: 9, md: 9 }}>
+						<Grid item xs={12} sm={6} md={4}>
 							{courierProvider == "Others" && (
 								<Fragment>
 									<Tooltip disableHoverListener title={"Please specify the other courier provider"} placement="top" arrow enterTouchDelay={100}>
@@ -526,7 +538,7 @@ export default function Verification() {
 									fullWidth
 									component="label"
 								>
-									upload receipt / invoice *
+									upload receipt / invoice / screenshot*
 									<input
 										type="file"
 										hidden
@@ -564,8 +576,7 @@ export default function Verification() {
 						</Grid>
 						<Grid item xs={12} md={6} order={{ xs: 11, md: 11 }}>
 							<FormHelperText>
-								Please ensure the image/pdf capture each items and its price in the package as well as the total price. If you have another parcel, please
-								create another form.
+								Please ensure a complete itemized receipt / invoice / screenshot that clearly indicating the price and shipment cost.
 							</FormHelperText>
 						</Grid>
 						<Grid item xs={12} md={6} order={{ xs: 12, md: 12 }}>
@@ -682,9 +693,14 @@ export default function Verification() {
 							</Tooltip>
 						</Grid>
 						<Grid item xs={6} display={"flex"} order={{ xs: 16, md: 16 }}>
-							<NextLink href="acknowledgement"  passHref>
+							<NextLink href="acknowledgement" passHref>
 								<Button startIcon={<ChevronLeftRounded />} variant="contained" color="accent" sx={{ width: { md: "unset", xs: "100%" } }}>
 									Back
+								</Button>
+							</NextLink>
+							<NextLink href="acknowledgement"  passHref>
+								<Button ariant="outlined" color="accent" sx={{ width: { md: "unset", xs: "100%", ml: "2em" } }}>
+									Reset
 								</Button>
 							</NextLink>
 						</Grid>
