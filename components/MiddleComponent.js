@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { auth, firestore, getAvatarURL, perf, setFCM } from "lib/firebase";
 import { useSelector, useDispatch } from "react-redux";
-import { selectUserData, selectUserExists, setAvatarURL, setNotifications, setUserData, setUserExists } from "lib/slices/userSlice";
+import { selectUserData, selectUserExists, setAvatarURL, setNotifications, setRole, setUserData, setUserExists } from "lib/slices/userSlice";
 import { routeManager } from "lib/routeManager";
 import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
@@ -39,6 +39,15 @@ function MiddleComponent(props) {
 			setIsLoading(true);
 			console.log("user update", user);
 			if (user) {
+				user.getIdTokenResult().then(({ claims }) => {
+					if (claims.moderator) {
+						dispatch(setRole("moderator"));
+					}else if (claims.employee) {
+						dispatch(setRole("employee"));
+					}else{
+						dispatch(setRole("member"));
+					}
+				});
 				dispatch(setUserExists(true));
 				dispatch(setAvatarURL(await getAvatarURL()));
 				const userSnapshot = onSnapshot(doc(firestore, "users", user.uid), (doc) => {

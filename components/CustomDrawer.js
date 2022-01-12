@@ -3,17 +3,19 @@ import Image from "next/image";
 import Logo from "public/svgs/logo.svg";
 import styles from "styles/main.module.scss";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { Dashboard, Inbox, Logout, Settings, SwapHoriz } from "@mui/icons-material";
+import { AdminPanelSettingsRounded, Dashboard, Inbox, Logout, Settings, SwapHoriz } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { auth } from "lib/firebase";
-import { useEffect, useState } from "react";
-import { selectUserData, setUserExists } from "lib/slices/userSlice";
+import { Fragment, useEffect, useState } from "react";
+import { selectRole, selectUserData, setUserExists } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { signOut } from "firebase/auth";
+import RoleDialog from "./RoleDialog";
+import { route } from "next/dist/server/router";
 
 export default function CustomDrawer(props) {
 	const { palette } = useTheme();
@@ -21,6 +23,10 @@ export default function CustomDrawer(props) {
 	const userData = useSelector(selectUserData);
 	const [verifyStatus, setVerifyStatus] = useState("...");
 	const dispatch = useDispatch();
+	const role = useSelector(selectRole);
+	const router = useRouter();
+	const roleDirectory = router.route.split("/")[1];
+	const [openRoleDialog, setOpenRoleDialog] = useState(false);
 
 	useEffect(() => {
 		if (userData?.verified) {
@@ -97,6 +103,30 @@ export default function CustomDrawer(props) {
 
 				{/* setting nav */}
 				<Box display="flex" flexDirection="column" width="100%">
+					{(role == "moderator" || role == "employee") && (
+						<Fragment>
+							<Button
+								fullWidth
+								color="white"
+								sx={{ mb: 1 }}
+								style={{ justifyContent: "flex-start", paddingLeft: "1em" }}
+								onClick={() => {
+									setOpenRoleDialog(true);
+								}}
+								startIcon={<AdminPanelSettingsRounded />}
+							>
+								Select Role
+							</Button>
+							<RoleDialog
+								selectedValue={roleDirectory}
+								open={openRoleDialog}
+								onClose={(role) => {
+									setOpenRoleDialog(false);
+									router.push(`/${role}/dashboard`);
+								}}
+							/>
+						</Fragment>
+					)}
 					<DrawerButton startIcon={<Settings />} href="/member/settings" label="Settings" />
 					<Button
 						onClick={() => {
@@ -128,7 +158,7 @@ function DrawerButton(props) {
 			<Link href={href} passHref>
 				<Button
 					onClick={() => {
-						router.push(href);
+						props.onClick ? props.onClick() : router.push(href);
 					}}
 					variant="contained"
 					startIcon={startIcon}
