@@ -43,6 +43,9 @@ export default function Summary() {
 				"isDifferentAddress",
 				"deliveryAddress",
 				"remark",
+				"requiresPermit",
+				"permitCategory",
+				"total"
 			];
 
 			keys.forEach((key) => {
@@ -110,16 +113,18 @@ export default function Summary() {
 												if (!success) throw "Error adding order";
 												const receiptMetadata = JSON.parse(newOrderData.receiptMetadata);
 												const receipt = new File([await (await fetch(newOrderData.receipt)).blob()], receiptMetadata.name, { type: receiptMetadata.type });
-
-												const bankTransferMetadata = JSON.parse(newOrderData.bankTransferMetadata);
-												const bankTransfer = new File([await (await fetch(newOrderData.bankTransfer)).blob()], bankTransferMetadata.name, {
-													type: bankTransferMetadata.type,
-												});
-												console.log({ bankTransfer });
 												await uploadBytes(ref(storage, `users/${auth.currentUser.uid}/orders/${data.id}/receipt`), receipt);
-												await uploadBytes(ref(storage, `users/${auth.currentUser.uid}/orders/${data.id}/bankTransfer`), bankTransfer);
+
+												if (newOrderData.bankTransfer) {
+													const bankTransferMetadata = JSON.parse(newOrderData.bankTransferMetadata);
+													const bankTransfer = new File([await (await fetch(newOrderData.bankTransfer)).blob()], bankTransferMetadata.name, {
+														type: bankTransferMetadata.type,
+													});
+													await uploadBytes(ref(storage, `users/${auth.currentUser.uid}/orders/${data.id}/bankTransfer`), bankTransfer);
+												}
 												window.sessionStorage.setItem("success", "true");
 											}),
+
 											{ loading: "Submitting order...", success: "Order submitted 👌", error: "Error submitting order 😫" }
 										)
 										.finally(() => {

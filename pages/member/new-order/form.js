@@ -13,13 +13,18 @@ import {
 	InputLabel,
 	Select,
 	MenuItem,
-	IconButton,
 	Checkbox,
+	Divider,
+	TableContainer,
+	Table,
+	TableBody,
+	TableRow,
+	TableCell,
 } from "@mui/material";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import { forwardRef, Fragment, useEffect, useState } from "react";
-import { ChevronLeftRounded, ChevronRightRounded, InfoRounded } from "@mui/icons-material";
+import { ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import NumberFormat from "react-number-format";
 import { LoadingButton } from "@mui/lab";
@@ -27,12 +32,13 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import NewOrderSteppers from "components/NewOrderSteppers";
 import { selectUserData } from "lib/slices/userSlice";
+import { currencyFormatter } from "lib/formatter";
 
-export default function Verification() {
+export default function Form() {
 	const router = useRouter();
 	const userData = useSelector(selectUserData);
 	const [purchaseFrom, setPurchaseFrom] = useState("");
-	const [weightRange, setWeightRange] = useState("");
+	const [weightRange, setWeightRange] = useState(null);
 	const [itemCategory, setItemCategory] = useState("");
 	const [parcelValue, setParcelValue] = useState("");
 	const [currency, setCurrency] = useState("MYR");
@@ -49,6 +55,10 @@ export default function Verification() {
 	const [isDifferentAddress, setIsDifferentAddress] = useState(false);
 	const [deliveryAddress, setDeliveryAddress] = useState("");
 	const [remark, setRemark] = useState("");
+	const [total, setTotal] = useState(0);
+
+	const [requiresPermit, setRequiresPermit] = useState(false);
+	const [permitCategory, setPermitCategory] = useState(null);
 
 	const [errors, setErrors] = useState({
 		purchaseFrom: [],
@@ -65,13 +75,14 @@ export default function Verification() {
 		paymentMethod: [],
 		deliveryMethod: [],
 		deliveryAddress: [],
+		permitCategory: [],
 	});
 	const [loaded, setLoaded] = useState(false);
 	const [loading, setLoading] = useState(false);
 
 	const reset = () => {
 		setPurchaseFrom("");
-		setWeightRange("");
+		setWeightRange(null);
 		setItemCategory("");
 		setParcelValue("");
 		setCurrency("MYR");
@@ -84,10 +95,13 @@ export default function Verification() {
 		setBankTransfer(null);
 		setBankTransferMetadata(null);
 		setPaymentMethod("");
-		setDeliveryMethod("");
+		setDeliveryMethod("Self-Pickup");
 		setIsDifferentAddress(false);
 		setDeliveryAddress(userData.deliveryAddress || userData.address || "missing delivery address");
 		setRemark("");
+		setRequiresPermit(false);
+		setPermitCategory(null);
+		setTotal(0);
 	};
 
 	useEffect(() => {
@@ -110,6 +124,9 @@ export default function Verification() {
 			setIsDifferentAddress(window.sessionStorage.getItem("isDifferentAddress") ?? false);
 			setDeliveryAddress(window.sessionStorage.getItem("deliveryAddress") ?? (userData.deliveryAddress || userData.address || "missing delivery address"));
 			setRemark(window.sessionStorage.getItem("remark") ?? "");
+			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") ?? "");
+			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? "");
+			setTotal(window.sessionStorage.getItem("total") ?? 0);
 			setLoaded(true);
 		}
 	}, [userData]);
@@ -135,6 +152,9 @@ export default function Verification() {
 			isDifferentAddress,
 			deliveryAddress,
 			remark,
+			requiresPermit,
+			permitCategory,
+			total,
 		};
 		Object.entries(data).forEach(([key, value]) => {
 			window.sessionStorage.setItem(key, value);
@@ -159,6 +179,9 @@ export default function Verification() {
 		deliveryAddress,
 		remark,
 		loaded,
+		requiresPermit,
+		permitCategory,
+		total,
 	]);
 
 	useEffect(() => {
@@ -267,7 +290,23 @@ export default function Verification() {
 	];
 	const paymentMethods = ["Bank Transfer", "Cash Payment", "Select Soon"];
 	const deliveryMethods = ["Self-Pickup", "Select Soon"];
-	const weightRanges = ["0.1 - 1.99kg ($6)", "2 - 7.99kg ($14)", "8 - 13.99kg ($23)", "14 - 19.99kg ($31)", "20 - 25.99kg ($43)"];
+	const weightRanges = [
+		{ range: { from: 0.1, to: 1.99 }, cost: 6 },
+		{ range: { from: 2, to: 7.99 }, cost: 14 },
+		{ range: { from: 8, to: 13.99 }, cost: 23 },
+		{ range: { from: 14, to: 19.99 }, cost: 31 },
+		{ range: { from: 20, to: 25.99 }, cost: 43 },
+	];
+
+	const permitCategories = [
+		"Cosmetics including perfume",
+		"Skincare & Healthcare",
+		"Medication or Pharmaceutical Products",
+		"Traditional Medicines & Health Supplement Products",
+		"Food Items",
+		"Books",
+		"Essential Oils",
+	];
 
 	function validateInputs() {
 		const currencyRegex = /^\d*(\.\d{2})?$/;
@@ -286,6 +325,7 @@ export default function Verification() {
 			paymentMethod: [],
 			deliveryMethod: [],
 			deliveryAddress: [],
+			permitCategory: [],
 		};
 
 		if (!purchaseFrom) _errors.purchaseFrom.push("This is required");
@@ -309,10 +349,17 @@ export default function Verification() {
 		if (!trackingNumber) _errors.trackingNumber.push("This is required");
 
 		if (!receipt) _errors.receipt.push("This is required");
-		if (!bankTransfer) _errors.bankTransfer.push("This is required");
+		// if (!bankTransfer) _errors.bankTransfer.push("This is required");
 		if (!!paymentMethod && !paymentMethods.includes(paymentMethod)) _errors.paymentMethod.push("Unknown method");
 		if (!!deliveryMethod && !deliveryMethods.includes(deliveryMethod)) {
 			_errors.deliveryMethod.push("Unknown method");
+		}
+		if (requiresPermit) {
+			if (!permitCategory) {
+				_errors.permitCategory.push("This is required");
+			} else if (!permitCategories.includes(permitCategory)) {
+				_errors.permitCategory.push("Unknown method");
+			}
 		}
 		if (!!deliveryMethod && deliveryMethod == "Home Delivery" && isDifferentAddress) {
 			if (!deliveryAddress) {
@@ -328,6 +375,18 @@ export default function Verification() {
 		setErrors(_errors);
 		return { errors: _errors, nErrors };
 	}
+
+	useEffect(() => {
+		let _total = 0;
+		if (deliveryMethod == "Home Delivery") _total += 10;
+		if (requiresPermit) _total += 10;
+		if (weightRange) {
+			let weightPrice = weightRange.split("(")[1].split(")")[0];
+			weightPrice = Number(weightPrice.replace(/[^0-9.-]+/g, ""));
+			_total += weightPrice;
+		}
+		setTotal(_total);
+	}, [deliveryMethod, requiresPermit, weightRange]);
 
 	return (
 		<MemberPageTemplate hideFAB>
@@ -346,7 +405,7 @@ export default function Verification() {
 				{/* ORDER FORM */}
 				<Box
 					py={4}
-					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 }, boxShadow: (theme) => theme.shadows[1] }}
+					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: 2, boxShadow: (theme) => theme.shadows[1] }}
 					display={"flex"}
 					flexDirection={"column"}
 					width={"100%"}
@@ -392,11 +451,14 @@ export default function Verification() {
 										required
 										error={!!errors.weightRange.length}
 									>
-										{weightRanges.map((weight, index) => (
-											<MenuItem value={weight} key={index}>
-												{weight}
-											</MenuItem>
-										))}
+										{weightRanges.map((weight, index) => {
+											const value = `${weight.range.from} - ${weight.range.to}kg (${currencyFormatter.format(weight.cost)})`;
+											return (
+												<MenuItem value={value} key={index}>
+													{value}
+												</MenuItem>
+											);
+										})}
 									</Select>
 								</FormControl>
 							</Tooltip>
@@ -640,13 +702,61 @@ export default function Verification() {
 									/>
 								</Button>
 							</Tooltip>
-							<FormHelperText sx={{ mb: 2 }}>{receiptMetadata && `File selected: ${JSON.parse(receiptMetadata).name}`}</FormHelperText>
+							<FormHelperText>{receiptMetadata && `File selected: ${JSON.parse(receiptMetadata).name}`}</FormHelperText>
 							<FormHelperText error>{errors.receipt.join(" , ")}</FormHelperText>
 						</Grid>
 						<Grid item xs={12} md={6}>
 							<FormHelperText>
 								Please ensure a complete itemized receipt / invoice / screenshot that clearly indicating the price and shipment cost.
 							</FormHelperText>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							<Box display="flex" alignItems="center"  xs={{ pt: 4 }}>
+								<Checkbox
+									checked={requiresPermit}
+									onChange={(e) => {
+										if (errors.permitCategory.length) {
+											setErrors({ ...errors, permitCategory: [] });
+										}
+										setRequiresPermit(e.target.checked);
+									}}
+								/>
+								<Typography variant="body2" sx={{ color: "text.main" }}>
+									Item requires permit?
+								</Typography>
+							</Box>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							{requiresPermit && (
+								<Fragment>
+									<Tooltip disableHoverListener title={"Select the type of permit you are applying"} placement="top" arrow enterTouchDelay={100}>
+										<FormControl fullWidth sx={{ mt: 1 }}>
+											<InputLabel error={!!errors.currency.length}>Permit Category</InputLabel>
+											<Select
+												value={permitCategory}
+												label="Permit Category"
+												onChange={(e) => {
+													setPermitCategory(e.target.value);
+													if (errors.permitCategory.length) {
+														setErrors({ ...errors, permitCategory: [] });
+													}
+												}}
+												margin="dense"
+												sx={{ boxShadow: (theme) => theme.shadows[1] }}
+												required
+												error={!!errors.permitCategory.length}
+											>
+												{permitCategories.map((permit, index) => (
+													<MenuItem value={permit} key={index}>
+														{permit}
+													</MenuItem>
+												))}
+											</Select>
+										</FormControl>
+									</Tooltip>
+									<FormHelperText error>{errors.permitCategory.join(" , ")}</FormHelperText>
+								</Fragment>
+							)}
 						</Grid>
 						<Grid item xs={12} md={6}>
 							<Tooltip disableHoverListener title={"Specify how you want to pay. You may select soon"} placement="top" arrow enterTouchDelay={100}>
@@ -676,7 +786,36 @@ export default function Verification() {
 							</Tooltip>
 							<FormHelperText error>{errors.paymentMethod.join(" , ")}</FormHelperText>
 						</Grid>
-						<Grid item xs={12} md={6}>
+						<Grid item md={6} xs={12}>
+							<TableContainer>
+								<Table>
+									<TableBody>
+										<TableRow>
+											<TableCell component="th">Parcel:</TableCell>
+											<TableCell>{weightRange ? weightRange.split("(")[1].split(")")[0] : "-"}</TableCell>
+										</TableRow>
+										{requiresPermit && (
+											<TableRow>
+												<TableCell component="th">Processing Permit:</TableCell>
+												<TableCell>{currencyFormatter.format(10)}</TableCell>
+											</TableRow>
+										)}
+										{deliveryMethod == "Home Delivery" && (
+											<TableRow>
+												<TableCell component="th">Delivery:</TableCell>
+												<TableCell>{currencyFormatter.format(10)}</TableCell>
+											</TableRow>
+										)}
+										<TableRow>
+											<TableCell component="th">Total:</TableCell>
+											<TableCell>{currencyFormatter.format(total)}</TableCell>
+										</TableRow>
+									</TableBody>
+								</Table>
+							</TableContainer>
+						</Grid>
+
+						{/* <Grid item xs={12} md={6}>
 							<Tooltip
 								disableHoverListener
 								title={"Specify how you want your parcel to be received. You may select soon"}
@@ -709,7 +848,7 @@ export default function Verification() {
 								</FormControl>
 							</Tooltip>
 							<FormHelperText error>{errors.deliveryMethod.join(" , ")}</FormHelperText>
-						</Grid>
+						</Grid> */}
 						{/* {paymentMethod == "Bank Transfer" && (
 							<Grid item xs={12}>
 								<Box display="flex" alignItems="center">
@@ -845,7 +984,8 @@ export default function Verification() {
 							<LoadingButton
 								onClick={() => {
 									setLoading(true);
-									const { nErrors } = validateInputs();
+									const { nErrors, errors } = validateInputs();
+									console.log(errors);
 									setLoading(false);
 									if (!nErrors) {
 										router.push("summary");

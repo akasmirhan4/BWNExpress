@@ -1,6 +1,6 @@
 import { Box, Container, Typography, Button } from "@mui/material";
 import MemberPageTemplate from "components/MemberPageTemplate";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 import { HomeRounded } from "@mui/icons-material";
@@ -8,18 +8,23 @@ import Link from "next/link";
 
 export default function Summary() {
 	const router = useRouter();
+	const [loaded, setLoaded] = useState(false);
 
 	useEffect(() => {
-		if (!window.sessionStorage.getItem("isAcknowledged")) {
-			toast("Redirecting...");
-			router.push("acknowledgement");
-		} else if (!window.sessionStorage.getItem("success")) {
-			toast("Redirecting...");
-			router.push("form");
-		} else {
-			window.sessionStorage.clear();
+		if (!loaded) {
+			if (!window.sessionStorage.getItem("isAcknowledged")) {
+				toast("Redirecting...");
+				router.push("acknowledgement");
+			} else if (!window.sessionStorage.getItem("success")) {
+				toast("Redirecting...");
+				console.log({ success: window.sessionStorage.getItem("success") });
+				router.push("form");
+			} else {
+				window.sessionStorage.clear();
+			}
+			setLoaded(true);
 		}
-	}, []);
+	}, [loaded]);
 
 	return (
 		<MemberPageTemplate>
