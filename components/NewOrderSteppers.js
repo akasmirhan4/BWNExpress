@@ -4,7 +4,7 @@ import { styled } from "@mui/material/styles";
 import React from "react";
 
 export default function NewOrderSteppers(props) {
-	const steps = ["Acknowledgement", "Fill In Form", "Summary"];
+	const steps = ["Acknowledgement", "Order Form", "Permit Application", "Payment", "Summary"];
 	return (
 		<Stack {...props} sx={{ ...props.sx, width: "100%" }} spacing={4}>
 			<Stepper alternativeLabel activeStep={props.activestep} connector={<QontoConnector />}>

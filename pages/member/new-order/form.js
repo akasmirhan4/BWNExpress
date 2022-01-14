@@ -13,13 +13,6 @@ import {
 	InputLabel,
 	Select,
 	MenuItem,
-	Checkbox,
-	Divider,
-	TableContainer,
-	Table,
-	TableBody,
-	TableRow,
-	TableCell,
 } from "@mui/material";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
@@ -38,7 +31,7 @@ export default function Form() {
 	const router = useRouter();
 	const userData = useSelector(selectUserData);
 	const [purchaseFrom, setPurchaseFrom] = useState("");
-	const [weightRange, setWeightRange] = useState(null);
+	const [weightRange, setWeightRange] = useState("");
 	const [itemCategory, setItemCategory] = useState("");
 	const [parcelValue, setParcelValue] = useState("");
 	const [currency, setCurrency] = useState("MYR");
@@ -48,17 +41,10 @@ export default function Form() {
 	const [trackingNumber, setTrackingNumber] = useState("");
 	const [receipt, setReceipt] = useState(null);
 	const [receiptMetadata, setReceiptMetadata] = useState(null);
-	const [paymentMethod, setPaymentMethod] = useState("");
 	const [deliveryMethod, setDeliveryMethod] = useState("");
-	const [bankTransfer, setBankTransfer] = useState(null);
-	const [bankTransferMetadata, setBankTransferMetadata] = useState(null);
 	const [isDifferentAddress, setIsDifferentAddress] = useState(false);
 	const [deliveryAddress, setDeliveryAddress] = useState("");
 	const [remark, setRemark] = useState("");
-	const [total, setTotal] = useState(0);
-
-	const [requiresPermit, setRequiresPermit] = useState(false);
-	const [permitCategory, setPermitCategory] = useState(null);
 
 	const [errors, setErrors] = useState({
 		purchaseFrom: [],
@@ -71,18 +57,15 @@ export default function Form() {
 		specificCourierProvider: [],
 		trackingNumber: [],
 		receipt: [],
-		bankTransfer: [],
-		paymentMethod: [],
 		deliveryMethod: [],
 		deliveryAddress: [],
-		permitCategory: [],
 	});
 	const [loaded, setLoaded] = useState(false);
 	const [loading, setLoading] = useState(false);
 
 	const reset = () => {
 		setPurchaseFrom("");
-		setWeightRange(null);
+		setWeightRange("");
 		setItemCategory("");
 		setParcelValue("");
 		setCurrency("MYR");
@@ -92,16 +75,10 @@ export default function Form() {
 		setTrackingNumber("");
 		setReceipt(null);
 		setReceiptMetadata(null);
-		setBankTransfer(null);
-		setBankTransferMetadata(null);
-		setPaymentMethod("");
 		setDeliveryMethod("Self-Pickup");
 		setIsDifferentAddress(false);
 		setDeliveryAddress(userData.deliveryAddress || userData.address || "missing delivery address");
 		setRemark("");
-		setRequiresPermit(false);
-		setPermitCategory(null);
-		setTotal(0);
 	};
 
 	useEffect(() => {
@@ -117,16 +94,10 @@ export default function Form() {
 			setTrackingNumber(window.sessionStorage.getItem("trackingNumber") ?? "");
 			setReceipt(window.sessionStorage.getItem("receipt"));
 			setReceiptMetadata(window.sessionStorage.getItem("receiptMetadata") ?? "");
-			setBankTransfer(window.sessionStorage.getItem("bankTransfer") ?? "");
-			setBankTransferMetadata(window.sessionStorage.getItem("bankTransferMetadata") ?? "");
-			setPaymentMethod(window.sessionStorage.getItem("paymentMethod") ?? "");
 			setDeliveryMethod(window.sessionStorage.getItem("deliveryMethod") ?? "");
 			setIsDifferentAddress(window.sessionStorage.getItem("isDifferentAddress") ?? false);
 			setDeliveryAddress(window.sessionStorage.getItem("deliveryAddress") ?? (userData.deliveryAddress || userData.address || "missing delivery address"));
 			setRemark(window.sessionStorage.getItem("remark") ?? "");
-			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") ?? "");
-			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? "");
-			setTotal(window.sessionStorage.getItem("total") ?? 0);
 			setLoaded(true);
 		}
 	}, [userData]);
@@ -145,16 +116,10 @@ export default function Form() {
 			trackingNumber,
 			receiptMetadata,
 			receipt,
-			bankTransfer,
-			bankTransferMetadata,
-			paymentMethod,
 			deliveryMethod,
 			isDifferentAddress,
 			deliveryAddress,
 			remark,
-			requiresPermit,
-			permitCategory,
-			total,
 		};
 		Object.entries(data).forEach(([key, value]) => {
 			window.sessionStorage.setItem(key, value);
@@ -171,17 +136,11 @@ export default function Form() {
 		trackingNumber,
 		receiptMetadata,
 		receipt,
-		bankTransfer,
-		bankTransferMetadata,
-		paymentMethod,
 		deliveryMethod,
 		isDifferentAddress,
 		deliveryAddress,
 		remark,
 		loaded,
-		requiresPermit,
-		permitCategory,
-		total,
 	]);
 
 	useEffect(() => {
@@ -290,23 +249,7 @@ export default function Form() {
 	];
 	const paymentMethods = ["Bank Transfer", "Cash Payment", "Select Soon"];
 	const deliveryMethods = ["Self-Pickup", "Select Soon"];
-	const weightRanges = [
-		{ range: { from: 0.1, to: 1.99 }, cost: 6 },
-		{ range: { from: 2, to: 7.99 }, cost: 14 },
-		{ range: { from: 8, to: 13.99 }, cost: 23 },
-		{ range: { from: 14, to: 19.99 }, cost: 31 },
-		{ range: { from: 20, to: 25.99 }, cost: 43 },
-	];
-
-	const permitCategories = [
-		"Cosmetics including perfume",
-		"Skincare & Healthcare",
-		"Medication or Pharmaceutical Products",
-		"Traditional Medicines & Health Supplement Products",
-		"Food Items",
-		"Books",
-		"Essential Oils",
-	];
+	const weightRanges = ["0.1 - 1.99kg ($6.00)", "2 - 7.99kg ($14.00)", "8 - 13.99kg ($23.00)", "14 - 19.99kg ($31.00)", "20 - 25.99kg ($43.00)"];
 
 	function validateInputs() {
 		const currencyRegex = /^\d*(\.\d{2})?$/;
@@ -321,11 +264,7 @@ export default function Form() {
 			specificCourierProvider: [],
 			trackingNumber: [],
 			receipt: [],
-			bankTransfer: [],
-			paymentMethod: [],
 			deliveryMethod: [],
-			deliveryAddress: [],
-			permitCategory: [],
 		};
 
 		if (!purchaseFrom) _errors.purchaseFrom.push("This is required");
@@ -349,17 +288,8 @@ export default function Form() {
 		if (!trackingNumber) _errors.trackingNumber.push("This is required");
 
 		if (!receipt) _errors.receipt.push("This is required");
-		// if (!bankTransfer) _errors.bankTransfer.push("This is required");
-		if (!!paymentMethod && !paymentMethods.includes(paymentMethod)) _errors.paymentMethod.push("Unknown method");
 		if (!!deliveryMethod && !deliveryMethods.includes(deliveryMethod)) {
 			_errors.deliveryMethod.push("Unknown method");
-		}
-		if (requiresPermit) {
-			if (!permitCategory) {
-				_errors.permitCategory.push("This is required");
-			} else if (!permitCategories.includes(permitCategory)) {
-				_errors.permitCategory.push("Unknown method");
-			}
 		}
 		if (!!deliveryMethod && deliveryMethod == "Home Delivery" && isDifferentAddress) {
 			if (!deliveryAddress) {
@@ -375,18 +305,6 @@ export default function Form() {
 		setErrors(_errors);
 		return { errors: _errors, nErrors };
 	}
-
-	useEffect(() => {
-		let _total = 0;
-		if (deliveryMethod == "Home Delivery") _total += 10;
-		if (requiresPermit) _total += 10;
-		if (weightRange) {
-			let weightPrice = weightRange.split("(")[1].split(")")[0];
-			weightPrice = Number(weightPrice.replace(/[^0-9.-]+/g, ""));
-			_total += weightPrice;
-		}
-		setTotal(_total);
-	}, [deliveryMethod, requiresPermit, weightRange]);
 
 	return (
 		<MemberPageTemplate hideFAB>
@@ -452,10 +370,9 @@ export default function Form() {
 										error={!!errors.weightRange.length}
 									>
 										{weightRanges.map((weight, index) => {
-											const value = `${weight.range.from} - ${weight.range.to}kg (${currencyFormatter.format(weight.cost)})`;
 											return (
-												<MenuItem value={value} key={index}>
-													{value}
+												<MenuItem value={weight} key={index}>
+													{weight}
 												</MenuItem>
 											);
 										})}
@@ -710,111 +627,6 @@ export default function Form() {
 								Please ensure a complete itemized receipt / invoice / screenshot that clearly indicating the price and shipment cost.
 							</FormHelperText>
 						</Grid>
-						<Grid item xs={12} md={6}>
-							<Box display="flex" alignItems="center"  xs={{ pt: 4 }}>
-								<Checkbox
-									checked={requiresPermit}
-									onChange={(e) => {
-										if (errors.permitCategory.length) {
-											setErrors({ ...errors, permitCategory: [] });
-										}
-										setRequiresPermit(e.target.checked);
-									}}
-								/>
-								<Typography variant="body2" sx={{ color: "text.main" }}>
-									Item requires permit?
-								</Typography>
-							</Box>
-						</Grid>
-						<Grid item xs={12} md={6}>
-							{requiresPermit && (
-								<Fragment>
-									<Tooltip disableHoverListener title={"Select the type of permit you are applying"} placement="top" arrow enterTouchDelay={100}>
-										<FormControl fullWidth sx={{ mt: 1 }}>
-											<InputLabel error={!!errors.currency.length}>Permit Category</InputLabel>
-											<Select
-												value={permitCategory}
-												label="Permit Category"
-												onChange={(e) => {
-													setPermitCategory(e.target.value);
-													if (errors.permitCategory.length) {
-														setErrors({ ...errors, permitCategory: [] });
-													}
-												}}
-												margin="dense"
-												sx={{ boxShadow: (theme) => theme.shadows[1] }}
-												required
-												error={!!errors.permitCategory.length}
-											>
-												{permitCategories.map((permit, index) => (
-													<MenuItem value={permit} key={index}>
-														{permit}
-													</MenuItem>
-												))}
-											</Select>
-										</FormControl>
-									</Tooltip>
-									<FormHelperText error>{errors.permitCategory.join(" , ")}</FormHelperText>
-								</Fragment>
-							)}
-						</Grid>
-						<Grid item xs={12} md={6}>
-							<Tooltip disableHoverListener title={"Specify how you want to pay. You may select soon"} placement="top" arrow enterTouchDelay={100}>
-								<FormControl fullWidth sx={{ mt: { xs: 3, sm: 1 } }}>
-									<InputLabel>Payment Method (Optional)</InputLabel>
-									<Select
-										value={paymentMethod}
-										label="Payment Method (Optional)"
-										onChange={(e) => {
-											setPaymentMethod(e.target.value);
-											if (errors.paymentMethod.length) {
-												setErrors({ ...errors, paymentMethod: [] });
-											}
-										}}
-										margin="dense"
-										sx={{ boxShadow: (theme) => theme.shadows[1] }}
-										error={!!errors.paymentMethod.length}
-										required
-									>
-										{paymentMethods.map((method, index) => (
-											<MenuItem value={method} key={index}>
-												{method}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-							</Tooltip>
-							<FormHelperText error>{errors.paymentMethod.join(" , ")}</FormHelperText>
-						</Grid>
-						<Grid item md={6} xs={12}>
-							<TableContainer>
-								<Table>
-									<TableBody>
-										<TableRow>
-											<TableCell component="th">Parcel:</TableCell>
-											<TableCell>{weightRange ? weightRange.split("(")[1].split(")")[0] : "-"}</TableCell>
-										</TableRow>
-										{requiresPermit && (
-											<TableRow>
-												<TableCell component="th">Processing Permit:</TableCell>
-												<TableCell>{currencyFormatter.format(10)}</TableCell>
-											</TableRow>
-										)}
-										{deliveryMethod == "Home Delivery" && (
-											<TableRow>
-												<TableCell component="th">Delivery:</TableCell>
-												<TableCell>{currencyFormatter.format(10)}</TableCell>
-											</TableRow>
-										)}
-										<TableRow>
-											<TableCell component="th">Total:</TableCell>
-											<TableCell>{currencyFormatter.format(total)}</TableCell>
-										</TableRow>
-									</TableBody>
-								</Table>
-							</TableContainer>
-						</Grid>
-
 						{/* <Grid item xs={12} md={6}>
 							<Tooltip
 								disableHoverListener
@@ -880,74 +692,6 @@ export default function Form() {
 								<FormHelperText error>{errors.deliveryAddress.join(" , ")}</FormHelperText>
 							</Grid>
 						)} */}
-						{paymentMethod == "Bank Transfer" && (
-							<Fragment>
-								<Grid item xs={12} md={6}>
-									<Tooltip disableHoverListener title={"Accepts only images/pdf with max 5MB size"} placement="top" arrow enterTouchDelay={100}>
-										<Button
-											variant={!errors.receipt.length ? "contained" : "outlined"}
-											color={!errors.receipt.length ? "accent" : "error"}
-											sx={{
-												color: !errors.receipt.length ? "white.main" : "error.main",
-												mt: { xs: 3, sm: 1 },
-											}}
-											size="large"
-											fullWidth
-											component="label"
-										>
-											upload bank transfer screenshot*
-											<input
-												type="file"
-												hidden
-												accept="image/jpeg,image/png,application/pdf"
-												onChange={(e) => {
-													const { files } = e.currentTarget;
-													if (!files.length) {
-														toast.error("No file selected");
-														return;
-													}
-													if (files.length > 1) {
-														toast.error("Please select 1 files only");
-														return;
-													}
-
-													if (files[0].size > 5 * 1024 * 1024) {
-														toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
-														return;
-													}
-													if (!["image/jpeg", "image/png", "application/pdf"].includes(files[0].type)) {
-														toast.error("Upload jpg, png or pdf files only");
-														return;
-													}
-													if (errors.bankTransfer.length) {
-														setErrors({ ...errors, bankTransfer: [] });
-													}
-													const reader = new FileReader();
-													reader.addEventListener(
-														"load",
-														function () {
-															setBankTransfer(reader.result);
-															console.log(reader.result);
-															toast.success("File selected 😎");
-															setBankTransferMetadata(JSON.stringify({ name: files[0].name, type: files[0].type }));
-														},
-														false
-													);
-													reader.readAsDataURL(files[0]);
-												}}
-											/>
-										</Button>
-									</Tooltip>
-									<FormHelperText sx={{ mb: 2 }}>{bankTransferMetadata && `File selected: ${JSON.parse(bankTransferMetadata).name}`}</FormHelperText>
-									<FormHelperText error>{errors.bankTransfer.join(" , ")}</FormHelperText>
-								</Grid>
-								<Grid item xs={12} md={6} sx={{ mt: { xs: 0, sm: 1 } }}>
-									<Typography fontWeight={"bold"}>Bank transfer details:</Typography>
-									<Typography>BIBD - 00001011111189</Typography>
-									<Typography>Baiduri Bank - 0200110484980</Typography>
-								</Grid>
-							</Fragment>
-						)}
 						<Grid item xs={12}>
 							<Tooltip
 								disableHoverListener
@@ -988,7 +732,7 @@ export default function Form() {
 									console.log(errors);
 									setLoading(false);
 									if (!nErrors) {
-										router.push("summary");
+										router.push("permit-application");
 									}
 								}}
 								disabled={!!Object.values(errors).reduce((a, v) => a + v.length, 0)}
