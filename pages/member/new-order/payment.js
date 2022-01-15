@@ -13,6 +13,11 @@ import {
 	InputLabel,
 	Select,
 	MenuItem,
+	TableContainer,
+	Table,
+	TableBody,
+	TableRow,
+	TableCell,
 } from "@mui/material";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
@@ -32,22 +37,26 @@ export default function Payment() {
 
 	const [errors, setErrors] = useState({
 		paymentMethod: [],
+		bankTransfers: [],
 	});
 
 	const [paymentMethod, setPaymentMethod] = useState("");
-	const [bankTransfer, setBankTransfer] = useState(null);
-	const [bankTransferMetadata, setBankTransferMetadata] = useState(null);
+	const [bankTransfers, setBankTransfers] = useState([]);
+	const [total, setTotal] = useState(0);
 	const [loaded, setLoaded] = useState(false);
 	const [loading, setLoading] = useState(false);
 
 	const reset = () => {
 		setPaymentMethod("");
+		setBankTransfers([]);
 	};
 
 	useEffect(() => {
 		if (userData) {
 			setPaymentMethod(window.sessionStorage.getItem("paymentMethod") ?? "");
-			setPaymentMethod(window.sessionStorage.getItem("paymentMethod") ?? "");
+			setBankTransfers(window.sessionStorage.getItem("bankTransfers") ?? []);
+			let _total = 0;
+			if(window.sessionStorage.getItem("requiresPermit") == "true") _total 
 			setLoaded(true);
 		}
 	}, [userData]);
@@ -56,11 +65,12 @@ export default function Payment() {
 		if (!loaded) return;
 		let data = {
 			paymentMethod,
+			bankTransfers,
 		};
 		Object.entries(data).forEach(([key, value]) => {
 			window.sessionStorage.setItem(key, value);
 		});
-	}, [paymentMethod]);
+	}, [paymentMethod, bankTransfers]);
 
 	useEffect(() => {
 		if (window.sessionStorage.getItem("isAcknowledged") != "true") {
@@ -77,12 +87,12 @@ export default function Payment() {
 	function validateInputs() {
 		let _errors = {
 			paymentMethod: [],
-			bankTransfer: [],
+			bankTransfers: [],
 		};
 		if (!paymentMethods.includes(paymentMethod)) {
 			_errors.paymentMethod.push("Unknown method");
 		} else if (paymentMethod == "Bank Transfer") {
-			if (!bankTransfer) _errors.paymentMethod.push("This is required");
+			if (!bankTransfers) _errors.bankTransfers.push("This is required");
 		}
 		const nErrors = !!Object.values(_errors).reduce((a, v) => a + v.length, 0);
 		if (!!nErrors) {
@@ -117,6 +127,34 @@ export default function Payment() {
 					borderRadius={4}
 				>
 					<Grid container columnSpacing={4} rowSpacing={2}>
+						<Grid item md={6} xs={12}>
+							<TableContainer>
+								<Table>
+									<TableBody>
+										<TableRow>
+											<TableCell component="th">Parcel Weight:</TableCell>
+											<TableCell>{weightRange ? weightRange.split("(")[1].split(")")[0] : "-"}</TableCell>
+										</TableRow>
+										{window.sessionStorage.getItem("requiresPermit") == "true" && (
+											<TableRow>
+												<TableCell component="th">Processing Permit:</TableCell>
+												<TableCell>{currencyFormatter.format(10)}</TableCell>
+											</TableRow>
+										)}
+										{deliveryMethod == "Home Delivery" && (
+											<TableRow>
+												<TableCell component="th">Delivery:</TableCell>
+												<TableCell>{currencyFormatter.format(10)}</TableCell>
+											</TableRow>
+										)}
+										<TableRow>
+											<TableCell component="th">Total:</TableCell>
+											<TableCell>{currencyFormatter.format(total)}</TableCell>
+										</TableRow>
+									</TableBody>
+								</Table>
+							</TableContainer>
+						</Grid>
 						<Grid item xs={12} md={6} display="flex" justifyContent={"flex-end"}>
 							<Tooltip
 								disableHoverListener
@@ -157,10 +195,10 @@ export default function Payment() {
 								<Fragment>
 									<Tooltip disableHoverListener title={"Accepts only images/pdf with max 5MB size"} placement="top" arrow enterTouchDelay={100}>
 										<Button
-											variant={!errors.paymentMethod.length ? "contained" : "outlined"}
-											color={!errors.paymentMethod.length ? "accent" : "error"}
+											variant={!errors.bankTransfers.length ? "contained" : "outlined"}
+											color={!errors.bankTransfers.length ? "accent" : "error"}
 											sx={{
-												color: !errors.paymentMethod.length ? "white.main" : "error.main",
+												color: !errors.bankTransfers.length ? "white.main" : "error.main",
 												mt: 1,
 											}}
 											size="large"
@@ -172,7 +210,7 @@ export default function Payment() {
 												type="file"
 												hidden
 												accept="image/jpeg,image/png,application/pdf"
-												onChange={(e) => {
+												onChange={async (e) => {
 													const { files } = e.currentTarget;
 													if (!files.length) {
 														toast.error("No file selected");
@@ -191,26 +229,41 @@ export default function Payment() {
 														toast.error("Upload jpg, png or pdf files only");
 														return;
 													}
-													if (errors.paymentMethod.length) {
-														setErrors({ ...errors, paymentMethod: [] });
+													if (errors.bankTransfers.length) {
+														setErrors({ ...errors, bankTransfers: [] });
 													}
-													const reader = new FileReader();
-													reader.addEventListener(
-														"load",
-														function () {
-															setBankTransfer(reader.result);
-															toast.success("File selected 😎");
-															setBankTransferMetadata(JSON.stringify({ name: files[0].name, type: files[0].type }));
-														},
-														false
-													);
-													reader.readAsDataURL(files[0]);
+
+													const getURL = (file) => {
+														return new Promise(async (resolve) => {
+															const reader = new FileReader();
+															reader.addEventListener(
+																"load",
+																function () {
+																	resolve({ URL: reader.result, name: file.name, type: file.type });
+																},
+																false
+															);
+															reader.readAsDataURL(file);
+														});
+													};
+
+													let batchPromises = [];
+													for (let i = 0; i < files.length; i++) {
+														batchPromises.push(getURL(files[i]));
+													}
+													await Promise.all(batchPromises).then((results) => setBankTransfers(JSON.stringify(results)));
+													toast.success("File(s) selected 😎");
 												}}
 											/>
 										</Button>
 									</Tooltip>
-									<FormHelperText>{bankTransferMetadata && `File selected: ${JSON.parse(bankTransferMetadata).name}`}</FormHelperText>
-									<FormHelperText error>{errors.paymentMethod.join(" , ")}</FormHelperText>
+									<FormHelperText>
+										{bankTransfers.length > 0 &&
+											`File selected: ${JSON.parse(bankTransfers)
+												.map(({ name }) => name)
+												.join(",")}`}
+									</FormHelperText>
+									<FormHelperText error>{errors.bankTransfers.join(" , ")}</FormHelperText>
 								</Fragment>
 							)}
 						</Grid>
@@ -220,7 +273,7 @@ export default function Payment() {
 							</Grid>
 						)}
 						<Grid item xs={12} sm={6} display={"flex"}>
-							<NextLink href="/member/new-order/permit" passHref>
+							<NextLink href="/member/new-order/permit-application" passHref>
 								<Button startIcon={<ChevronLeftRounded />} variant="contained" color="accent" sx={{ width: { sm: "unset", xs: "100%" } }}>
 									Back
 								</Button>

@@ -22,6 +22,12 @@ export default function Summary() {
 		if (window.sessionStorage.getItem("isAcknowledged") != "true") {
 			toast("Redirecting...");
 			router.push("acknowledgement");
+		} else if (!window.sessionStorage.getItem("weightRange")) {
+			toast("Redirecting...");
+			router.push("form");
+		} else if (!window.sessionStorage.getItem("paymentMethod")) {
+			toast("Redirecting...");
+			router.push("payment");
 		} else {
 			let details = {};
 			let keys = [
@@ -45,7 +51,8 @@ export default function Summary() {
 				"remark",
 				"requiresPermit",
 				"permitCategory",
-				"total"
+				"permitRemark",
+				"total",
 			];
 
 			keys.forEach((key) => {
@@ -69,7 +76,7 @@ export default function Summary() {
 						<Typography color="text.primary">New Order</Typography>
 					</Breadcrumbs>
 				</Box>
-				<NewOrderSteppers sx={{ my: 4 }} activestep={2} />
+				<NewOrderSteppers sx={{ my: 4 }} activestep={4} />
 				<Box
 					py={4}
 					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 }, boxShadow: (theme) => theme.shadows[1] }}
@@ -89,7 +96,7 @@ export default function Summary() {
 					</Box>
 					<Grid container spacing={2}>
 						<Grid item xs={6} display={"flex"} order={{ xs: 16, md: 16 }}>
-							<NextLink href="form" passHref>
+							<NextLink href="payment" passHref>
 								<Button startIcon={<ChevronLeftRounded />} variant="contained" color="accent" sx={{ width: { md: "unset", xs: "100%" } }}>
 									Back
 								</Button>

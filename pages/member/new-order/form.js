@@ -39,8 +39,7 @@ export default function Form() {
 	const [courierProvider, setCourierProvider] = useState("");
 	const [specificCourierProvider, setSpecificCourierProvider] = useState("");
 	const [trackingNumber, setTrackingNumber] = useState("");
-	const [receipt, setReceipt] = useState(null);
-	const [receiptMetadata, setReceiptMetadata] = useState(null);
+	const [receipts, setReceipts] = useState([]);
 	const [deliveryMethod, setDeliveryMethod] = useState("");
 	const [isDifferentAddress, setIsDifferentAddress] = useState(false);
 	const [deliveryAddress, setDeliveryAddress] = useState("");
@@ -56,7 +55,7 @@ export default function Form() {
 		courierProvider: [],
 		specificCourierProvider: [],
 		trackingNumber: [],
-		receipt: [],
+		receipts: [],
 		deliveryMethod: [],
 		deliveryAddress: [],
 	});
@@ -73,8 +72,7 @@ export default function Form() {
 		setCourierProvider("");
 		setSpecificCourierProvider("");
 		setTrackingNumber("");
-		setReceipt(null);
-		setReceiptMetadata(null);
+		setReceipts([]);
 		setDeliveryMethod("Self-Pickup");
 		setIsDifferentAddress(false);
 		setDeliveryAddress(userData.deliveryAddress || userData.address || "missing delivery address");
@@ -92,8 +90,7 @@ export default function Form() {
 			setCourierProvider(window.sessionStorage.getItem("courierProvider") ?? "");
 			setSpecificCourierProvider(window.sessionStorage.getItem("specificCourierProvider") ?? "");
 			setTrackingNumber(window.sessionStorage.getItem("trackingNumber") ?? "");
-			setReceipt(window.sessionStorage.getItem("receipt"));
-			setReceiptMetadata(window.sessionStorage.getItem("receiptMetadata") ?? "");
+			setReceipts(window.sessionStorage.getItem("receipts") ?? []);
 			setDeliveryMethod(window.sessionStorage.getItem("deliveryMethod") ?? "");
 			setIsDifferentAddress(window.sessionStorage.getItem("isDifferentAddress") ?? false);
 			setDeliveryAddress(window.sessionStorage.getItem("deliveryAddress") ?? (userData.deliveryAddress || userData.address || "missing delivery address"));
@@ -114,8 +111,7 @@ export default function Form() {
 			courierProvider,
 			specificCourierProvider,
 			trackingNumber,
-			receiptMetadata,
-			receipt,
+			receipts,
 			deliveryMethod,
 			isDifferentAddress,
 			deliveryAddress,
@@ -134,8 +130,7 @@ export default function Form() {
 		courierProvider,
 		specificCourierProvider,
 		trackingNumber,
-		receiptMetadata,
-		receipt,
+		receipts,
 		deliveryMethod,
 		isDifferentAddress,
 		deliveryAddress,
@@ -247,7 +242,6 @@ export default function Form() {
 		"J&T",
 		"Others",
 	];
-	const paymentMethods = ["Bank Transfer", "Cash Payment", "Select Soon"];
 	const deliveryMethods = ["Self-Pickup", "Select Soon"];
 	const weightRanges = ["0.1 - 1.99kg ($6.00)", "2 - 7.99kg ($14.00)", "8 - 13.99kg ($23.00)", "14 - 19.99kg ($31.00)", "20 - 25.99kg ($43.00)"];
 
@@ -263,7 +257,7 @@ export default function Form() {
 			courierProvider: [],
 			specificCourierProvider: [],
 			trackingNumber: [],
-			receipt: [],
+			receipts: [],
 			deliveryMethod: [],
 		};
 
@@ -287,7 +281,7 @@ export default function Form() {
 		}
 		if (!trackingNumber) _errors.trackingNumber.push("This is required");
 
-		if (!receipt) _errors.receipt.push("This is required");
+		if (!receipts.length) _errors.receipts.push("This is required");
 		if (!!deliveryMethod && !deliveryMethods.includes(deliveryMethod)) {
 			_errors.deliveryMethod.push("Unknown method");
 		}
@@ -443,7 +437,7 @@ export default function Form() {
 							<FormHelperText error>{errors.currency.join(" , ")}</FormHelperText>
 						</Grid>
 						<Grid item xs={12} sm={8} md={4}>
-							<Tooltip disableHoverListener title={"Match the exact amount in your receipt"} placement="top" arrow enterTouchDelay={100}>
+							<Tooltip disableHoverListener title={"Match the exact amount in your receipt(s)"} placement="top" arrow enterTouchDelay={100}>
 								<TextField
 									name="numberformat"
 									label="Parcel Value"
@@ -489,7 +483,7 @@ export default function Form() {
 						<Grid item xs={12} md={4}>
 							<Tooltip
 								disableHoverListener
-								title={"Refer to your parcel receipt for the tracking ID (Not Order number/id). E.g: NLMYA12345678"}
+								title={"Refer to your parcel receipt(s) for the tracking ID (Not Order number/id). E.g: NLMYA12345678"}
 								placement="top"
 								arrow
 								enterTouchDelay={100}
@@ -567,60 +561,77 @@ export default function Form() {
 						<Grid item xs={12} md={6}>
 							<Tooltip disableHoverListener title={"Accepts only images/pdf with max 5MB size"} placement="top" arrow enterTouchDelay={100}>
 								<Button
-									variant={!errors.receipt.length ? "contained" : "outlined"}
-									color={!errors.receipt.length ? "accent" : "error"}
+									variant={!errors.receipts.length ? "contained" : "outlined"}
+									color={!errors.receipts.length ? "accent" : "error"}
 									sx={{
-										color: !errors.receipt.length ? "white.main" : "error.main",
+										color: !errors.receipts.length ? "white.main" : "error.main",
 									}}
 									size="large"
 									fullWidth
 									component="label"
 								>
-									upload receipt / invoice / screenshot*
+									upload receipts / invoices / screenshots*
 									<input
 										type="file"
 										hidden
+										multiple
 										accept="image/jpeg,image/png,application/pdf"
-										onChange={(e) => {
+										onChange={async (e) => {
 											const { files } = e.currentTarget;
 											if (!files.length) {
 												toast.error("No file selected");
 												return;
 											}
-											if (files.length > 1) {
-												toast.error("Please select 1 files only");
+											if (files.length > 4) {
+												toast.error("Please select max 4 files only");
 												return;
 											}
 
-											if (files[0].size > 5 * 1024 * 1024) {
-												toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
-												return;
+											for (let i = 0; i < files.length; i++) {
+												if (files[i].size > 5 * 1024 * 1024) {
+													toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
+													return;
+												}
+												if (!["image/jpeg", "image/png", "application/pdf"].includes(files[i].type)) {
+													toast.error("Upload jpg, png or pdf files only");
+													return;
+												}
 											}
-											if (!["image/jpeg", "image/png", "application/pdf"].includes(files[0].type)) {
-												toast.error("Upload jpg, png or pdf files only");
-												return;
+											if (errors.receipts.length) {
+												setErrors({ ...errors, receipts: [] });
 											}
-											if (errors.receipt.length) {
-												setErrors({ ...errors, receipt: [] });
+
+											const getURL = (file) => {
+												return new Promise(async (resolve) => {
+													const reader = new FileReader();
+													reader.addEventListener(
+														"load",
+														function () {
+															resolve({ URL: reader.result, name: file.name, type: file.type });
+														},
+														false
+													);
+													reader.readAsDataURL(file);
+												});
+											};
+
+											let batchPromises = [];
+											for (let i = 0; i < files.length; i++) {
+												batchPromises.push(getURL(files[i]));
 											}
-											const reader = new FileReader();
-											reader.addEventListener(
-												"load",
-												function () {
-													setReceipt(reader.result);
-													console.log(reader.result);
-													toast.success("File selected 😎");
-													setReceiptMetadata(JSON.stringify({ name: files[0].name, type: files[0].type }));
-												},
-												false
-											);
-											reader.readAsDataURL(files[0]);
+											await Promise.all(batchPromises).then((results) => setReceipts(JSON.stringify(results)));
+											toast.success("File(s) selected 😎");
 										}}
 									/>
 								</Button>
 							</Tooltip>
-							<FormHelperText>{receiptMetadata && `File selected: ${JSON.parse(receiptMetadata).name}`}</FormHelperText>
-							<FormHelperText error>{errors.receipt.join(" , ")}</FormHelperText>
+							<FormHelperText>
+								{receipts?.length > 0 &&
+									`File selected: ${JSON.parse(receipts)
+										.map(({ name }) => name)
+										.join(",")}`}
+							</FormHelperText>
+							<FormHelperText error>{errors.receipts.join(" , ")}</FormHelperText>
 						</Grid>
 						<Grid item xs={12} md={6}>
 							<FormHelperText>

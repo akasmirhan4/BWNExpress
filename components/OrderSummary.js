@@ -124,16 +124,16 @@ function OrderTable(props) {
 						<TableCell>{orderData?.itemDescription}</TableCell>
 					</TableRow>
 					<TableRow>
+						<TableCell component={"th"}>Weight Range</TableCell>
+						<TableCell>{orderData?.weightRange}</TableCell>
+					</TableRow>
+					<TableRow>
 						<TableCell component={"th"}>Courier Provider</TableCell>
 						<TableCell>{orderData?.courierProvider == "Others" ? orderData?.specificCourierProvider : orderData?.courierProvider}</TableCell>
 					</TableRow>
 					<TableRow>
 						<TableCell component={"th"}>Tracking Number</TableCell>
 						<TableCell>{orderData?.trackingNumber}</TableCell>
-					</TableRow>
-					<TableRow>
-						<TableCell component={"th"}>Payment Method</TableCell>
-						<TableCell>{orderData?.paymentMethod == "" ? "Select Soon" : orderData?.paymentMethod}</TableCell>
 					</TableRow>
 					<TableRow>
 						<TableCell component={"th"}>Delivery Method</TableCell>
@@ -159,6 +159,16 @@ function OrderTable(props) {
 							<TableCell>{orderData?.permitCategory}</TableCell>
 						</TableRow>
 					)}
+					{orderData?.requiresPermit && (
+						<TableRow>
+							<TableCell component={"th"}>Permit Remark</TableCell>
+							<TableCell>{orderData?.permitRemark}</TableCell>
+						</TableRow>
+					)}
+					<TableRow>
+						<TableCell component={"th"}>Payment Method</TableCell>
+						<TableCell>{orderData?.paymentMethod == "" ? "Select Soon" : orderData?.paymentMethod}</TableCell>
+					</TableRow>
 					<TableRow>
 						<TableCell component={"th"}>Total</TableCell>
 						<TableCell>{currencyFormatter.format(orderData?.total)}</TableCell>
