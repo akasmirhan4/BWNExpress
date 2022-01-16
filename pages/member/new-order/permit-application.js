@@ -14,6 +14,10 @@ import {
 	MenuItem,
 	FormHelperText,
 	TextField,
+	Dialog,
+	DialogContent,
+	DialogContentText,
+	DialogActions,
 } from "@mui/material";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
@@ -34,25 +38,64 @@ export default function PermitApplication() {
 	const [requiresPermit, setRequiresPermit] = useState(false);
 	const [permitCategory, setPermitCategory] = useState("");
 	const [permitRemark, setPermitRemark] = useState("");
+	const [productInformations, setProductInformations] = useState([]);
+	const [openDialog, setOpenDialog] = useState(false);
+	const [itemCategory, setitemCategory] = useState("");
+	const [permitCategories, setPermitCategories] = useState([
+		"MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)",
+		"MOH Food Safety and Quality Unit (Food products, coffee and other drinks)",
+		"Pusat Dakhwah Islamiah (Religious books)",
+		"Internal Security (All Books)",
+	]);
 
 	const [errors, setErrors] = useState({
 		permitCategory: [],
+		productInformations: [],
 	});
 	const [loaded, setLoaded] = useState(false);
 	const [loading, setLoading] = useState(false);
 
 	const reset = () => {
-		setRequiresPermit(false);
-		setPermitCategory("");
-		setPermitRemark("");
+		const itemCategory = window.sessionStorage.getItem("itemCategory");
+		setitemCategory(itemCategory);
+		if (MOHPharmacies.includes(itemCategory)) {
+			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") ?? true);
+			setPermitCategories(["MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)"]);
+			setPermitCategory(
+				window.sessionStorage.getItem("permitCategory") ??
+					"MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)"
+			);
+		} else if (MOHFoodSafeties.includes(itemCategory)) {
+			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") == "true" ?? true);
+			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? "MOH Food Safety and Quality Unit (Food products, coffee and other drinks)");
+			setPermitCategories(["MOH Food Safety and Quality Unit (Food products, coffee and other drinks)"]);
+		} else if (internalSecurities.includes(itemCategory)) {
+			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") == "true" ?? true);
+			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? "");
+			setPermitCategories(["Pusat Dakhwah Islamiah (Religious books)", "Internal Security (All Books)"]);
+		} else {
+			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") == "true" ?? false);
+			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? "");
+			setPermitCategories([
+				"MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)",
+				"MOH Food Safety and Quality Unit (Food products, coffee and other drinks)",
+				"Pusat Dakhwah Islamiah (Religious books)",
+				"Internal Security (All Books)",
+			]);
+		}
+		setPermitRemark(window.sessionStorage.getItem("permitRemark") ?? "");
+		setProductInformations(window.sessionStorage.getItem("productInformations") ?? []);
+		setLoaded(true);
 	};
+
+	const MOHPharmacies = ["Skincare", "Cosmetics", "Hair care", "Fragrance", "Essential oils", "Medical Use"];
+	const MOHFoodSafeties = ["Snack", "Dried Food", "Tea", "Coffee", "Supplements", "Can Drinks"];
+	const AITI = ["Electronics (Household)", "Camera accessories", "Computer parts", "Watch", "Phone accessories", "Mobile phone"];
+	const internalSecurities = ["Books"];
 
 	useEffect(() => {
 		if (userData) {
-			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") ?? "");
-			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? "");
-			setPermitRemark(window.sessionStorage.getItem("permitRemark") ?? "");
-			setLoaded(true);
+			reset();
 		}
 	}, [userData]);
 
@@ -62,11 +105,12 @@ export default function PermitApplication() {
 			requiresPermit,
 			permitCategory,
 			permitRemark,
+			productInformations,
 		};
 		Object.entries(data).forEach(([key, value]) => {
 			window.sessionStorage.setItem(key, value);
 		});
-	}, [requiresPermit, permitCategory, permitRemark]);
+	}, [requiresPermit, permitCategory, permitRemark, productInformations]);
 
 	useEffect(() => {
 		if (window.sessionStorage.getItem("isAcknowledged") != "true") {
@@ -78,20 +122,11 @@ export default function PermitApplication() {
 		}
 	}, []);
 
-	const permitCategories = [
-		"Cosmetics including perfume",
-		"Skincare & Healthcare",
-		"Medication or Pharmaceutical Products",
-		"Traditional Medicines & Health Supplement Products",
-		"Food Items",
-		"Books",
-		"Essential Oils",
-	];
-
 	function validateInputs() {
 		const currencyRegex = /^\d*(\.\d{2})?$/;
 		let _errors = {
 			permitCategory: [],
+			productInformations: [],
 		};
 
 		if (requiresPermit) {
@@ -100,6 +135,8 @@ export default function PermitApplication() {
 			} else if (!permitCategories.includes(permitCategory)) {
 				_errors.permitCategory.push("Unknown method");
 			}
+			console.log(productInformations);
+			if (!productInformations.length) _errors.productInformations.push("This is required");
 		}
 		const nErrors = !!Object.values(_errors).reduce((a, v) => a + v.length, 0);
 		if (!!nErrors) {
@@ -111,6 +148,32 @@ export default function PermitApplication() {
 
 	return (
 		<MemberPageTemplate hideFAB>
+			<Dialog open={openDialog}>
+				<DialogContent>
+					<DialogContentText sx={{ whiteSpace: "pre-line" }}>
+						{requiresPermit
+							? "If the format is not followed and insufficient information is  provided, permit applications will not be processed and bwnexpress.com will not be responsible for any delays or disapproval."
+							: `You are to be aware that the Brunei customs has enforced permits to be applied for all make up, skincare, hair care products, henna products, perfume/fragrances, essential oils, food, supplements and books to be applied regardless of quantity. \n\n Any goods that require any Wi-Fi and Bluetooth connectivity will require an AITI permit which is the responsibility of a member. If required, a fee will be incurred to a member  for bwnexpress.com to apply on behalf. \n\n If such items exists in your package, it will result in delays bringing parcel into Brunei Darussalam.`}
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button
+						onClick={() => {
+							setOpenDialog(false);
+						}}
+					>
+						Cancel
+					</Button>
+					<Button
+						onClick={() => {
+							setOpenDialog(false);
+							router.push("payment");
+						}}
+					>
+						I Understand
+					</Button>
+				</DialogActions>
+			</Dialog>
 			<Container sx={{ pt: 4 }}>
 				<Box display={"flex"} justifyContent="space-between" alignItems={"center"} sx={{ mb: 4 }}>
 					<Breadcrumbs aria-label="breadcrumb">
@@ -134,6 +197,24 @@ export default function PermitApplication() {
 					borderRadius={4}
 				>
 					<Grid container columnSpacing={4} rowSpacing={2}>
+						{permitCategory.startsWith("MOH") && (
+							<Grid item xs={12}>
+								<Typography variant="subtitle1" color="error.main" sx={{ ml: 1 }}>
+									<span style={{ fontWeight: "bold" }}>Please Note: </span>
+									{permitCategory == "MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)" &&
+										"Permits will take between 3 to 5 weeks for MOH approval."}
+									{permitCategory == "MOH Food Safety and Quality Unit (Food products, coffee and other drinks)" &&
+										"Permits will more than 5 weeks for MOH approval for food items."}
+								</Typography>
+							</Grid>
+						)}
+						{itemCategory == "Books" && (
+							<Grid item xs={12}>
+								<Typography variant="subtitle1" color="error.main" sx={{ ml: 1 }}>
+									Select permit category as "Pusat Dakhwah Islamiah" if the product is considered a religious books. Else select "Internal Security".
+								</Typography>
+							</Grid>
+						)}
 						<Grid item xs={12} md={6}>
 							<Box display="flex" alignItems="center">
 								<Checkbox checked={requiresPermit} onChange={(e) => setRequiresPermit(e.target.checked)} />
@@ -147,7 +228,7 @@ export default function PermitApplication() {
 								<Fragment>
 									<Tooltip disableHoverListener title={"Select the right permit for your parcel"} placement="top" arrow enterTouchDelay={100}>
 										<FormControl fullWidth sx={{ mt: 1 }}>
-											<InputLabel error={!!errors.permitCategory.length}>Permit Category</InputLabel>
+											<InputLabel error={!!errors.permitCategory.length}>Permit Category *</InputLabel>
 											<Select
 												value={permitCategory}
 												label="Permit Category"
@@ -174,6 +255,113 @@ export default function PermitApplication() {
 								</Fragment>
 							)}
 						</Grid>
+						{requiresPermit && (
+							<Grid item xs={12}>
+								<Typography sx={{ my: 2 }}>
+									Permits are applied for all items within one parcel and one invoice. Additional invoices will be additional permits required. A permit
+									application if for a maximum of 8 items with the quantity of not more than 4 items per item. Any additional quantity or item will require an
+									additional permit application with a separate IC. [TODO: wordy and not very clear]
+								</Typography>
+							</Grid>
+						)}
+						{requiresPermit && (
+							<Fragment>
+								<Grid item xs={12} md={6}>
+									<Tooltip title={"Accepts only images/pdf/docs with max 5MB size"} placement="top" arrow enterTouchDelay={100}>
+										<Button
+											variant={!errors.productInformations.length ? "contained" : "outlined"}
+											color={!errors.productInformations.length ? "accent" : "error"}
+											sx={{
+												color: !errors.productInformations.length ? "white.main" : "error.main",
+											}}
+											size="large"
+											fullWidth
+											component="label"
+										>
+											upload product informations*
+											<input
+												type="file"
+												hidden
+												multiple
+												accept="image/jpeg,image/png,application/pdf,.doc, .docx,.txt"
+												onChange={async (e) => {
+													const { files } = e.currentTarget;
+													if (!files.length) {
+														toast.error("No file selected");
+														return;
+													}
+													if (files.length > 4) {
+														toast.error("Please select max 4 files only");
+														return;
+													}
+
+													for (let i = 0; i < files.length; i++) {
+														if (files[i].size > 5 * 1024 * 1024) {
+															toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
+															return;
+														}
+														console.log(files[i].type);
+														if (
+															![
+																"image/jpeg",
+																"image/png",
+																"application/pdf",
+																"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+																"application/msword",
+																"text/plain",
+															].includes(files[i].type)
+														) {
+															toast.error("Upload images, pdf files, or word files only");
+															return;
+														}
+													}
+													if (errors.productInformations.length) {
+														setErrors({ ...errors, productInformations: [] });
+													}
+
+													const getURL = (file) => {
+														return new Promise(async (resolve) => {
+															const reader = new FileReader();
+															reader.addEventListener(
+																"load",
+																function () {
+																	resolve({ URL: reader.result, name: file.name, type: file.type });
+																},
+																false
+															);
+															reader.readAsDataURL(file);
+														});
+													};
+
+													let batchPromises = [];
+													for (let i = 0; i < files.length; i++) {
+														batchPromises.push(getURL(files[i]));
+													}
+													await Promise.all(batchPromises).then((results) => setProductInformations(JSON.stringify(results)));
+													toast.success("File(s) selected 😎");
+												}}
+											/>
+										</Button>
+									</Tooltip>
+									<FormHelperText>
+										{productInformations?.length > 0 &&
+											`File selected: ${JSON.parse(productInformations)
+												.map(({ name }) => name)
+												.join(" , ")}`}
+									</FormHelperText>
+									<FormHelperText error>{errors.productInformations.join(" , ")}</FormHelperText>
+								</Grid>
+								<Grid item xs={12} md={6}>
+									<Typography sx={{ mt: 1 }}>
+										<span style={{ fontWeight: "bold" }}>Important!</span> Please follow this sample{" "}
+										<Link href="https://bwnexpress.com/wp-content/uploads/2021/01/BWN02830.pdf" target="_blank" style={{ fontWeight: "bold" }}>
+											here
+										</Link>
+									</Typography>
+								</Grid>
+							</Fragment>
+						)}
+
 						{requiresPermit && (
 							<Grid item xs={12}>
 								<Tooltip
@@ -216,7 +404,7 @@ export default function PermitApplication() {
 									console.log(errors);
 									setLoading(false);
 									if (!nErrors) {
-										router.push("payment");
+										setOpenDialog(true);
 									}
 								}}
 								disabled={!!Object.values(errors).reduce((a, v) => a + v.length, 0)}

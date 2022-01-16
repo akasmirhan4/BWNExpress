@@ -245,6 +245,34 @@ export default function Form() {
 	const deliveryMethods = ["Self-Pickup", "Select Soon"];
 	const weightRanges = ["0.1 - 1.99kg ($6.00)", "2 - 7.99kg ($14.00)", "8 - 13.99kg ($23.00)", "14 - 19.99kg ($31.00)", "20 - 25.99kg ($43.00)"];
 
+	const MOHPharmacies = ["Skincare", "Cosmetics", "Hair care", "Fragrance", "Essential oils", "Medical Use"];
+	const MOHFoodSafeties = ["Snack", "Dried Food", "Tea", "Coffee", "Supplements", "Can Drinks"];
+	const AITI = ["Electronics (Household)", "Camera accessories", "Computer parts", "Watch", "Phone accessories", "Mobile phone"];
+	const internalSecurities = ["Books"];
+
+	useEffect(() => {
+		if (itemCategory) {
+			if (MOHPharmacies.includes(itemCategory)) {
+				window.sessionStorage.setItem("requiresPermit", true);
+				window.sessionStorage.setItem(
+					"permitCategory",
+					"MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)"
+				);
+			} else if (MOHFoodSafeties.includes(itemCategory)) {
+				window.sessionStorage.setItem("requiresPermit", true);
+				window.sessionStorage.setItem("permitCategory", "MOH Food Safety and Quality Unit (Food products, coffee and other drinks)");
+			} else if (internalSecurities.includes(itemCategory)) {
+				window.sessionStorage.setItem("requiresPermit", true);
+				window.sessionStorage.setItem("permitCategory", "");
+			} else {
+				window.sessionStorage.setItem("requiresPermit", false);
+				window.sessionStorage.setItem("permitCategory", "");
+			}
+			window.sessionStorage.setItem("permitRemark", "");
+			window.sessionStorage.setItem("productInformations", "[]");
+		}
+	}, [itemCategory]);
+
 	function validateInputs() {
 		const currencyRegex = /^\d*(\.\d{2})?$/;
 		let _errors = {
@@ -629,7 +657,7 @@ export default function Form() {
 								{receipts?.length > 0 &&
 									`File selected: ${JSON.parse(receipts)
 										.map(({ name }) => name)
-										.join(",")}`}
+										.join(" , ")}`}
 							</FormHelperText>
 							<FormHelperText error>{errors.receipts.join(" , ")}</FormHelperText>
 						</Grid>
