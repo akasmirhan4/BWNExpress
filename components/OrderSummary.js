@@ -1,13 +1,28 @@
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Skeleton } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Skeleton, Link } from "@mui/material";
 import { currencyFormatter } from "lib/formatter";
 import Image from "next/image";
-import { memo, useState } from "react";
+import { Fragment, memo, useEffect, useState } from "react";
 
 export default function OrderSummary(props) {
-	const { orderData, receiptURL, bankTransferURL } = props || {};
-	const [receiptLoaded, setReceiptLoaded] = useState(false);
-	const [bankTransferLoaded, setBankTransferLoaded] = useState(false);
-	console.log(bankTransferURL, receiptURL);
+	const { orderData } = props || {};
+	console.log(orderData);
+	const [receipts, setReceipts] = useState([]);
+	const [productInformations, setProductInformations] = useState([]);
+	const [bankTransfers, setBankTransfers] = useState([]);
+
+	useEffect(() => {
+		if (orderData) {
+			if (!!orderData.receipts) {
+				setReceipts(JSON.parse(orderData.receipts));
+			}
+			if (!!orderData.productInformations) {
+				setProductInformations(JSON.parse(orderData.productInformations));
+			}
+			if (!!orderData.bankTransfers) {
+				setBankTransfers(JSON.parse(orderData.bankTransfers));
+			}
+		}
+	}, [orderData]);
 
 	function camelCaseToText(camel) {
 		const result = camel.replace(/([A-Z])/g, " $1");
@@ -18,56 +33,42 @@ export default function OrderSummary(props) {
 		<Box>
 			<Typography sx={{ mb: 2 }}>Summary</Typography>
 			<OrderTable orderData={orderData} />
-			{(!!receiptURL || orderData?.receipt) && <Typography sx={{ mt: 4 }}>Receipt Preview</Typography>}
-			{(!!receiptURL || orderData?.receipt) && (
-				<Box
-					width="100%"
-					minHeight={"48em"}
-					border="1px dashed"
-					borderColor="secondaryAccent.main"
-					display="flex"
-					justifyContent={"center"}
-					alignItems={"center"}
-					borderRadius={1}
-					position="relative"
-					bgcolor={"lightGrey.secondary"}
-					sx={{ zIndex: 0, my: 2 }}
-				>
-					{["application/pdf"].includes(JSON.parse(orderData?.receiptMetadata).type) ? (
-						<PDFViewer src={receiptURL ?? orderData?.receipt} />
-					) : (
-						<Image src={receiptURL ?? orderData?.receipt} alt="receipt" layout="fill" objectFit="contain" />
-					)}
-					<Typography sx={{ bgcolor: "secondary.main", p: 1, color: "white.main", opacity: 0.8, fontSize: { xs: "0.7rem", sm: "1rem" } }} textAlign="center">
-						{JSON.parse(orderData?.receiptMetadata).name ?? orderData.receiptMetadata.name ?? "..."}
-					</Typography>
-				</Box>
-			)}
-			{(!!bankTransferURL || orderData?.bankTransfer) && <Typography sx={{ mt: 4 }}>Bank Transfer Preview</Typography>}
-			{(!!bankTransferURL || orderData?.bankTransfer) && (
-				<Box
-					width="100%"
-					minHeight={"48em"}
-					border="1px dashed"
-					borderColor="secondaryAccent.main"
-					display="flex"
-					justifyContent={"center"}
-					alignItems={"center"}
-					borderRadius={1}
-					position="relative"
-					bgcolor={"lightGrey.secondary"}
-					sx={{ zIndex: 0, my: 2 }}
-				>
-					{["application/pdf"].includes(JSON.parse(orderData?.bankTransferMetadata).type) ? (
-						<PDFViewer src={bankTransferURL ?? orderData?.bankTransfer} />
-					) : (
-						<Image src={bankTransferURL ?? orderData?.bankTransfer} alt="bankTransfer" layout="fill" objectFit="contain" priority />
-					)}
-					<Typography sx={{ bgcolor: "secondary.main", p: 1, color: "white.main", opacity: 0.8, fontSize: { xs: "0.7rem", sm: "1rem" } }} textAlign="center">
-						{JSON.parse(orderData?.bankTransferMetadata).name ?? orderData.bankTransferMetadata.name ?? "..."}
-					</Typography>
-				</Box>
-			)}
+			<Box sx={{ display: "flex", flexDirection: "column" }}>
+				{receipts.length > 0 && (
+					<Fragment>
+						<Typography sx={{ mt: 4 }}>Receipts Attached: </Typography>
+						{receipts.map((receipt, index) => (
+							<Link href={receipt.URL} target={"_blank"} key={index}>
+								{receipt.name}
+							</Link>
+						))}
+					</Fragment>
+				)}
+			</Box>
+			<Box sx={{ display: "flex", flexDirection: "column" }}>
+				{productInformations.length > 0 && (
+					<Fragment>
+						<Typography sx={{ mt: 4 }}>Product Info Documents Attached: </Typography>
+						{productInformations.map((productInformation, index) => (
+							<Link href={productInformation.URL} target={"_blank"} key={index}>
+								{productInformation.name}
+							</Link>
+						))}
+					</Fragment>
+				)}
+			</Box>
+			<Box sx={{ display: "flex", flexDirection: "column" }}>
+				{bankTransfers.length > 0 && (
+					<Fragment>
+						<Typography sx={{ mt: 4 }}>Transfer Screenshot Attached: </Typography>
+						{bankTransfers.map((bankTransfer, index) => (
+							<Link href={bankTransfer.URL} target={"_blank"} key={index}>
+								{bankTransfer.name}
+							</Link>
+						))}
+					</Fragment>
+				)}
+			</Box>
 		</Box>
 	);
 }

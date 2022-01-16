@@ -30,6 +30,7 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import NewOrderSteppers from "components/NewOrderSteppers";
 import { selectUserData } from "lib/slices/userSlice";
+import { currencyFormatter } from "lib/formatter";
 
 export default function Payment() {
 	const router = useRouter();
@@ -45,6 +46,9 @@ export default function Payment() {
 	const [total, setTotal] = useState(0);
 	const [loaded, setLoaded] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [weightRange, setWeightRange] = useState("");
+	const [requiresPermit, setRequiresPermit] = useState(false);
+	const [deliveryMethod, setDeliveryMethod] = useState("");
 
 	const reset = () => {
 		setPaymentMethod("");
@@ -55,11 +59,29 @@ export default function Payment() {
 		if (userData) {
 			setPaymentMethod(window.sessionStorage.getItem("paymentMethod") ?? "");
 			setBankTransfers(window.sessionStorage.getItem("bankTransfers") ?? []);
-			let _total = 0;
-			if(window.sessionStorage.getItem("requiresPermit") == "true") _total 
+			setWeightRange(window.sessionStorage.getItem("weightRange") ?? "");
+			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") == "true" ?? false);
+			setDeliveryMethod(window.sessionStorage.getItem("deliveryMethod") ?? "");
 			setLoaded(true);
 		}
 	}, [userData]);
+
+	useEffect(() => {
+		let total = 0;
+		if (weightRange) {
+			const price = Number(
+				weightRange
+					.split("(")[1]
+					.split(")")[0]
+					.replace(/[^0-9.-]+/g, "")
+			);
+			total = total + price;
+		}
+		if (requiresPermit) total = total + 10;
+		if (deliveryMethod == "Home Delivery") total = total + 10;
+		setTotal(total);
+		window.sessionStorage.setItem("total", total);
+	}, [weightRange, requiresPermit, deliveryMethod]);
 
 	useEffect(() => {
 		if (!loaded) return;
@@ -127,34 +149,6 @@ export default function Payment() {
 					borderRadius={4}
 				>
 					<Grid container columnSpacing={4} rowSpacing={2}>
-						<Grid item md={6} xs={12}>
-							<TableContainer>
-								<Table>
-									<TableBody>
-										<TableRow>
-											<TableCell component="th">Parcel Weight:</TableCell>
-											<TableCell>{weightRange ? weightRange.split("(")[1].split(")")[0] : "-"}</TableCell>
-										</TableRow>
-										{window.sessionStorage.getItem("requiresPermit") == "true" && (
-											<TableRow>
-												<TableCell component="th">Processing Permit:</TableCell>
-												<TableCell>{currencyFormatter.format(10)}</TableCell>
-											</TableRow>
-										)}
-										{deliveryMethod == "Home Delivery" && (
-											<TableRow>
-												<TableCell component="th">Delivery:</TableCell>
-												<TableCell>{currencyFormatter.format(10)}</TableCell>
-											</TableRow>
-										)}
-										<TableRow>
-											<TableCell component="th">Total:</TableCell>
-											<TableCell>{currencyFormatter.format(total)}</TableCell>
-										</TableRow>
-									</TableBody>
-								</Table>
-							</TableContainer>
-						</Grid>
 						<Grid item xs={12} md={6} display="flex" justifyContent={"flex-end"}>
 							<Tooltip
 								disableHoverListener
@@ -191,6 +185,35 @@ export default function Payment() {
 							</Tooltip>
 						</Grid>
 						<Grid item xs={12} md={6}>
+							<TableContainer>
+								<Table>
+									<TableBody>
+										<TableRow>
+											<TableCell component="th">Parcel Weight:</TableCell>
+											<TableCell>{weightRange ? weightRange.split("(")[1].split(")")[0] : "-"}</TableCell>
+										</TableRow>
+										{requiresPermit && (
+											<TableRow>
+												<TableCell component="th">Processing Permit:</TableCell>
+												<TableCell>{currencyFormatter.format(10)}</TableCell>
+											</TableRow>
+										)}
+										{deliveryMethod == "Home Delivery" && (
+											<TableRow>
+												<TableCell component="th">Delivery:</TableCell>
+												<TableCell>{currencyFormatter.format(10)}</TableCell>
+											</TableRow>
+										)}
+										<TableRow>
+											<TableCell component="th">Total:</TableCell>
+											<TableCell>{currencyFormatter.format(total)}</TableCell>
+										</TableRow>
+									</TableBody>
+								</Table>
+							</TableContainer>
+						</Grid>
+
+						<Grid item xs={12}>
 							{paymentMethod == "Bank Transfer" && (
 								<Fragment>
 									<Tooltip disableHoverListener title={"Accepts only images/pdf with max 5MB size"} placement="top" arrow enterTouchDelay={100}>
@@ -199,7 +222,7 @@ export default function Payment() {
 											color={!errors.bankTransfers.length ? "accent" : "error"}
 											sx={{
 												color: !errors.bankTransfers.length ? "white.main" : "error.main",
-												mt: 1,
+												mt: 4,
 											}}
 											size="large"
 											fullWidth
