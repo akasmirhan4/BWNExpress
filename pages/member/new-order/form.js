@@ -13,6 +13,7 @@ import {
 	InputLabel,
 	Select,
 	MenuItem,
+	InputAdornment,
 } from "@mui/material";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
@@ -31,7 +32,8 @@ export default function Form() {
 	const router = useRouter();
 	const userData = useSelector(selectUserData);
 	const [purchaseFrom, setPurchaseFrom] = useState("");
-	const [weightRange, setWeightRange] = useState("");
+	const [weightPrice, setWeightPrice] = useState("");
+	const [parcelWeight, setParcelWeight] = useState("");
 	const [itemCategory, setItemCategory] = useState("");
 	const [parcelValue, setParcelValue] = useState("");
 	const [currency, setCurrency] = useState("MYR");
@@ -47,7 +49,8 @@ export default function Form() {
 
 	const [errors, setErrors] = useState({
 		purchaseFrom: [],
-		weightRange: [],
+		parcelWeight: [],
+		weightPrice: [],
 		itemCategory: [],
 		currency: [],
 		parcelValue: [],
@@ -64,9 +67,10 @@ export default function Form() {
 
 	const reset = () => {
 		setPurchaseFrom("");
-		setWeightRange("");
-		setItemCategory("");
+		setParcelWeight("");
+		setWeightPrice("");
 		setParcelValue("");
+		setItemCategory("");
 		setCurrency("MYR");
 		setItemDescription("");
 		setCourierProvider("");
@@ -82,7 +86,8 @@ export default function Form() {
 	useEffect(() => {
 		if (userData) {
 			setPurchaseFrom(window.sessionStorage.getItem("purchaseFrom") ?? "");
-			setWeightRange(window.sessionStorage.getItem("weightRange") ?? "");
+			setParcelWeight(window.sessionStorage.getItem("parcelWeight") ?? "");
+			setWeightPrice(window.sessionStorage.getItem("weightPrice") ?? "");
 			setItemCategory(window.sessionStorage.getItem("itemCategory") ?? "");
 			setParcelValue(window.sessionStorage.getItem("parcelValue") ?? "");
 			setCurrency(window.sessionStorage.getItem("currency") ?? "MYR");
@@ -103,8 +108,9 @@ export default function Form() {
 		if (!loaded) return;
 		let data = {
 			purchaseFrom,
-			weightRange,
 			itemCategory,
+			parcelWeight,
+			weightPrice,
 			parcelValue,
 			currency,
 			itemDescription,
@@ -122,7 +128,7 @@ export default function Form() {
 		});
 	}, [
 		purchaseFrom,
-		weightRange,
+		parcelWeight,
 		itemCategory,
 		parcelValue,
 		currency,
@@ -243,7 +249,6 @@ export default function Form() {
 		"Others",
 	];
 	const deliveryMethods = ["Self-Pickup", "Select Soon"];
-	const weightRanges = ["0.1 - 1.99kg ($6.00)", "2 - 7.99kg ($14.00)", "8 - 13.99kg ($23.00)", "14 - 19.99kg ($31.00)", "20 - 25.99kg ($43.00)"];
 
 	const MOHPharmacies = ["Skincare", "Cosmetics", "Hair care", "Fragrance", "Essential oils", "Medical Use"];
 	const MOHFoodSafeties = ["Snack", "Dried Food", "Tea", "Coffee", "Supplements", "Can Drinks"];
@@ -277,7 +282,7 @@ export default function Form() {
 		const currencyRegex = /^\d*(\.\d{2})?$/;
 		let _errors = {
 			purchaseFrom: [],
-			weightRange: [],
+			parcelWeight: [],
 			itemCategory: [],
 			currency: [],
 			parcelValue: [],
@@ -290,7 +295,7 @@ export default function Form() {
 		};
 
 		if (!purchaseFrom) _errors.purchaseFrom.push("This is required");
-		if (!weightRange) _errors.weightRange.push("This is required");
+		if (!parcelWeight) _errors.parcelWeight.push("This is required");
 		if (!itemCategory) _errors.itemCategory.push("This is required");
 		if (!currency) _errors.currency.push("This is required");
 		if (!parcelValue) {
@@ -354,117 +359,87 @@ export default function Form() {
 				>
 					<Grid container columnSpacing={4} rowSpacing={2}>
 						<Grid item xs={12} md={6}>
-							<Tooltip disableHoverListener title={"E.g: Lazada, UNIQLO, H&M"} placement="top" arrow enterTouchDelay={100}>
-								<TextField
-									label="Purchase From"
-									fullWidth
-									margin="dense"
-									sx={{ boxShadow: (theme) => theme.shadows[1] }}
-									value={purchaseFrom}
-									onChange={(e) => {
-										setPurchaseFrom(e.target.value);
-										if (errors.purchaseFrom.length) {
-											setErrors({ ...errors, purchaseFrom: [] });
-										}
-									}}
-									error={!!errors.purchaseFrom.length}
-									required
-								/>
-							</Tooltip>
-							<FormHelperText error>{errors.purchaseFrom.join(" , ")}</FormHelperText>
-						</Grid>
-						<Grid item xs={12} md={6} display="flex" justifyContent={"flex-end"}>
-							<Tooltip disableHoverListener title={"Ensure you declare the correct parcel weight"} placement="top" arrow enterTouchDelay={100}>
-								<FormControl fullWidth sx={{ mt: { xs: 0, sm: 1 } }}>
-									<InputLabel error={!!errors.weightRange.length}>Weight Range</InputLabel>
-									<Select
-										value={weightRange}
-										label="Weight Range"
-										onChange={(e) => {
-											setWeightRange(e.target.value);
-											if (errors.weightRange.length) {
-												setErrors({ ...errors, weightRange: [] });
-											}
-										}}
-										margin="dense"
-										sx={{ boxShadow: (theme) => theme.shadows[1] }}
-										required
-										error={!!errors.weightRange.length}
-									>
-										{weightRanges.map((weight, index) => {
-											return (
-												<MenuItem value={weight} key={index}>
-													{weight}
-												</MenuItem>
-											);
-										})}
-									</Select>
-								</FormControl>
-							</Tooltip>
+							<CustomTextField
+								tooltip={"E.g: Lazada, UNIQLO, H&M"}
+								label="Purchase From"
+								value={purchaseFrom}
+								onChange={(e) => {
+									setPurchaseFrom(e.target.value);
+									if (errors.purchaseFrom.length) {
+										setErrors({ ...errors, purchaseFrom: [] });
+									}
+								}}
+								errors={errors.purchaseFrom}
+							/>
 						</Grid>
 						<Grid item xs={12} md={6}>
-							<Tooltip
-								disableHoverListener
-								title={"Ensure you declare the correct item category. This will be used to apply for permit"}
-								placement="top"
-								arrow
-								enterTouchDelay={100}
-							>
-								<FormControl fullWidth sx={{ mt: { xs: 0, sm: 1 } }}>
-									<InputLabel error={!!errors.itemCategory.length}>Item Category</InputLabel>
-									<Select
-										value={itemCategory}
-										label="Item Category"
-										onChange={(e) => {
-											setItemCategory(e.target.value);
-											if (errors.itemCategory.length) {
-												setErrors({ ...errors, itemCategory: [] });
-											}
-										}}
-										margin="dense"
-										sx={{ boxShadow: (theme) => theme.shadows[1] }}
-										required
-										error={!!errors.itemCategory.length}
-									>
-										{itemCategories.map((category, index) => (
-											<MenuItem value={category} key={index}>
-												{category}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-							</Tooltip>
-							<FormHelperText error>{errors.itemCategory.join(" , ")}</FormHelperText>
+							<CustomTextField
+								type="number"
+								tooltip={"Ensure you declare the correct parcel weight"}
+								label="Parcel Weight"
+								value={parcelWeight}
+								onChange={(e) => {
+									setParcelWeight(e.target.value);
+									if (errors.parcelWeight.length) {
+										setErrors({ ...errors, parcelWeight: [] });
+									}
+								}}
+								errors={errors.parcelWeight}
+								InputProps={{
+									inputMode: "decimal",
+									endAdornment: <InputAdornment position="end">kg </InputAdornment>,
+								}}
+							/>
+						</Grid>
+						<Grid item xs={12} md={6}>
+							<CustomSelector
+								tooltip="Ensure you declare the correct item category. This will be used to apply for permit"
+								label="Item Category"
+								onChange={(e) => {
+									setItemCategory(e.target.value);
+									if (errors.itemCategory.length) {
+										setErrors({ ...errors, itemCategory: [] });
+									}
+								}}
+								value={itemCategory}
+								errors={errors.itemCategory}
+								items={itemCategories}
+							/>
 						</Grid>
 						<Grid item xs={12} sm={4} md={2}>
-							<Tooltip disableHoverListener title={"Select the currency used to purchase your parcel"} placement="top" arrow enterTouchDelay={100}>
-								<FormControl fullWidth sx={{ mt: 1 }}>
-									<InputLabel error={!!errors.currency.length}>Currency</InputLabel>
-									<Select
-										value={currency}
-										label="Currency"
-										onChange={(e) => {
-											setCurrency(e.target.value);
-											if (errors.currency.length) {
-												setErrors({ ...errors, currency: [] });
-											}
-										}}
-										margin="dense"
-										sx={{ boxShadow: (theme) => theme.shadows[1] }}
-										required
-										error={!!errors.currency.length}
-									>
-										{currencies.map((currency, index) => (
-											<MenuItem value={currency} key={index}>
-												{currency}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-							</Tooltip>
-							<FormHelperText error>{errors.currency.join(" , ")}</FormHelperText>
+							<CustomSelector
+								tooltip="Select the currency used to purchase your parcel"
+								label="Currency"
+								required
+								onChange={(e) => {
+									setCurrency(e.target.value);
+									if (errors.currency.length) {
+										setErrors({ ...errors, currency: [] });
+									}
+								}}
+								value={currency}
+								errors={errors.currency}
+								items={currencies}
+							/>
 						</Grid>
 						<Grid item xs={12} sm={8} md={4}>
+						<CustomTextField
+								type="number"
+								tooltip={"Ensure you declare the correct parcel weight"}
+								label="Parcel Weight"
+								value={parcelWeight}
+								onChange={(e) => {
+									setParcelWeight(e.target.value);
+									if (errors.parcelWeight.length) {
+										setErrors({ ...errors, parcelWeight: [] });
+									}
+								}}
+								errors={errors.parcelWeight}
+								InputProps={{
+									inputMode: "decimal",
+									endAdornment: <InputAdornment position="end">kg </InputAdornment>,
+								}}
+							/>
 							<Tooltip disableHoverListener title={"Match the exact amount in your receipt(s)"} placement="top" arrow enterTouchDelay={100}>
 								<TextField
 									name="numberformat"
@@ -535,32 +510,20 @@ export default function Form() {
 							<FormHelperText error>{errors.trackingNumber.join(" , ")}</FormHelperText>
 						</Grid>
 						<Grid item xs={12} sm={6} md={4}>
-							<Tooltip disableHoverListener title={"Select the courier to be handling your parcel"} placement="top" arrow enterTouchDelay={100}>
-								<FormControl fullWidth sx={{ mt: { xs: 3, sm: 1 } }}>
-									<InputLabel error={!!errors.courierProvider.length}>Courier Provider *</InputLabel>
-									<Select
-										value={courierProvider}
-										label="Courier Provider *"
-										onChange={(e) => {
-											setCourierProvider(e.target.value);
-											if (errors.courierProvider.length) {
-												setErrors({ ...errors, courierProvider: [] });
-											}
-										}}
-										margin="dense"
-										sx={{ boxShadow: (theme) => theme.shadows[1] }}
-										required
-										error={!!errors.courierProvider.length}
-									>
-										{couriers.map((courier, index) => (
-											<MenuItem value={courier} key={index}>
-												{courier}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-							</Tooltip>
-							<FormHelperText error>{errors.courierProvider.join(" , ")}</FormHelperText>
+							<CustomSelector
+								tooltip="Select the courier to be handling your parcel"
+								label="Courier Provider"
+								required
+								onChange={(e) => {
+									setCourierProvider(e.target.value);
+									if (errors.courierProvider.length) {
+										setErrors({ ...errors, courierProvider: [] });
+									}
+								}}
+								value={courierProvider}
+								errors={errors.courierProvider}
+								items={couriers}
+							/>
 						</Grid>
 						<Grid item xs={12} sm={6} md={4}>
 							{courierProvider == "Others" && (
@@ -818,3 +781,44 @@ const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
 		/>
 	);
 });
+
+function CustomSelector(props) {
+	const { tooltip, errors, required, label, onChange, value, items } = props;
+	return (
+		<Fragment>
+			<Tooltip disableHoverListener title={tooltip} placement="top" arrow enterTouchDelay={100}>
+				<FormControl fullWidth sx={{ mt: { xs: 3, sm: 1 } }}>
+					<InputLabel error={errors.length}>{`${label} ${required ? " *" : ""}`}</InputLabel>
+					<Select
+						value={value}
+						label={`${label} ${required ? " *" : ""}`}
+						onChange={onChange}
+						margin="dense"
+						sx={{ boxShadow: (theme) => theme.shadows[1] }}
+						required
+						error={errors.length}
+					>
+						{items.map((item, index) => (
+							<MenuItem value={item} key={index}>
+								{item}
+							</MenuItem>
+						))}
+					</Select>
+				</FormControl>
+			</Tooltip>
+			<FormHelperText error>{errors.join(" , ")}</FormHelperText>
+		</Fragment>
+	);
+}
+
+function CustomTextField(props) {
+	const { tooltip, errors } = props;
+	return (
+		<Fragment>
+			<Tooltip disableHoverListener title={tooltip} placement="top" arrow enterTouchDelay={100}>
+				<TextField {...props} fullWidth margin="dense" sx={{ boxShadow: (theme) => theme.shadows[1] }} error={errors.length} />
+			</Tooltip>
+			<FormHelperText error>{errors.join(" , ")}</FormHelperText>
+		</Fragment>
+	);
+}
