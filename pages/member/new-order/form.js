@@ -1,23 +1,7 @@
-import {
-	Box,
-	Container,
-	Typography,
-	Button,
-	Grid,
-	Breadcrumbs,
-	Link,
-	TextField,
-	FormHelperText,
-	Tooltip,
-	FormControl,
-	InputLabel,
-	Select,
-	MenuItem,
-	InputAdornment,
-} from "@mui/material";
+import { Box, Container, Typography, Button, Grid, Breadcrumbs, Link, FormHelperText, Tooltip, InputAdornment } from "@mui/material";
 import NextLink from "next/link";
 import MemberPageTemplate from "components/MemberPageTemplate";
-import { forwardRef, Fragment, useEffect, useState } from "react";
+import { forwardRef, useEffect, useState } from "react";
 import { ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
 import toast from "react-hot-toast";
 import NumberFormat from "react-number-format";
@@ -26,7 +10,8 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import NewOrderSteppers from "components/NewOrderSteppers";
 import { selectUserData } from "lib/slices/userSlice";
-import { currencyFormatter } from "lib/formatter";
+import { internalSecurities, itemCategories, MOHFoodSafeties, MOHPharmacies, deliveryMethods, currencies, couriers } from "lib/formConstant";
+import { CustomSelector, CustomTextField } from "components/FormInputs";
 
 export default function Form() {
 	const router = useRouter();
@@ -161,99 +146,6 @@ export default function Form() {
 			setDeliveryAddress(userData.deliveryAddress || userData.address || "missing delivery address");
 		}
 	}, [isDifferentAddress]);
-
-	const itemCategories = [
-		"Facemasks",
-		"Disinfectant spray gun",
-		"Clothes",
-		"Socks",
-		"Pants",
-		"Bra",
-		"Panty",
-		"Shoes",
-		"Shoe accessories",
-		"Bags",
-		"Luggage",
-		"Cap",
-		"Belt",
-		"Scarf",
-		"Glove",
-		"Glasses",
-		"Contact Lens",
-		"Watch",
-		"Jewelleries",
-		"Skincare",
-		"Cosmetics",
-		"Hair care",
-		"Fragrance",
-		"Phone accessories",
-		"Mobile phone",
-		"Computer parts",
-		"Car Parts",
-		"Car care",
-		"Organizers",
-		"Daily items",
-		"Stationaries",
-		"Office supplies",
-		"Electronics (Household)",
-		"Decoration",
-		"Bed sheet",
-		"Household items",
-		"Toiletries",
-		"Camera accessories",
-		"Toys or models",
-		"Baby items",
-		"Baby chair",
-		"Furniture",
-		"Cleaning items",
-		"Music instruments",
-		"Fitness gear",
-		"Renovation material",
-		"Electronic parts",
-		"Garden supplies",
-		"Machine parts",
-		"Camping stuff",
-		"Snack",
-		"Dried Food",
-		"Tea",
-		"Coffee",
-		"Supplements",
-		"Can Drinks",
-		"Bicycle",
-		"Pet supply",
-		"Fishing supply",
-		"Hair trimming supply",
-		"Games",
-		"Kitchenware",
-		"Books",
-		"Sports Equipment",
-		"Medical Use",
-	].sort();
-	const currencies = ["MYR", "BND", "SGD", "USD", "CNY", "JPY"];
-	const couriers = [
-		"ABX Express",
-		"Airpak Express",
-		"ARAMEX",
-		"Asiaxpress",
-		"City-Link Express",
-		"DeliveryLah",
-		"DHL Express",
-		"DPEX",
-		"FEDEX",
-		"GD Express",
-		"UPS",
-		"Ninja Van",
-		"Pos Laju",
-		"Singpost",
-		"J&T",
-		"Others",
-	];
-	const deliveryMethods = ["Self-Pickup", "Select Soon"];
-
-	const MOHPharmacies = ["Skincare", "Cosmetics", "Hair care", "Fragrance", "Essential oils", "Medical Use"];
-	const MOHFoodSafeties = ["Snack", "Dried Food", "Tea", "Coffee", "Supplements", "Can Drinks"];
-	const AITI = ["Electronics (Household)", "Camera accessories", "Computer parts", "Watch", "Phone accessories", "Mobile phone"];
-	const internalSecurities = ["Books"];
 
 	useEffect(() => {
 		if (itemCategory) {
@@ -423,91 +315,54 @@ export default function Form() {
 							/>
 						</Grid>
 						<Grid item xs={12} sm={8} md={4}>
-						<CustomTextField
+							<CustomTextField
 								type="number"
-								tooltip={"Ensure you declare the correct parcel weight"}
-								label="Parcel Weight"
-								value={parcelWeight}
+								tooltip={"Match the exact amount in your receipt(s)"}
+								label="Parcel Value"
+								value={parcelValue}
 								onChange={(e) => {
-									setParcelWeight(e.target.value);
-									if (errors.parcelWeight.length) {
-										setErrors({ ...errors, parcelWeight: [] });
+									setParcelValue(e.target.value);
+									if (errors.parcelValue.length) {
+										setErrors({ ...errors, parcelValue: [] });
 									}
 								}}
-								errors={errors.parcelWeight}
+								errors={errors.parcelValue}
 								InputProps={{
-									inputMode: "decimal",
-									endAdornment: <InputAdornment position="end">kg </InputAdornment>,
+									inputComponent: NumberFormatCustom,
 								}}
+								required
 							/>
-							<Tooltip disableHoverListener title={"Match the exact amount in your receipt(s)"} placement="top" arrow enterTouchDelay={100}>
-								<TextField
-									name="numberformat"
-									label="Parcel Value"
-									fullWidth
-									margin="dense"
-									sx={{ boxShadow: (theme) => theme.shadows[1] }}
-									value={parcelValue}
-									onChange={(e) => {
-										setParcelValue(e.target.value);
-										if (errors.parcelValue.length) {
-											setErrors({ ...errors, parcelValue: [] });
-										}
-									}}
-									required
-									InputProps={{ inputComponent: NumberFormatCustom }}
-									error={!!errors.parcelValue.length}
-								/>
-							</Tooltip>
-							<FormHelperText error>{errors.parcelValue.join(" , ")}</FormHelperText>
 						</Grid>
 						<Grid item xs={12}>
-							<Tooltip disableHoverListener title={"Give a brief description of parcel content"} placement="top" arrow enterTouchDelay={100}>
-								<TextField
-									multiline
-									minRows={4}
-									label="Item Description"
-									fullWidth
-									margin="dense"
-									sx={{ boxShadow: (theme) => theme.shadows[1], mt: { xs: 2, sm: 0 } }}
-									value={itemDescription}
-									onChange={(e) => {
-										setItemDescription(e.target.value);
-										if (errors.itemDescription.length) {
-											setErrors({ ...errors, itemDescription: [] });
-										}
-									}}
-									error={!!errors.itemDescription.length}
-									required
-								/>
-							</Tooltip>
-							<FormHelperText error>{errors.itemDescription.join(" , ")}</FormHelperText>
+							<CustomTextField
+								tooltip={"Give a brief description of parcel content"}
+								label="Item Description"
+								value={itemDescription}
+								onChange={(e) => {
+									setItemDescription(e.target.value);
+									if (errors.itemDescription.length) {
+										setErrors({ ...errors, itemDescription: [] });
+									}
+								}}
+								errors={errors.itemDescription}
+								multiline
+								minRows={4}
+							/>
 						</Grid>
 						<Grid item xs={12} md={4}>
-							<Tooltip
-								disableHoverListener
-								title={"Refer to your parcel receipt(s) for the tracking ID (Not Order number/id). E.g: NLMYA12345678"}
-								placement="top"
-								arrow
-								enterTouchDelay={100}
-							>
-								<TextField
-									label="Tracking ID"
-									fullWidth
-									margin="dense"
-									sx={{ boxShadow: (theme) => theme.shadows[1] }}
-									value={trackingNumber}
-									onChange={(e) => {
-										setTrackingNumber(e.target.value);
-										if (errors.trackingNumber.length) {
-											setErrors({ ...errors, trackingNumber: [] });
-										}
-									}}
-									error={!!errors.trackingNumber.length}
-									required
-								/>
-							</Tooltip>
-							<FormHelperText error>{errors.trackingNumber.join(" , ")}</FormHelperText>
+							<CustomTextField
+								tooltip={"Refer to your parcel receipt(s) for the tracking ID (Not Order number/id). E.g: NLMYA12345678"}
+								label="Tracking ID"
+								value={trackingNumber}
+								onChange={(e) => {
+									setTrackingNumber(e.target.value);
+									if (errors.trackingNumber.length) {
+										setErrors({ ...errors, trackingNumber: [] });
+									}
+								}}
+								errors={errors.trackingNumber}
+								required
+							/>
 						</Grid>
 						<Grid item xs={12} sm={6} md={4}>
 							<CustomSelector
@@ -527,26 +382,19 @@ export default function Form() {
 						</Grid>
 						<Grid item xs={12} sm={6} md={4}>
 							{courierProvider == "Others" && (
-								<Fragment>
-									<Tooltip disableHoverListener title={"Please specify the other courier provider"} placement="top" arrow enterTouchDelay={100}>
-										<TextField
-											label="Other Courier Provider"
-											fullWidth
-											margin="dense"
-											sx={{ boxShadow: (theme) => theme.shadows[1] }}
-											value={specificCourierProvider}
-											onChange={(e) => {
-												setSpecificCourierProvider(e.target.value);
-												if (errors.specificCourierProvider.length) {
-													setErrors({ ...errors, specificCourierProvider: [] });
-												}
-											}}
-											error={!!errors.specificCourierProvider.length}
-											required
-										/>
-									</Tooltip>
-									<FormHelperText error>{errors.specificCourierProvider.join(" , ")}</FormHelperText>
-								</Fragment>
+								<CustomTextField
+									tooltip="Please specify the other courier provider"
+									label="Other Courier Provider"
+									required
+									onChange={(e) => {
+										setSpecificCourierProvider(e.target.value);
+										if (errors.specificCourierProvider.length) {
+											setErrors({ ...errors, specificCourierProvider: [] });
+										}
+									}}
+									value={specificCourierProvider}
+									errors={errors.specificCourierProvider}
+								/>
 							)}
 						</Grid>
 						<Grid item xs={12} md={6}>
@@ -629,92 +477,14 @@ export default function Form() {
 								Please ensure a complete itemized receipt / invoice / screenshot that clearly indicating the price and shipment cost.
 							</FormHelperText>
 						</Grid>
-						{/* <Grid item xs={12} md={6}>
-							<Tooltip
-								disableHoverListener
-								title={"Specify how you want your parcel to be received. You may select soon"}
-								placement="top"
-								arrow
-								enterTouchDelay={100}
-							>
-								<FormControl fullWidth sx={{ mt: { xs: 3, sm: 1 } }}>
-									<InputLabel>Delivery Method (Optional)</InputLabel>
-									<Select
-										value={deliveryMethod}
-										label="Delivery Method (Optional)"
-										onChange={(e) => {
-											setDeliveryMethod(e.target.value);
-											if (errors.deliveryMethod.length) {
-												setErrors({ ...errors, deliveryMethod: [] });
-											}
-										}}
-										margin="dense"
-										sx={{ boxShadow: (theme) => theme.shadows[1] }}
-										error={!!errors.deliveryMethod.length}
-										required
-									>
-										{deliveryMethods.map((method, index) => (
-											<MenuItem value={method} key={index}>
-												{method}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-							</Tooltip>
-							<FormHelperText error>{errors.deliveryMethod.join(" , ")}</FormHelperText>
-						</Grid> */}
-						{/* {paymentMethod == "Bank Transfer" && (
-							<Grid item xs={12}>
-								<Box display="flex" alignItems="center">
-									<Checkbox checked={isDifferentAddress} onChange={(e) => setIsDifferentAddress(e.target.checked)} />
-									<Typography variant="body2" sx={{ color: "text.main" }}>
-										Use different delivery address?
-									</Typography>
-								</Box>
-								<Tooltip disableHoverListener title={"Specify your delivery address"} placement="top" arrow enterTouchDelay={100}>
-									<TextField
-										disabled={!isDifferentAddress}
-										label="Delivery Address"
-										fullWidth
-										margin="dense"
-										sx={{ boxShadow: (theme) => theme.shadows[1] }}
-										value={deliveryAddress}
-										onChange={(e) => {
-											setDeliveryAddress(e.target.value);
-											if (errors.deliveryAddress.length) {
-												setErrors({ ...errors, deliveryAddress: [] });
-											}
-										}}
-										error={!!errors.deliveryAddress.length}
-										required
-										multiline
-										minRows={4}
-									/>
-								</Tooltip>
-								<FormHelperText error>{errors.deliveryAddress.join(" , ")}</FormHelperText>
-							</Grid>
-						)} */}
 						<Grid item xs={12}>
-							<Tooltip
-								disableHoverListener
-								title={"Add remarks for declaration purpose or if theres anything you want to notify us regarding your parcel"}
-								placement="top"
-								arrow
-								enterTouchDelay={100}
-							>
-								<TextField
-									label="Remark"
-									multiline
-									sx={{ mt: { xs: 2, sm: 0 }, boxShadow: (theme) => theme.shadows[1] }}
-									minRows={4}
-									fullWidth
-									margin="dense"
-									value={remark}
-									onChange={(e) => {
-										setRemark(e.target.value);
-									}}
-								/>
-							</Tooltip>
+							<CustomTextField
+								tooltip="Add remarks for declaration purpose or if theres anything you want to notify us regarding your parcel"
+								label="Remark"
+								multiline
+								value={remark}
+								onChange={(e) => setRemark(e.target.value)}
+							/>
 						</Grid>
 						<Grid item xs={12} sm={6} display={"flex"}>
 							<NextLink href="/member/new-order/acknowledgement" passHref>
@@ -781,44 +551,3 @@ const NumberFormatCustom = forwardRef(function NumberFormatCustom(props, ref) {
 		/>
 	);
 });
-
-function CustomSelector(props) {
-	const { tooltip, errors, required, label, onChange, value, items } = props;
-	return (
-		<Fragment>
-			<Tooltip disableHoverListener title={tooltip} placement="top" arrow enterTouchDelay={100}>
-				<FormControl fullWidth sx={{ mt: { xs: 3, sm: 1 } }}>
-					<InputLabel error={errors.length}>{`${label} ${required ? " *" : ""}`}</InputLabel>
-					<Select
-						value={value}
-						label={`${label} ${required ? " *" : ""}`}
-						onChange={onChange}
-						margin="dense"
-						sx={{ boxShadow: (theme) => theme.shadows[1] }}
-						required
-						error={errors.length}
-					>
-						{items.map((item, index) => (
-							<MenuItem value={item} key={index}>
-								{item}
-							</MenuItem>
-						))}
-					</Select>
-				</FormControl>
-			</Tooltip>
-			<FormHelperText error>{errors.join(" , ")}</FormHelperText>
-		</Fragment>
-	);
-}
-
-function CustomTextField(props) {
-	const { tooltip, errors } = props;
-	return (
-		<Fragment>
-			<Tooltip disableHoverListener title={tooltip} placement="top" arrow enterTouchDelay={100}>
-				<TextField {...props} fullWidth margin="dense" sx={{ boxShadow: (theme) => theme.shadows[1] }} error={errors.length} />
-			</Tooltip>
-			<FormHelperText error>{errors.join(" , ")}</FormHelperText>
-		</Fragment>
-	);
-}
