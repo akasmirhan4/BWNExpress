@@ -46,7 +46,7 @@ export default function SendVerification(params) {
 			auth.currentUser.reload();
 			if (auth.currentUser.emailVerified) {
 				(async () => {
-					console.log("verified!");
+					
 					await updateDoc(doc(firestore, "users", auth.currentUser.uid), { "verified.email": true });
 					router.push("/auth/register/new-user");
 				})();

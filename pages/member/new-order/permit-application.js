@@ -135,7 +135,7 @@ export default function PermitApplication() {
 			} else if (!permitCategories.includes(permitCategory)) {
 				_errors.permitCategory.push("Unknown method");
 			}
-			console.log(productInformations);
+			
 			if (!productInformations.length) _errors.productInformations.push("This is required");
 		}
 		const nErrors = !!Object.values(_errors).reduce((a, v) => a + v.length, 0);
@@ -300,7 +300,7 @@ export default function PermitApplication() {
 															toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
 															return;
 														}
-														console.log(files[i].type);
+														
 														if (
 															![
 																"image/jpeg",
@@ -401,7 +401,7 @@ export default function PermitApplication() {
 								onClick={() => {
 									setLoading(true);
 									const { nErrors, errors } = validateInputs();
-									console.log(errors);
+									
 									setLoading(false);
 									if (!nErrors) {
 										setOpenDialog(true);

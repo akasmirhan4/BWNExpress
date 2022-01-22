@@ -5,7 +5,7 @@ import { Fragment, memo, useEffect, useState } from "react";
 
 export default function OrderSummary(props) {
 	const { orderData } = props || {};
-	console.log(orderData);
+	
 	const [receipts, setReceipts] = useState([]);
 	const [productInformations, setProductInformations] = useState([]);
 	const [bankTransfers, setBankTransfers] = useState([]);
