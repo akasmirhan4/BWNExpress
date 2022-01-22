@@ -310,7 +310,7 @@ export default function Payment() {
 								onClick={() => {
 									setLoading(true);
 									const { nErrors, errors } = validateInputs();
-									console.log(errors);
+									
 									setLoading(false);
 									if (!nErrors) {
 										router.push("summary");

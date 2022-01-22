@@ -501,7 +501,7 @@ export default function Form() {
 								onClick={() => {
 									setLoading(true);
 									const { nErrors, errors } = validateInputs();
-									console.log(errors);
+									
 									setLoading(false);
 									if (!nErrors) {
 										router.push("permit-application");

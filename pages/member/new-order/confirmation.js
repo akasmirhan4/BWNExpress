@@ -17,7 +17,7 @@ export default function Summary() {
 				router.push("acknowledgement");
 			} else if (!window.sessionStorage.getItem("success")) {
 				toast("Redirecting...");
-				console.log({ success: window.sessionStorage.getItem("success") });
+				
 				router.push("form");
 			} else {
 				window.sessionStorage.clear();

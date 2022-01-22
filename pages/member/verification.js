@@ -144,7 +144,7 @@ export default function Verification() {
 										await new PhoneAuthProvider(auth)
 											.verifyPhoneNumber(phoneNo, recaptcha)
 											.then((verificationID) => {
-												console.log({ verificationID });
+												
 												setVerificationID(verificationID);
 												toast(`OTP sent to ${phoneNo}`);
 												setOpenOTPDialog(true);
@@ -184,7 +184,7 @@ export default function Verification() {
 						const phoneCredential = PhoneAuthProvider.credential(verificationID, OTP);
 						await linkWithCredential(auth.currentUser, phoneCredential)
 							.then(async (usercred) => {
-								console.log({ usercred });
+								
 								await updateDoc(doc(firestore, "users", auth.currentUser.uid), { "verified.phoneNo": true });
 								toast.success("Phone number linked 👍");
 							})

@@ -56,7 +56,7 @@ function TrackerComponent(props) {
 					success: "data loaded",
 					error: "error fetching data",
 				});
-				console.log(results);
+				
 				if (!results[0] || !results[1]) {
 					toast.error("Data missing. Redirecting...");
 					router.push("/member/my-orders");

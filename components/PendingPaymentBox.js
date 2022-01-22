@@ -14,7 +14,7 @@ export default function PendingPaymentsBox(props) {
 	const userExist = useSelector(selectUserExists);
 
 	useEffect(() => {
-		console.log("user: ", auth.currentUser);
+		
 		if (userExist) {
 			(async () => {
 				const _pendingPayments = await getPendingPayments();
