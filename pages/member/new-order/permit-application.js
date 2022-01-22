@@ -8,11 +8,6 @@ import {
 	Link,
 	Checkbox,
 	Tooltip,
-	FormControl,
-	InputLabel,
-	Select,
-	MenuItem,
-	FormHelperText,
 	TextField,
 	Dialog,
 	DialogContent,
@@ -30,6 +25,8 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import NewOrderSteppers from "components/NewOrderSteppers";
 import { selectUserData } from "lib/slices/userSlice";
+import { CustomSelector } from "components/FormInputs";
+import CustomUploadButton from "components/CustomUploadButton";
 
 export default function PermitApplication() {
 	const router = useRouter();
@@ -100,19 +97,6 @@ export default function PermitApplication() {
 	}, [userData]);
 
 	useEffect(() => {
-		if (!loaded) return;
-		let data = {
-			requiresPermit,
-			permitCategory,
-			permitRemark,
-			productInformations,
-		};
-		Object.entries(data).forEach(([key, value]) => {
-			window.sessionStorage.setItem(key, value);
-		});
-	}, [requiresPermit, permitCategory, permitRemark, productInformations]);
-
-	useEffect(() => {
 		if (window.sessionStorage.getItem("isAcknowledged") != "true") {
 			toast("Redirecting...");
 			router.push("acknowledgement");
@@ -135,7 +119,7 @@ export default function PermitApplication() {
 			} else if (!permitCategories.includes(permitCategory)) {
 				_errors.permitCategory.push("Unknown method");
 			}
-			
+			console.log(productInformations);
 			if (!productInformations.length) _errors.productInformations.push("This is required");
 		}
 		const nErrors = !!Object.values(_errors).reduce((a, v) => a + v.length, 0);
@@ -225,34 +209,20 @@ export default function PermitApplication() {
 						</Grid>
 						<Grid item xs={12} md={6}>
 							{requiresPermit && (
-								<Fragment>
-									<Tooltip disableHoverListener title={"Select the right permit for your parcel"} placement="top" arrow enterTouchDelay={100}>
-										<FormControl fullWidth sx={{ mt: 1 }}>
-											<InputLabel error={!!errors.permitCategory.length}>Permit Category *</InputLabel>
-											<Select
-												value={permitCategory}
-												label="Permit Category"
-												onChange={(e) => {
-													setPermitCategory(e.target.value);
-													if (errors.permitCategory.length) {
-														setErrors({ ...errors, permitCategory: [] });
-													}
-												}}
-												margin="dense"
-												sx={{ boxShadow: (theme) => theme.shadows[1] }}
-												required
-												error={!!errors.permitCategory.length}
-											>
-												{permitCategories.map((permit, index) => (
-													<MenuItem value={permit} key={index}>
-														{permit}
-													</MenuItem>
-												))}
-											</Select>
-										</FormControl>
-									</Tooltip>
-									<FormHelperText error>{errors.permitCategory.join(" , ")}</FormHelperText>
-								</Fragment>
+								<CustomSelector
+									tooltip="Select the right permit for your parcel"
+									required
+									errors={errors.permitCategory}
+									label={"Permit Category"}
+									items={permitCategories}
+									value={permitCategory}
+									onChange={(e) => {
+										setPermitCategory(e.target.value);
+										if (errors.permitCategory.length) {
+											setErrors({ ...errors, permitCategory: [] });
+										}
+									}}
+								/>
 							)}
 						</Grid>
 						{requiresPermit && (
@@ -267,89 +237,26 @@ export default function PermitApplication() {
 						{requiresPermit && (
 							<Fragment>
 								<Grid item xs={12} md={6}>
-									<Tooltip title={"Accepts only images/pdf/docs with max 5MB size"} placement="top" arrow enterTouchDelay={100}>
-										<Button
-											variant={!errors.productInformations.length ? "contained" : "outlined"}
-											color={!errors.productInformations.length ? "accent" : "error"}
-											sx={{
-												color: !errors.productInformations.length ? "white.main" : "error.main",
-											}}
-											size="large"
-											fullWidth
-											component="label"
-										>
-											upload product informations*
-											<input
-												type="file"
-												hidden
-												multiple
-												accept="image/jpeg,image/png,application/pdf,.doc, .docx,.txt"
-												onChange={async (e) => {
-													const { files } = e.currentTarget;
-													if (!files.length) {
-														toast.error("No file selected");
-														return;
-													}
-													if (files.length > 4) {
-														toast.error("Please select max 4 files only");
-														return;
-													}
-
-													for (let i = 0; i < files.length; i++) {
-														if (files[i].size > 5 * 1024 * 1024) {
-															toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
-															return;
-														}
-														
-														if (
-															![
-																"image/jpeg",
-																"image/png",
-																"application/pdf",
-																"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-																"application/msword",
-																"text/plain",
-															].includes(files[i].type)
-														) {
-															toast.error("Upload images, pdf files, or word files only");
-															return;
-														}
-													}
-													if (errors.productInformations.length) {
-														setErrors({ ...errors, productInformations: [] });
-													}
-
-													const getURL = (file) => {
-														return new Promise(async (resolve) => {
-															const reader = new FileReader();
-															reader.addEventListener(
-																"load",
-																function () {
-																	resolve({ URL: reader.result, name: file.name, type: file.type });
-																},
-																false
-															);
-															reader.readAsDataURL(file);
-														});
-													};
-
-													let batchPromises = [];
-													for (let i = 0; i < files.length; i++) {
-														batchPromises.push(getURL(files[i]));
-													}
-													await Promise.all(batchPromises).then((results) => setProductInformations(JSON.stringify(results)));
-													toast.success("File(s) selected 😎");
-												}}
-											/>
-										</Button>
-									</Tooltip>
-									<FormHelperText>
-										{productInformations?.length > 0 &&
-											`File selected: ${JSON.parse(productInformations)
-												.map(({ name }) => name)
-												.join(" , ")}`}
-									</FormHelperText>
-									<FormHelperText error>{errors.productInformations.join(" , ")}</FormHelperText>
+									<CustomUploadButton
+										onChange={(results) => {
+											if (errors.productInformations.length) {
+												setErrors({ ...errors, productInformations: [] });
+											}
+											console.log(results);
+											try {
+												window.sessionStorage.setItem("productInformations", JSON.stringify(results));
+												setProductInformations(JSON.stringify(results));
+												toast.success("File(s) selected 😎");
+											} catch (e) {
+												toast.error("Files exceeded quota size");
+											}
+										}}
+										tooltip="Accepts only images/pdf/docs with max 5MB size"
+										label="upload product informations"
+										maxFile={4}
+										required
+										value={productInformations}
+									/>
 								</Grid>
 								<Grid item xs={12} md={6}>
 									<Typography sx={{ mt: 1 }}>
@@ -401,7 +308,7 @@ export default function PermitApplication() {
 								onClick={() => {
 									setLoading(true);
 									const { nErrors, errors } = validateInputs();
-									
+									console.log(errors);
 									setLoading(false);
 									if (!nErrors) {
 										setOpenDialog(true);

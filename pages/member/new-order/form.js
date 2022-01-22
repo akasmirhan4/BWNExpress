@@ -12,6 +12,9 @@ import NewOrderSteppers from "components/NewOrderSteppers";
 import { selectUserData } from "lib/slices/userSlice";
 import { internalSecurities, itemCategories, MOHFoodSafeties, MOHPharmacies, deliveryMethods, currencies, couriers } from "lib/formConstant";
 import { CustomSelector, CustomTextField } from "components/FormInputs";
+import { firestore } from "lib/firebase";
+import { collection, doc, setDoc } from "firebase/firestore";
+import CustomUploadButton from "components/CustomUploadButton";
 
 export default function Form() {
 	const router = useRouter();
@@ -31,6 +34,8 @@ export default function Form() {
 	const [isDifferentAddress, setIsDifferentAddress] = useState(false);
 	const [deliveryAddress, setDeliveryAddress] = useState("");
 	const [remark, setRemark] = useState("");
+
+	const [orderID, setOrderID] = useState("");
 
 	const [errors, setErrors] = useState({
 		purchaseFrom: [],
@@ -80,11 +85,16 @@ export default function Form() {
 			setCourierProvider(window.sessionStorage.getItem("courierProvider") ?? "");
 			setSpecificCourierProvider(window.sessionStorage.getItem("specificCourierProvider") ?? "");
 			setTrackingNumber(window.sessionStorage.getItem("trackingNumber") ?? "");
-			setReceipts(window.sessionStorage.getItem("receipts") ?? []);
+			if (window.sessionStorage.getItem("receipts")) {
+				setReceipts(JSON.parse(window.sessionStorage.getItem("receipts")));
+			} else {
+				setReceipts([]);
+			}
 			setDeliveryMethod(window.sessionStorage.getItem("deliveryMethod") ?? "");
 			setIsDifferentAddress(window.sessionStorage.getItem("isDifferentAddress") ?? false);
 			setDeliveryAddress(window.sessionStorage.getItem("deliveryAddress") ?? (userData.deliveryAddress || userData.address || "missing delivery address"));
 			setRemark(window.sessionStorage.getItem("remark") ?? "");
+			setOrderID(window.sessionStorage.getItem("orderID") ?? doc(collection(firestore, `allOrders`)).id);
 			setLoaded(true);
 		}
 	}, [userData]);
@@ -102,11 +112,11 @@ export default function Form() {
 			courierProvider,
 			specificCourierProvider,
 			trackingNumber,
-			receipts,
 			deliveryMethod,
 			isDifferentAddress,
 			deliveryAddress,
 			remark,
+			orderID,
 		};
 		Object.entries(data).forEach(([key, value]) => {
 			window.sessionStorage.setItem(key, value);
@@ -127,6 +137,7 @@ export default function Form() {
 		deliveryAddress,
 		remark,
 		loaded,
+		orderID,
 	]);
 
 	useEffect(() => {
@@ -398,79 +409,24 @@ export default function Form() {
 							)}
 						</Grid>
 						<Grid item xs={12} md={6}>
-							<Tooltip disableHoverListener title={"Accepts only images/pdf with max 5MB size"} placement="top" arrow enterTouchDelay={100}>
-								<Button
-									variant={!errors.receipts.length ? "contained" : "outlined"}
-									color={!errors.receipts.length ? "accent" : "error"}
-									sx={{
-										color: !errors.receipts.length ? "white.main" : "error.main",
-									}}
-									size="large"
-									fullWidth
-									component="label"
-								>
-									upload receipts / invoices / screenshots*
-									<input
-										type="file"
-										hidden
-										multiple
-										accept="image/jpeg,image/png,application/pdf"
-										onChange={async (e) => {
-											const { files } = e.currentTarget;
-											if (!files.length) {
-												toast.error("No file selected");
-												return;
-											}
-											if (files.length > 4) {
-												toast.error("Please select max 4 files only");
-												return;
-											}
-
-											for (let i = 0; i < files.length; i++) {
-												if (files[i].size > 5 * 1024 * 1024) {
-													toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
-													return;
-												}
-												if (!["image/jpeg", "image/png", "application/pdf"].includes(files[i].type)) {
-													toast.error("Upload jpg, png or pdf files only");
-													return;
-												}
-											}
-											if (errors.receipts.length) {
-												setErrors({ ...errors, receipts: [] });
-											}
-
-											const getURL = (file) => {
-												return new Promise(async (resolve) => {
-													const reader = new FileReader();
-													reader.addEventListener(
-														"load",
-														function () {
-															resolve({ URL: reader.result, name: file.name, type: file.type });
-														},
-														false
-													);
-													reader.readAsDataURL(file);
-												});
-											};
-
-											let batchPromises = [];
-											for (let i = 0; i < files.length; i++) {
-												batchPromises.push(getURL(files[i]));
-											}
-											await Promise.all(batchPromises).then((results) => setReceipts(JSON.stringify(results)));
-											toast.success("File(s) selected 😎");
-										}}
-									/>
-								</Button>
-							</Tooltip>
-							<FormHelperText>
-								{receipts?.length > 0 &&
-									`File selected: ${JSON.parse(receipts)
-										.map(({ name }) => name)
-										.join(" , ")}`}
-							</FormHelperText>
-							<FormHelperText error>{errors.receipts.join(" , ")}</FormHelperText>
+							<CustomUploadButton
+								tooltip="Accepts only images/pdf with max 5MB size"
+								errors={errors.receipts}
+								value={receipts}
+								label="upload receipts / invoices / screenshots"
+								required
+								accept="image/jpeg,image/png,application/pdf"
+								maxFile={4}
+								type="receipt"
+								onChange={(results) => {
+									if (errors.receipts.length) {
+										setErrors({ ...errors, receipts: [] });
+									}
+									setReceipts(results);
+									window.sessionStorage.setItem("receipts", JSON.stringify(results));
+									toast.success("File(s) selected 😎");
+								}}
+							/>
 						</Grid>
 						<Grid item xs={12} md={6}>
 							<FormHelperText>
@@ -498,12 +454,28 @@ export default function Form() {
 						</Grid>
 						<Grid item xs={12} sm={6} display={"flex"} justifyContent={"flex-end"}>
 							<LoadingButton
-								onClick={() => {
+								onClick={async () => {
 									setLoading(true);
 									const { nErrors, errors } = validateInputs();
-									
-									setLoading(false);
 									if (!nErrors) {
+										await setDoc(orderRef, {
+											purchaseFrom,
+											weightPrice,
+											parcelValue,
+											itemCategory,
+											currency,
+											itemDescription,
+											courierProvider,
+											specificCourierProvider,
+											trackingNumber,
+											receipts,
+											deliveryMethod,
+											isDifferentAddress,
+											deliveryAddress,
+											remark,
+										});
+
+										setLoading(false);
 										router.push("permit-application");
 									}
 								}}
