@@ -31,6 +31,10 @@ import { useRouter } from "next/router";
 import NewOrderSteppers from "components/NewOrderSteppers";
 import { selectUserData } from "lib/slices/userSlice";
 import { currencyFormatter } from "lib/formatter";
+import { CustomSelector } from "components/FormInputs";
+import CustomUploadButton from "components/CustomUploadButton";
+import { doc, setDoc } from "firebase/firestore";
+import { firestore } from "lib/firebase";
 
 export default function Payment() {
 	const router = useRouter();
@@ -46,7 +50,7 @@ export default function Payment() {
 	const [total, setTotal] = useState(0);
 	const [loaded, setLoaded] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [weightRange, setWeightRange] = useState("");
+	const [parcelWeight, setParcelWeight] = useState("");
 	const [requiresPermit, setRequiresPermit] = useState(false);
 	const [deliveryMethod, setDeliveryMethod] = useState("");
 
@@ -58,8 +62,12 @@ export default function Payment() {
 	useEffect(() => {
 		if (userData) {
 			setPaymentMethod(window.sessionStorage.getItem("paymentMethod") ?? "");
-			setBankTransfers(window.sessionStorage.getItem("bankTransfers") ?? []);
-			setWeightRange(window.sessionStorage.getItem("weightRange") ?? "");
+			if (window.sessionStorage.getItem("bankTransfers")) {
+				setBankTransfers(JSON.parse(window.sessionStorage.getItem("bankTransfers")));
+			} else {
+				setBankTransfers([]);
+			}
+			setParcelWeight(window.sessionStorage.getItem("parcelWeight") ?? "");
 			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") == "true" ?? false);
 			setDeliveryMethod(window.sessionStorage.getItem("deliveryMethod") ?? "");
 			setLoaded(true);
@@ -68,37 +76,33 @@ export default function Payment() {
 
 	useEffect(() => {
 		let total = 0;
-		if (weightRange) {
-			const price = Number(
-				weightRange
-					.split("(")[1]
-					.split(")")[0]
-					.replace(/[^0-9.-]+/g, "")
-			);
-			total = total + price;
+		if (parcelWeight) {
+			total = total + getWeightPrice(parcelWeight);
 		}
 		if (requiresPermit) total = total + 10;
 		if (deliveryMethod == "Home Delivery") total = total + 10;
 		setTotal(total);
 		window.sessionStorage.setItem("total", total);
-	}, [weightRange, requiresPermit, deliveryMethod]);
+	}, [parcelWeight, requiresPermit, deliveryMethod]);
 
 	useEffect(() => {
 		if (!loaded) return;
 		let data = {
 			paymentMethod,
-			bankTransfers,
 		};
 		Object.entries(data).forEach(([key, value]) => {
 			window.sessionStorage.setItem(key, value);
 		});
-	}, [paymentMethod, bankTransfers]);
+	}, [paymentMethod]);
 
 	useEffect(() => {
 		if (window.sessionStorage.getItem("isAcknowledged") != "true") {
 			toast("Redirecting...");
 			router.push("acknowledgement");
-		} else if (!window.sessionStorage.getItem("weightRange")) {
+		} else if (!window.sessionStorage.getItem("requiresPermit")) {
+			toast("Redirecting...");
+			router.push("permit-application");
+		} else if (!window.sessionStorage.getItem("parcelWeight")) {
 			toast("Redirecting...");
 			router.push("form");
 		}
@@ -150,47 +154,28 @@ export default function Payment() {
 				>
 					<Grid container columnSpacing={4} rowSpacing={2}>
 						<Grid item xs={12} md={6} display="flex" justifyContent={"flex-end"}>
-							<Tooltip
-								disableHoverListener
-								title={"You may opt for payment soon; we can process everything before your payment"}
-								placement="top"
-								arrow
-								enterTouchDelay={100}
-							>
-								<FormControl fullWidth sx={{ mt: { xs: 0, sm: 1 } }}>
-									<InputLabel error={!!errors.paymentMethod.length}>Payment Method</InputLabel>
-									<Select
-										value={paymentMethod}
-										label="Payment Method"
-										onChange={(e) => {
-											setPaymentMethod(e.target.value);
-											if (errors.paymentMethod.length) {
-												setErrors({ ...errors, paymentMethod: [] });
-											}
-										}}
-										margin="dense"
-										sx={{ boxShadow: (theme) => theme.shadows[1] }}
-										required
-										error={!!errors.paymentMethod.length}
-									>
-										{paymentMethods.map((method, index) => {
-											return (
-												<MenuItem value={method} key={index}>
-													{method}
-												</MenuItem>
-											);
-										})}
-									</Select>
-								</FormControl>
-							</Tooltip>
+							<CustomSelector
+								tooltip="You may opt for payment soon. We can process everything before your payment"
+								label="Payment Method"
+								required
+								value={paymentMethod}
+								onChange={(e) => {
+									setPaymentMethod(e.target.value);
+									if (errors.paymentMethod.length) {
+										setErrors({ ...errors, paymentMethod: [] });
+									}
+								}}
+								errors={errors.paymentMethod}
+								items={paymentMethods}
+							/>
 						</Grid>
 						<Grid item xs={12} md={6}>
 							<TableContainer>
 								<Table>
 									<TableBody>
 										<TableRow>
-											<TableCell component="th">Parcel Weight:</TableCell>
-											<TableCell>{weightRange ? weightRange.split("(")[1].split(")")[0] : "-"}</TableCell>
+											<TableCell component="th">{`Parcel Weight (${parcelWeight} kg): `}</TableCell>
+											<TableCell>{currencyFormatter.format(getWeightPrice(parcelWeight))}</TableCell>
 										</TableRow>
 										{requiresPermit && (
 											<TableRow>
@@ -215,79 +200,19 @@ export default function Payment() {
 
 						<Grid item xs={12}>
 							{paymentMethod == "Bank Transfer" && (
-								<Fragment>
-									<Tooltip disableHoverListener title={"Accepts only images/pdf with max 5MB size"} placement="top" arrow enterTouchDelay={100}>
-										<Button
-											variant={!errors.bankTransfers.length ? "contained" : "outlined"}
-											color={!errors.bankTransfers.length ? "accent" : "error"}
-											sx={{
-												color: !errors.bankTransfers.length ? "white.main" : "error.main",
-												mt: 4,
-											}}
-											size="large"
-											fullWidth
-											component="label"
-										>
-											upload screenshot of bank transfer
-											<input
-												type="file"
-												hidden
-												accept="image/jpeg,image/png,application/pdf"
-												onChange={async (e) => {
-													const { files } = e.currentTarget;
-													if (!files.length) {
-														toast.error("No file selected");
-														return;
-													}
-													if (files.length > 1) {
-														toast.error("Please select 1 files only");
-														return;
-													}
-
-													if (files[0].size > 5 * 1024 * 1024) {
-														toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
-														return;
-													}
-													if (!["image/jpeg", "image/png", "application/pdf"].includes(files[0].type)) {
-														toast.error("Upload jpg, png or pdf files only");
-														return;
-													}
-													if (errors.bankTransfers.length) {
-														setErrors({ ...errors, bankTransfers: [] });
-													}
-
-													const getURL = (file) => {
-														return new Promise(async (resolve) => {
-															const reader = new FileReader();
-															reader.addEventListener(
-																"load",
-																function () {
-																	resolve({ URL: reader.result, name: file.name, type: file.type });
-																},
-																false
-															);
-															reader.readAsDataURL(file);
-														});
-													};
-
-													let batchPromises = [];
-													for (let i = 0; i < files.length; i++) {
-														batchPromises.push(getURL(files[i]));
-													}
-													await Promise.all(batchPromises).then((results) => setBankTransfers(JSON.stringify(results)));
-													toast.success("File(s) selected 😎");
-												}}
-											/>
-										</Button>
-									</Tooltip>
-									<FormHelperText>
-										{bankTransfers.length > 0 &&
-											`File selected: ${JSON.parse(bankTransfers)
-												.map(({ name }) => name)
-												.join(",")}`}
-									</FormHelperText>
-									<FormHelperText error>{errors.bankTransfers.join(" , ")}</FormHelperText>
-								</Fragment>
+								<CustomUploadButton
+									tooltip="Accepts only images/pdf with max 5MB size"
+									label="upload screenshot of bank transfer"
+									accept="image/jpeg,image/png,application/pdf"
+									type="bankTransfers"
+									maxFile={1}
+									value={bankTransfers}
+									onChange={(results) => {
+										if (errors.bankTransfers.length) setErrors({ ...errors, bankTransfers: [] });
+										setBankTransfers(results);
+										window.sessionStorage.setItem("bankTransfers", JSON.stringify(results));
+									}}
+								/>
 							)}
 						</Grid>
 						{paymentMethod == "Bank Transfer" && (
@@ -307,13 +232,24 @@ export default function Payment() {
 						</Grid>
 						<Grid item xs={12} sm={6} display={"flex"} justifyContent={"flex-end"}>
 							<LoadingButton
-								onClick={() => {
-									setLoading(true);
-									const { nErrors, errors } = validateInputs();
-									
-									setLoading(false);
-									if (!nErrors) {
-										router.push("summary");
+								onClick={async () => {
+									try {
+										setLoading(true);
+										const { nErrors } = validateInputs();
+										setLoading(false);
+										if (!nErrors) {
+											setLoading(true);
+											const dataToUpdate = {
+												paymentMethod,
+											};
+											const orderID = window.sessionStorage.getItem("orderID");
+											if (!orderID) throw "missing order ID";
+											await setDoc(doc(firestore, "allOrders", orderID), dataToUpdate, { merge: true });
+											await router.push("summary");
+											setLoading(false);
+										}
+									} catch (e) {
+										toast.error(e);
 									}
 								}}
 								disabled={!!Object.values(errors).reduce((a, v) => a + v.length, 0)}
@@ -332,4 +268,39 @@ export default function Payment() {
 			</Container>
 		</MemberPageTemplate>
 	);
+}
+
+function getWeightPrice(weight) {
+	const numWeight = Number(weight);
+	/* 
+	0.1kg to 1.99kg - $6
+	2kg to 3.99kg - $9
+	4kg to 5.99kg - $12
+	6kg to 7.99kg - $15
+	8kg to 9.99kg - $18
+	10kg to 11.99kg - $21
+	12kg to 13.99kg - $24
+	14kg to 15.99kg - $27
+	16kg to 17.99kg - $30
+	18kg to 19.99kg - $33
+	20kg to 21.99kg - $36
+	22kg to 23.99kg - $39
+	24kg to 25.99kg - $42
+	26kg and above - $3 per kilo 
+	*/
+
+	if (numWeight > 0 && numWeight < 2) return 6;
+	if (numWeight < 4) return 9;
+	if (numWeight < 6) return 12;
+	if (numWeight < 8) return 15;
+	if (numWeight < 10) return 18;
+	if (numWeight < 12) return 21;
+	if (numWeight < 14) return 24;
+	if (numWeight < 16) return 27;
+	if (numWeight < 18) return 30;
+	if (numWeight < 20) return 33;
+	if (numWeight < 22) return 36;
+	if (numWeight < 24) return 39;
+	if (numWeight < 26) return 42;
+	if (numWeight >= 26) return 42 + 3 * Math.ceil(numWeight - 26);
 }

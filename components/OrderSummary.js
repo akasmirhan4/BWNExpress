@@ -1,11 +1,10 @@
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Skeleton, Link } from "@mui/material";
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Link } from "@mui/material";
 import { currencyFormatter } from "lib/formatter";
-import Image from "next/image";
 import { Fragment, memo, useEffect, useState } from "react";
 
 export default function OrderSummary(props) {
 	const { orderData } = props || {};
-	
+	console.log(orderData);
 	const [receipts, setReceipts] = useState([]);
 	const [productInformations, setProductInformations] = useState([]);
 	const [bankTransfers, setBankTransfers] = useState([]);
@@ -73,10 +72,6 @@ export default function OrderSummary(props) {
 	);
 }
 
-const PDFViewer = memo(function PDFViewer(props) {
-	return <embed src={`${props.src}#toolbar=0&navpanes=0&scrollbar=0`} width="100%" height="100%" style={{ position: "absolute", zIndex: -1 }} />;
-});
-
 function OrderTable(props) {
 	const orderData = props.orderData;
 
@@ -125,8 +120,8 @@ function OrderTable(props) {
 						<TableCell>{orderData?.itemDescription}</TableCell>
 					</TableRow>
 					<TableRow>
-						<TableCell component={"th"}>Weight Range</TableCell>
-						<TableCell>{orderData?.weightRange}</TableCell>
+						<TableCell component={"th"}>Parcel Weight</TableCell>
+						<TableCell>{`${orderData?.parcelWeight} kg`}</TableCell>
 					</TableRow>
 					<TableRow>
 						<TableCell component={"th"}>Courier Provider</TableCell>

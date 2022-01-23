@@ -22,7 +22,10 @@ export default function Summary() {
 		if (window.sessionStorage.getItem("isAcknowledged") != "true") {
 			toast("Redirecting...");
 			router.push("acknowledgement");
-		} else if (!window.sessionStorage.getItem("weightRange")) {
+		} else if (!window.sessionStorage.getItem("requiresPermit")) {
+			toast("Redirecting...");
+			router.push("permit-application");
+		} else if (!window.sessionStorage.getItem("parcelWeight")) {
 			toast("Redirecting...");
 			router.push("form");
 		} else if (!window.sessionStorage.getItem("paymentMethod")) {
@@ -32,7 +35,7 @@ export default function Summary() {
 			let details = {};
 			let keys = [
 				"purchaseFrom",
-				"weightRange",
+				"parcelWeight",
 				"itemCategory",
 				"parcelValue",
 				"currency",
@@ -105,9 +108,11 @@ export default function Summary() {
 							<LoadingButton
 								onClick={async () => {
 									setLoading(true);
-									const orderDataCopy = { ...newOrderData };
-									delete orderDataCopy.receipt;
-									delete orderDataCopy.bankTransfer;
+									console.log(newOrderData);
+									const orderDataCopy = { ...newOrderData, complete: true };
+									delete orderDataCopy.receipts;
+									delete orderDataCopy.bankTransfers;
+									delete orderDataCopy.productInformations;
 									let success = false;
 									await toast
 										.promise(
@@ -117,28 +122,15 @@ export default function Summary() {
 											)(orderDataCopy).then(async ({ data }) => {
 												success = data.success;
 												if (!success) throw "Error adding order";
-												const receiptMetadata = JSON.parse(newOrderData.receiptMetadata);
-												const receipt = new File([await (await fetch(newOrderData.receipt)).blob()], receiptMetadata.name, { type: receiptMetadata.type });
-												await uploadBytes(ref(storage, `users/${auth.currentUser.uid}/orders/${data.id}/receipt`), receipt);
-
-												if (newOrderData.bankTransfer) {
-													const bankTransferMetadata = JSON.parse(newOrderData.bankTransferMetadata);
-													const bankTransfer = new File([await (await fetch(newOrderData.bankTransfer)).blob()], bankTransferMetadata.name, {
-														type: bankTransferMetadata.type,
-													});
-													await uploadBytes(ref(storage, `users/${auth.currentUser.uid}/orders/${data.id}/bankTransfer`), bankTransfer);
-												}
 												window.sessionStorage.setItem("success", "true");
+												await router.push("confirmation");
+												setLoading(false);
 											}),
-
 											{ loading: "Submitting order...", success: "Order submitted 👌", error: "Error submitting order 😫" }
 										)
 										.finally(() => {
 											setLoading(false);
 										});
-									if (success) {
-										router.push("confirmation");
-									}
 								}}
 								disabled={!isAccurate}
 								endIcon={<ChevronRightRounded />}

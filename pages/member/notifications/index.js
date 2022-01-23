@@ -184,7 +184,7 @@ function NotificationCard(props) {
 								<IconButton
 									onClick={async (e) => {
 										e.preventDefault();
-										
+										console.log("unarchived");
 										await archiveNotification(props.id, false);
 									}}
 								>
@@ -194,7 +194,7 @@ function NotificationCard(props) {
 								<IconButton
 									onClick={async (e) => {
 										e.preventDefault();
-										
+										console.log("archived");
 										await archiveNotification(props.id);
 									}}
 								>

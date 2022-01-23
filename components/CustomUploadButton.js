@@ -42,56 +42,61 @@ export default function CustomUploadButton(props) {
 						accept={accept}
 						onChange={async (e) => {
 							setLoading(true);
-							const { files } = e.currentTarget;
-							if (required && !files.length) {
-								toast.error("No file selected");
-								return;
-							}
-							if (files.length > maxFile) {
-								toast.error(`Please select max ${maxFile} files only`);
-								return;
-							}
-
-							for (let i = 0; i < files.length; i++) {
-								if (files[i].size > 5 * 1024 * 1024) {
-									toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
+							try {
+								const { files } = e.currentTarget;
+								if (required && !files.length) {
+									toast.error("No file selected");
 									return;
 								}
-								let acceptFileTypes = [];
-								const acceptArray = accept.split(",");
-								if (acceptArray.includes("image/jpeg")) acceptFileTypes.push("image/jpeg", "image/png");
-								if (acceptArray.includes("application/pdf")) acceptFileTypes.push("application/pdf");
-								if (acceptArray.includes(".doc"))
-									acceptFileTypes.push("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword", "text/plain");
-								if (!acceptFileTypes.includes(files[i].type)) {
-									toast.error("Upload images, pdf files, or word files only");
+								if (files.length > maxFile) {
+									toast.error(`Please select max ${maxFile} files only`);
 									return;
 								}
+
+								for (let i = 0; i < files.length; i++) {
+									if (files[i].size > 5 * 1024 * 1024) {
+										toast.error("File(s) exceed 5MB. Please compress before uploading the file(s).");
+										return;
+									}
+									let acceptFileTypes = [];
+									const acceptArray = accept.split(",");
+									if (acceptArray.includes("image/jpeg")) acceptFileTypes.push("image/jpeg", "image/png");
+									if (acceptArray.includes("application/pdf")) acceptFileTypes.push("application/pdf");
+									if (acceptArray.includes(".doc"))
+										acceptFileTypes.push("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword", "text/plain");
+									if (!acceptFileTypes.includes(files[i].type)) {
+										toast.error("Upload images, pdf files, or word files only");
+										return;
+									}
+								}
+
+								const orderID = window.sessionStorage.getItem("orderID");
+								if (!orderID) throw "missing orderID";
+
+								const getURL = (file) => {
+									return new Promise(async (resolve) => {
+										const storageRef = ref(storage, `users/${auth.currentUser.uid}/orders/${orderID}/${type}/${file.name}`);
+										await uploadBytes(storageRef, file);
+										const URL = await getDownloadURL(storageRef);
+										resolve({ URL, ref: storageRef, name: file.name, type: file.type });
+									});
+								};
+
+								let batchPromises = [];
+								// Delete all files in folder
+								const folderRef = ref(storage, `users/${auth.currentUser.uid}/orders/${orderID}/${type}`);
+								const batchDelete = await listAll(folderRef).then((results) => results.items.map(deleteObject));
+								await Promise.all(batchDelete);
+
+								for (let i = 0; i < files.length; i++) {
+									batchPromises.push(getURL(files[i]));
+								}
+
+								await toast.promise(Promise.all(batchPromises).then(onChange), { loading: "uploading...", success: "File(s) selected 😎" });
+							} catch (e) {
+								console.error(e);
+								toast.error(JSON.stringify(e));
 							}
-
-							const orderID = window.sessionStorage.getItem("orderID");
-							if (!orderID) throw "missing orderID";
-
-							const getURL = (file) => {
-								return new Promise(async (resolve) => {
-									const storageRef = ref(storage, `users/${auth.currentUser.uid}/orders/${orderID}/${type}/${file.name}`);
-									await uploadBytes(storageRef, file);
-									const URL = await getDownloadURL(storageRef);
-									resolve({ URL, ref: storageRef, name: file.name, type: file.type });
-								});
-							};
-
-							let batchPromises = [];
-							// Delete all files in folder
-							const folderRef = ref(storage, `users/${auth.currentUser.uid}/orders/${orderID}/${type}`);
-							const batchDelete = await listAll(folderRef).then((results) => results.items.map(deleteObject));
-							await Promise.all(batchDelete);
-
-							for (let i = 0; i < files.length; i++) {
-								batchPromises.push(getURL(files[i]));
-							}
-
-							await toast.promise(Promise.all(batchPromises).then(onChange), { loading: "uploading..." });
 							setLoading(false);
 						}}
 					/>

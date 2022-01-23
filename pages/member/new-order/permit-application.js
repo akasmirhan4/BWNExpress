@@ -27,6 +27,8 @@ import NewOrderSteppers from "components/NewOrderSteppers";
 import { selectUserData } from "lib/slices/userSlice";
 import { CustomSelector } from "components/FormInputs";
 import CustomUploadButton from "components/CustomUploadButton";
+import { doc, setDoc } from "firebase/firestore";
+import { firestore } from "lib/firebase";
 
 export default function PermitApplication() {
 	const router = useRouter();
@@ -81,7 +83,11 @@ export default function PermitApplication() {
 			]);
 		}
 		setPermitRemark(window.sessionStorage.getItem("permitRemark") ?? "");
-		setProductInformations(window.sessionStorage.getItem("productInformations") ?? []);
+		if (window.sessionStorage.getItem("productInformations")) {
+			setProductInformations(JSON.parse(window.sessionStorage.getItem("productInformations")));
+		} else {
+			setProductInformations([]);
+		}
 		setLoaded(true);
 	};
 
@@ -97,10 +103,18 @@ export default function PermitApplication() {
 	}, [userData]);
 
 	useEffect(() => {
+		window.sessionStorage.setItem("requiresPermit", requiresPermit);
+	}, [requiresPermit]);
+
+	useEffect(() => {
+		window.sessionStorage.setItem("permitCategory", permitCategory);
+	}, [permitCategory]);
+
+	useEffect(() => {
 		if (window.sessionStorage.getItem("isAcknowledged") != "true") {
 			toast("Redirecting...");
 			router.push("acknowledgement");
-		} else if (!window.sessionStorage.getItem("weightRange")) {
+		} else if (!window.sessionStorage.getItem("parcelWeight")) {
 			toast("Redirecting...");
 			router.push("form");
 		}
@@ -144,14 +158,16 @@ export default function PermitApplication() {
 					<Button
 						onClick={() => {
 							setOpenDialog(false);
+							setLoading(false);
 						}}
 					>
 						Cancel
 					</Button>
 					<Button
-						onClick={() => {
+						onClick={async () => {
 							setOpenDialog(false);
-							router.push("payment");
+							await router.push("payment");
+							setLoading(false);
 						}}
 					>
 						I Understand
@@ -181,7 +197,7 @@ export default function PermitApplication() {
 					borderRadius={4}
 				>
 					<Grid container columnSpacing={4} rowSpacing={2}>
-						{permitCategory.startsWith("MOH") && (
+						{requiresPermit && permitCategory.startsWith("MOH") && (
 							<Grid item xs={12}>
 								<Typography variant="subtitle1" color="error.main" sx={{ ml: 1 }}>
 									<span style={{ fontWeight: "bold" }}>Please Note: </span>
@@ -242,18 +258,13 @@ export default function PermitApplication() {
 											if (errors.productInformations.length) {
 												setErrors({ ...errors, productInformations: [] });
 											}
-											console.log(results);
-											try {
-												window.sessionStorage.setItem("productInformations", JSON.stringify(results));
-												setProductInformations(JSON.stringify(results));
-												toast.success("File(s) selected 😎");
-											} catch (e) {
-												toast.error("Files exceeded quota size");
-											}
+											setProductInformations(results);
+											window.sessionStorage.setItem("productInformations", JSON.stringify(results));
 										}}
 										tooltip="Accepts only images/pdf/docs with max 5MB size"
 										label="upload product informations"
 										maxFile={4}
+										type="permits"
 										required
 										value={productInformations}
 									/>
@@ -305,13 +316,25 @@ export default function PermitApplication() {
 						</Grid>
 						<Grid item xs={12} sm={6} display={"flex"} justifyContent={"flex-end"}>
 							<LoadingButton
-								onClick={() => {
-									setLoading(true);
-									const { nErrors, errors } = validateInputs();
-									console.log(errors);
-									setLoading(false);
-									if (!nErrors) {
-										setOpenDialog(true);
+								onClick={async () => {
+									try {
+										setLoading(true);
+										const { nErrors, errors } = validateInputs();
+										console.log(errors);
+										setLoading(false);
+										if (!nErrors) {
+											setLoading(true);
+											const dataToUpdate = {
+												requiresPermit,
+												permitCategory,
+											};
+											const orderID = window.sessionStorage.getItem("orderID");
+											if (!orderID) throw "missing order ID";
+											await setDoc(doc(firestore, "allOrders", orderID), dataToUpdate, { merge: true });
+											setOpenDialog(true);
+										}
+									} catch (e) {
+										toast.error(e);
 									}
 								}}
 								disabled={!!Object.values(errors).reduce((a, v) => a + v.length, 0)}

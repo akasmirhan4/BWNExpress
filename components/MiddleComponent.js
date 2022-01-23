@@ -6,7 +6,6 @@ import { routeManager } from "lib/routeManager";
 import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
 import { Backdrop, CircularProgress } from "@mui/material";
-import toast from "react-hot-toast";
 import { trace } from "firebase/performance";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 
@@ -37,7 +36,7 @@ function MiddleComponent(props) {
 	useEffect(() => {
 		auth.onAuthStateChanged(async (user) => {
 			setIsLoading(true);
-			
+			console.log("user update", user);
 			if (user) {
 				user.getIdTokenResult().then(({ claims }) => {
 					if (claims.moderator) {
@@ -52,7 +51,7 @@ function MiddleComponent(props) {
 				dispatch(setAvatarURL(await getAvatarURL()));
 				const userSnapshot = onSnapshot(doc(firestore, "users", user.uid), (doc) => {
 					const userData = doc.data();
-					
+					console.log("userData update", userData);
 					if (!userData) return;
 					const dispatchData = {
 						...userData,
@@ -71,12 +70,12 @@ function MiddleComponent(props) {
 						const data = doc.data();
 						notifications.push({ ...data, timestamp: data.timestamp.toDate().toISOString(), id: doc.id });
 					});
-					
+					console.log("notifications update", notifications);
 					dispatch(setNotifications(notifications));
 				});
 				setSnapshots([userSnapshot, notificationSnapshot]);
 			} else {
-				
+				console.log("logging out");
 				dispatch(setUserExists(false));
 				dispatch(setUserData(null));
 				setIsLoading(false);
@@ -94,7 +93,7 @@ function MiddleComponent(props) {
 			if (!userData) return;
 
 			if (userData.FCM) {
-				
+				console.log(userData.FCM?.timestamp);
 				if (new Date().getTime() - userData.FCM?.timestamp > 2 * 7 * 24 * 60 * 60 * 1000) setFCM();
 			} else {
 				await setFCM();

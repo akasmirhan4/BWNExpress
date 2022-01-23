@@ -13,7 +13,7 @@ import { selectUserData } from "lib/slices/userSlice";
 import { internalSecurities, itemCategories, MOHFoodSafeties, MOHPharmacies, deliveryMethods, currencies, couriers } from "lib/formConstant";
 import { CustomSelector, CustomTextField } from "components/FormInputs";
 import { firestore } from "lib/firebase";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
 import CustomUploadButton from "components/CustomUploadButton";
 
 export default function Form() {
@@ -35,7 +35,7 @@ export default function Form() {
 	const [deliveryAddress, setDeliveryAddress] = useState("");
 	const [remark, setRemark] = useState("");
 
-	const [orderID, setOrderID] = useState("");
+	const [orderID, setOrderID] = useState(null);
 
 	const [errors, setErrors] = useState({
 		purchaseFrom: [],
@@ -94,10 +94,16 @@ export default function Form() {
 			setIsDifferentAddress(window.sessionStorage.getItem("isDifferentAddress") ?? false);
 			setDeliveryAddress(window.sessionStorage.getItem("deliveryAddress") ?? (userData.deliveryAddress || userData.address || "missing delivery address"));
 			setRemark(window.sessionStorage.getItem("remark") ?? "");
-			setOrderID(window.sessionStorage.getItem("orderID") ?? doc(collection(firestore, `allOrders`)).id);
 			setLoaded(true);
 		}
 	}, [userData]);
+
+	useEffect(() => {
+		if (orderID) return;
+		const docRef = doc(collection(firestore, `allOrders`));
+		setOrderID(docRef.id);
+		window.sessionStorage.setItem("orderID", docRef.id);
+	}, [orderID]);
 
 	useEffect(() => {
 		if (!loaded) return;
@@ -116,7 +122,6 @@ export default function Form() {
 			isDifferentAddress,
 			deliveryAddress,
 			remark,
-			orderID,
 		};
 		Object.entries(data).forEach(([key, value]) => {
 			window.sessionStorage.setItem(key, value);
@@ -137,7 +142,6 @@ export default function Form() {
 		deliveryAddress,
 		remark,
 		loaded,
-		orderID,
 	]);
 
 	useEffect(() => {
@@ -417,14 +421,13 @@ export default function Form() {
 								required
 								accept="image/jpeg,image/png,application/pdf"
 								maxFile={4}
-								type="receipt"
+								type="receipts"
 								onChange={(results) => {
 									if (errors.receipts.length) {
 										setErrors({ ...errors, receipts: [] });
 									}
 									setReceipts(results);
 									window.sessionStorage.setItem("receipts", JSON.stringify(results));
-									toast.success("File(s) selected 😎");
 								}}
 							/>
 						</Grid>
@@ -438,6 +441,7 @@ export default function Form() {
 								tooltip="Add remarks for declaration purpose or if theres anything you want to notify us regarding your parcel"
 								label="Remark"
 								multiline
+								minRows={4}
 								value={remark}
 								onChange={(e) => setRemark(e.target.value)}
 							/>
@@ -456,9 +460,10 @@ export default function Form() {
 							<LoadingButton
 								onClick={async () => {
 									setLoading(true);
-									const { nErrors, errors } = validateInputs();
+									const { nErrors } = validateInputs();
 									if (!nErrors) {
-										await setDoc(orderRef, {
+										const dataToUpdate = {
+											timestamp: serverTimestamp(),
 											purchaseFrom,
 											weightPrice,
 											parcelValue,
@@ -468,16 +473,15 @@ export default function Form() {
 											courierProvider,
 											specificCourierProvider,
 											trackingNumber,
-											receipts,
 											deliveryMethod,
 											isDifferentAddress,
 											deliveryAddress,
 											remark,
-										});
-
-										setLoading(false);
-										router.push("permit-application");
+										};
+										await setDoc(doc(firestore, "allOrders", orderID), dataToUpdate, { merge: true });
+										await router.push("permit-application");
 									}
+									setLoading(false);
 								}}
 								disabled={!!Object.values(errors).reduce((a, v) => a + v.length, 0)}
 								endIcon={<ChevronRightRounded />}
