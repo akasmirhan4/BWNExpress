@@ -231,7 +231,7 @@ function EnhancedTableRow(props) {
 
 	return (
 		<Fragment>
-			<TableRow key={row.orderID} sx={{ "& > *": { borderBottom: "unset" } }}>
+			<TableRow key={row.orderID}>
 				{isMdDown && (
 					<TableCell sx={{ px: 0, width: "1em" }}>
 						<IconButton aria-label="expand row" size="small" onClick={() => setCollapseOpen(!collapseOpen)}>

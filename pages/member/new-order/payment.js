@@ -76,12 +76,12 @@ export default function Payment() {
 
 	useEffect(() => {
 		let total = 0;
-		if (parcelWeight) {
-			total = total + getWeightPrice(parcelWeight);
-		}
+		const weightPrice = getWeightPrice(parcelWeight);
+		total = total + weightPrice;
 		if (requiresPermit) total = total + 10;
 		if (deliveryMethod == "Home Delivery") total = total + 10;
 		setTotal(total);
+		window.sessionStorage.setItem("weightPrice", weightPrice);
 		window.sessionStorage.setItem("total", total);
 	}, [parcelWeight, requiresPermit, deliveryMethod]);
 
