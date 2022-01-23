@@ -7,10 +7,9 @@ import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
 import NewOrderSteppers from "components/NewOrderSteppers";
 import { ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
-import { functions, auth, storage } from "lib/firebase";
+import { functions } from "lib/firebase";
 import OrderSummary from "components/OrderSummary";
 import { httpsCallable } from "firebase/functions";
-import { ref, uploadBytes } from "firebase/storage";
 
 export default function Summary() {
 	const router = useRouter();
@@ -52,6 +51,7 @@ export default function Summary() {
 				"deliveryAddress",
 				"remark",
 				"requiresPermit",
+				"weightPrice",
 				"permitCategory",
 				"permitRemark",
 				"total",
@@ -108,8 +108,8 @@ export default function Summary() {
 							<LoadingButton
 								onClick={async () => {
 									setLoading(true);
-									console.log(newOrderData);
-									const orderDataCopy = { ...newOrderData, complete: true };
+									const orderID = window.sessionStorage.getItem("orderID");
+									const orderDataCopy = { ...newOrderData, orderID, complete: true };
 									delete orderDataCopy.receipts;
 									delete orderDataCopy.bankTransfers;
 									delete orderDataCopy.productInformations;

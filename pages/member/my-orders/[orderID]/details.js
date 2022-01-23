@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { selectOrders, selectUserExists } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import { auth, getbankTransferURL, getOrder, getReceiptURL } from "lib/firebase";
+import { getOrder } from "lib/firebase";
 import toast from "react-hot-toast";
 import NextLink from "next/link";
 
@@ -14,8 +14,6 @@ export default function Details() {
 	const orders = useSelector(selectOrders);
 	const router = useRouter();
 	const [orderData, setOrderData] = useState(null);
-	const [receiptURL, setReceiptURL] = useState(null);
-	const [bankTransferURL, setBankTransferURL] = useState(null);
 	const userExist = useSelector(selectUserExists);
 
 	useEffect(() => {
@@ -41,9 +39,6 @@ export default function Details() {
 				if (!success) {
 					toast.error("Error getting data. Redirecting...");
 					router.push("/member/my-orders");
-				} else {
-					setReceiptURL(await getReceiptURL(router.query.orderID));
-					setBankTransferURL(await getbankTransferURL(router.query.orderID));
 				}
 			})();
 		}
@@ -53,7 +48,7 @@ export default function Details() {
 		<MemberPageTemplate>
 			<Container sx={{ my: 4 }}>
 				<Breadcrumbs aria-label="breadcrumb">
-					<NextLink href="/member/my-orders"  passHref>
+					<NextLink href="/member/my-orders" passHref>
 						<Link underline="hover" color="inherit">
 							My Orders
 						</Link>
@@ -70,7 +65,7 @@ export default function Details() {
 					bgcolor={"white.main"}
 					borderRadius={4}
 				>
-					<OrderSummary orderData={orderData} receiptURL={receiptURL} bankTransferURL={bankTransferURL} />
+					<OrderSummary orderData={orderData} />
 				</Box>
 			</Container>
 		</MemberPageTemplate>

@@ -12,7 +12,7 @@ import NewOrderSteppers from "components/NewOrderSteppers";
 import { selectUserData } from "lib/slices/userSlice";
 import { internalSecurities, itemCategories, MOHFoodSafeties, MOHPharmacies, deliveryMethods, currencies, couriers } from "lib/formConstant";
 import { CustomSelector, CustomTextField } from "components/FormInputs";
-import { firestore } from "lib/firebase";
+import { auth, firestore } from "lib/firebase";
 import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
 import CustomUploadButton from "components/CustomUploadButton";
 
@@ -331,7 +331,6 @@ export default function Form() {
 						</Grid>
 						<Grid item xs={12} sm={8} md={4}>
 							<CustomTextField
-								type="number"
 								tooltip={"Match the exact amount in your receipt(s)"}
 								label="Parcel Value"
 								value={parcelValue}
@@ -477,7 +476,10 @@ export default function Form() {
 											isDifferentAddress,
 											deliveryAddress,
 											remark,
+											userID: auth.currentUser.uid,
+											userRef: doc(firestore, "users", auth.currentUser.uid),
 										};
+										await setDoc(doc(firestore, "users", auth.currentUser.uid, "orders", orderID), { orderRef: doc(firestore, "allOrders", orderID), orderID });
 										await setDoc(doc(firestore, "allOrders", orderID), dataToUpdate, { merge: true });
 										await router.push("permit-application");
 									}
