@@ -118,7 +118,7 @@ export default function Payment() {
 		if (!paymentMethods.includes(paymentMethod)) {
 			_errors.paymentMethod.push("Unknown method");
 		} else if (paymentMethod == "Bank Transfer") {
-			if (!bankTransfers) _errors.bankTransfers.push("This is required");
+			if (!bankTransfers.length) _errors.bankTransfers.push("This is required");
 		}
 		const nErrors = !!Object.values(_errors).reduce((a, v) => a + v.length, 0);
 		if (!!nErrors) {
@@ -161,9 +161,8 @@ export default function Payment() {
 								value={paymentMethod}
 								onChange={(e) => {
 									setPaymentMethod(e.target.value);
-									if (errors.paymentMethod.length) {
-										setErrors({ ...errors, paymentMethod: [] });
-									}
+									if (errors.paymentMethod.length) setErrors({ ...errors, paymentMethod: [] });
+									if (errors.bankTransfers.length) setErrors({ ...errors, bankTransfers: [] });
 								}}
 								errors={errors.paymentMethod}
 								items={paymentMethods}
