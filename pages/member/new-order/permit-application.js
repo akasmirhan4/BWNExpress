@@ -211,7 +211,8 @@ export default function PermitApplication() {
 						{itemCategory == "Books" && (
 							<Grid item xs={12}>
 								<Typography variant="subtitle1" color="error.main" sx={{ ml: 1 }}>
-									Select permit category as "Pusat Dakhwah Islamiah" if the product is considered a religious books. Else select "Internal Security".
+									If the product is considered a religious books select <span style={{ fontWeight: "bold" }}>Pusat Dakhwah Islamiah</span>; else select
+									<span style={{ fontWeight: "bold" }}>Internal Security</span>
 								</Typography>
 							</Grid>
 						)}
