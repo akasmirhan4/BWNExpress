@@ -205,6 +205,7 @@ export default function MyOrders() {
 						</TableBody>
 					</Table>
 				</TableContainer>
+				{!displayedRows.length && <Typography sx={{ my: 4, textAlign: "center" }}>😢 Nothing to display</Typography>}
 				{loading && (
 					<Fragment>
 						<Skeleton variant="rectangular" width={"100%"} height={"2em"} sx={{ my: 1 }} />
