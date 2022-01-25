@@ -413,7 +413,7 @@ function NewUserContainer(props) {
 									preferredName,
 									IC,
 									gender,
-									DOB: DOB.toLocaleDateString(),
+									DOB: DOB.toISOString(),
 									phoneNo,
 									address,
 									isDifferentAddress,
