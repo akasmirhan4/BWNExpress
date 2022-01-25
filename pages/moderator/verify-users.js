@@ -1,4 +1,4 @@
-import { CheckRounded, CloseRounded, EditRounded, SendRounded, ZoomInRounded } from "@mui/icons-material";
+import { CheckRounded, CloseRounded, EditRounded, SendRounded, SentimentVeryDissatisfiedRounded, ZoomInRounded } from "@mui/icons-material";
 import { DatePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import {
@@ -54,12 +54,20 @@ export default function VerifyUsers() {
 					<Typography color="text.primary">Verify Users</Typography>
 				</Breadcrumbs>
 				<Grid container spacing={2}>
-					{pendingUsers.length > 0 &&
+					{pendingUsers.length > 0 ? (
 						pendingUsers.map((user, index) => (
 							<Grid item xs={12} md={6} key={index}>
 								<PendingUserCard user={user} />
 							</Grid>
-						))}
+						))
+					) : (
+						<Grid item xs={12}>
+							<Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", mt: 4 }}>
+								<Typography variant="h6">🥱</Typography>
+								<Typography>No pending Users...</Typography>
+							</Box>
+						</Grid>
+					)}
 				</Grid>
 			</Container>
 		</ModeratorPageTemplate>
@@ -78,13 +86,15 @@ function PendingUserCard(props) {
 	const getICURLs = async (userID) => {
 		try {
 			const list = await listAll(ref(storage, `/users/${userID}/IC`));
+			console.log({ list, items: list.items });
 			const names = list.items.map(({ name }) => name);
 			const promises = list.items.map(getDownloadURL);
 			const URLS = await Promise.all(promises);
 			return URLS.map((URL, index) => {
 				return { URL, name: names[index], ref: list.items[index] };
 			});
-		} catch {
+		} catch (e) {
+			console.error(e);
 			return [];
 		}
 	};

@@ -426,7 +426,10 @@ function NewUserContainer(props) {
 										functions,
 										"setUserDetails"
 									)(updateDetails).then(({ data }) => {
-										if (!data.success) throw "Error in backend";
+										if (!data.success) {
+											setValidity(data.validity);
+											throw "Error in backend";
+										}
 										setLoaded(true);
 										router.push("/auth/register/upload-ic");
 									}),
