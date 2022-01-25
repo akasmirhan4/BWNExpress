@@ -41,8 +41,8 @@ export default function PermitApplication() {
 	const [openDialog, setOpenDialog] = useState(false);
 	const [itemCategory, setitemCategory] = useState("");
 	const [permitCategories, setPermitCategories] = useState([
-		"MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)",
-		"MOH Food Safety and Quality Unit (Food products, coffee and other drinks)",
+		"MOH Pharmacy",
+		"MOH Food Safety and Quality Unit",
 		"Pusat Dakhwah Islamiah (Religious books)",
 		"Internal Security (All Books)",
 	]);
@@ -103,10 +103,12 @@ export default function PermitApplication() {
 	}, [userData]);
 
 	useEffect(() => {
+		if (!loaded) return;
 		window.sessionStorage.setItem("requiresPermit", requiresPermit);
 	}, [requiresPermit]);
-
+	
 	useEffect(() => {
+		if (!loaded) return;
 		window.sessionStorage.setItem("permitCategory", permitCategory);
 	}, [permitCategory]);
 
@@ -211,8 +213,8 @@ export default function PermitApplication() {
 						{itemCategory == "Books" && (
 							<Grid item xs={12}>
 								<Typography variant="subtitle1" color="error.main" sx={{ ml: 1 }}>
-									If the product is considered a religious books select <span style={{ fontWeight: "bold" }}>Pusat Dakhwah Islamiah</span>; else select
-									<span style={{ fontWeight: "bold" }}>Internal Security</span>
+									If the product is considered a religious books select <span style={{ fontWeight: "bold" }}>Pusat Dakhwah Islamiah</span>; else select{" "}
+									<span style={{ fontWeight: "bold" }}>Internal Security</span>.
 								</Typography>
 							</Grid>
 						)}
