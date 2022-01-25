@@ -91,6 +91,7 @@ export default function Verification() {
 								<NextLink href={"/member/upload-ic"} passHref>
 									<LoadingButton
 										loading={!userData || verified?.IC == "pending"}
+										disabled={verified?.IC == true}
 										variant="contained"
 										fullWidth
 										endIcon={verified?.IC == true ? <CheckRounded /> : verified?.IC == "uploadingLater" ? <UploadRounded /> : null}
@@ -119,7 +120,7 @@ export default function Verification() {
 					</Grid>
 					<Grid item xs={4} sx={{ display: "flex", alignItems: "center" }}>
 						<Button disabled={!userData || verified?.email} variant="contained" fullWidth endIcon={verified?.email == true ? <CheckRounded /> : null}>
-							{!userData ? "Loading..." : verified?.email == true ? "" : "verify"}
+							{!userData ? "Loading..." : verified?.email == true ? "Verified" : "verify"}
 						</Button>
 					</Grid>
 					<Grid item xs={3} md={4} sx={{ display: "flex", alignItems: "center" }}>
@@ -172,7 +173,7 @@ export default function Verification() {
 								}
 							}}
 						>
-							{!userData ? "Loading..." : verified?.phoneNo == true ? "" : isVerifying ? "verifying..." : timer ? timer : "SEND OTP"}
+							{!userData ? "Loading..." : verified?.phoneNo == true ? "Verified" : isVerifying ? "verifying..." : timer ? timer : "SEND OTP"}
 						</LoadingButton>
 					</Grid>
 				</Grid>
