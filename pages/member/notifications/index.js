@@ -1,14 +1,11 @@
 import {
-	AnnouncementOutlined,
 	AnnouncementRounded,
 	ArchiveRounded,
 	BugReportRounded,
+	CheckCircleRounded,
 	ChevronLeft,
 	ChevronRightRounded,
-	DetailsRounded,
-	LocalShippingRounded,
 	MessageRounded,
-	MoreVertRounded,
 	UnarchiveRounded,
 } from "@mui/icons-material";
 import {
@@ -85,6 +82,9 @@ export default function Notifications() {
 						case "message":
 							icon = <MessageRounded />;
 							break;
+						case "success":
+							icon = <CheckCircleRounded />;
+							break;
 						case "alert":
 							icon = <AnnouncementRounded />;
 							break;
@@ -97,7 +97,7 @@ export default function Notifications() {
 							key={notification.id}
 							title={notification.title}
 							subtitle={notification.subtitle}
-							timestamp={moment(notification.timestamp).fromNow(true)}
+							timestamp={moment(notification.timestamp).fromNow()}
 							icon={icon}
 							href={notification.href}
 							id={notification.id}
@@ -120,7 +120,7 @@ function NotificationCard(props) {
 		<Fragment>
 			{!!props.details && (
 				<Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-					<DialogTitle>{props.title + " " + props.subtitle}</DialogTitle>
+					<DialogTitle>{props.title}</DialogTitle>
 					<DialogContent>
 						<DialogContentText>{props.details}</DialogContentText>
 					</DialogContent>

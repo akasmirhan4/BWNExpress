@@ -7,7 +7,7 @@ import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
 import { Backdrop, CircularProgress } from "@mui/material";
 import { trace } from "firebase/performance";
-import { collection, doc, onSnapshot } from "firebase/firestore";
+import { collection, doc, onSnapshot, orderBy, query } from "firebase/firestore";
 
 function MiddleComponent(props) {
 	const [lang, setLang] = useState("EN");
@@ -41,9 +41,9 @@ function MiddleComponent(props) {
 				user.getIdTokenResult().then(({ claims }) => {
 					if (claims.moderator) {
 						dispatch(setRole("moderator"));
-					}else if (claims.employee) {
+					} else if (claims.employee) {
 						dispatch(setRole("employee"));
-					}else{
+					} else {
 						dispatch(setRole("member"));
 					}
 				});
@@ -63,12 +63,12 @@ function MiddleComponent(props) {
 					dispatch(setUserData(dispatchData));
 					if (isLoading) setIsLoading(false);
 				});
-				const notificationSnapshot = onSnapshot(collection(firestore, "users", user.uid, "notifications"), (docs) => {
+				const notificationSnapshot = onSnapshot(query(collection(firestore, "users", user.uid, "notifications"), orderBy("timestamp", "desc")), (docs) => {
 					if (docs.empty) return;
 					let notifications = [];
 					docs.forEach((doc) => {
 						const data = doc.data();
-						notifications.push({ ...data, timestamp: data.timestamp.toDate().toISOString(), id: doc.id });
+						notifications.push({ ...data, timestamp: data.timestamp?.toDate().toISOString(), id: doc.id });
 					});
 					console.log("notifications update", notifications);
 					dispatch(setNotifications(notifications));

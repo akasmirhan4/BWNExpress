@@ -90,7 +90,7 @@ export default function Verification() {
 							<span style={{ width: "100%" }}>
 								<NextLink href={"/member/upload-ic"} passHref>
 									<LoadingButton
-										loading={!userData || verified?.IC !== "uploadingLater"}
+										loading={!userData || verified?.IC == "pending"}
 										variant="contained"
 										fullWidth
 										endIcon={verified?.IC == true ? <CheckRounded /> : verified?.IC == "uploadingLater" ? <UploadRounded /> : null}
@@ -103,7 +103,7 @@ export default function Verification() {
 											? "verifying..."
 											: verified?.IC == true
 											? "verified"
-											: "unknown"}
+											: "verify"}
 									</LoadingButton>
 								</NextLink>
 							</span>

@@ -15,7 +15,7 @@ import {
 	DialogActions,
 	DialogContent,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link2 from "next/link";
 import toast from "react-hot-toast";
 import { auth, firestore, storage } from "lib/firebase";
@@ -23,7 +23,7 @@ import RegisterSteppers from "components/RegisterSteppers";
 import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
 import { doc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytes } from "firebase/storage";
+import { deleteObject, listAll, ref, uploadBytes } from "firebase/storage";
 
 export default function UploadIC(params) {
 	const [isUploading, setIsUploading] = useState(false);
@@ -34,7 +34,6 @@ export default function UploadIC(params) {
 	const [isValid, setIsValid] = useState(true);
 	const router = useRouter();
 	const [openDialog, setOpenDialog] = useState(false);
-	const [dialogOpened, setDialogOpened] = useState(false);
 
 	function readFileAsText(file) {
 		return new Promise(function (resolve, reject) {
@@ -242,39 +241,13 @@ export default function UploadIC(params) {
 								onClick={async () => {
 									if (isUploadingLater) {
 										const updateDetails = { "verified.IC": "uploadingLater", userVerifiedLevel: 1.5 };
-										await toast.promise(updateDoc(doc(firestore, "users", auth.currentUser.uid), updateDetails), {
+										toast.promise(updateDoc(doc(firestore, "users", auth.currentUser.uid), updateDetails), {
 											loading: "updating user...",
 											success: "user updated 👌",
 											error: "error updating user 😫",
 										});
 									} else {
-										if (!dialogOpened) {
-											setOpenDialog(true);
-											return;
-										}
-										if (selectedFiles) {
-											setIsUploading(true);
-											const filteredFile = selectedFiles.filter((file) => file);
-											let batchPromises = [];
-											for (var i = 0; i < filteredFile.length; i++) {
-												batchPromises.push(
-													uploadBytes(ref(storage, `users/${auth.currentUser.uid}/unverifiedIC/${new Date().getTime()}${i}`), filteredFile[i])
-												);
-											}
-											const updateDetails = { "verified.IC": "pending", userVerifiedLevel: 1.5 };
-											const results = await toast
-												.promise(
-													Promise.all(batchPromises).then(() => {
-														updateDoc(doc(firestore, "users", auth.currentUser.uid), updateDetails);
-														router.push("/member/dashboard");
-													}),
-													{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
-												)
-												.catch(() => {
-													setIsUploading(false);
-												});
-											return results;
-										}
+										setOpenDialog(true);
 									}
 								}}
 							>
@@ -285,10 +258,9 @@ export default function UploadIC(params) {
 				</Container>
 			</Box>
 			<Dialog
-				open={openDialog && !dialogOpened && !isUploadingLater}
+				open={openDialog && !isUploadingLater}
 				onClose={() => {
 					setOpenDialog(false);
-					setDialogOpened(true);
 				}}
 			>
 				<DialogTitle>Before you continue</DialogTitle>
@@ -299,12 +271,40 @@ export default function UploadIC(params) {
 					</DialogContentText>
 				</DialogContent>
 				<DialogActions>
+					<Button>Cancel</Button>
 					<Button
-						onClick={() => {
+						onClick={async () => {
 							setOpenDialog(false);
-							setDialogOpened(true);
+							if (selectedFiles) {
+								setIsUploading(true);
+
+								const folderRef = ref(storage, `users/${auth.currentUser.uid}/IC`);
+								const batchDelete = await listAll(folderRef).then((results) => results.items.map(deleteObject));
+								await Promise.all(batchDelete);
+
+								const filteredFile = selectedFiles.filter((file) => file);
+								let batchPromises = [];
+								for (var i = 0; i < filteredFile.length; i++) {
+									batchPromises.push(uploadBytes(ref(storage, `users/${auth.currentUser.uid}/IC/${filteredFile[i].name}`), filteredFile[i]));
+								}
+								const updateDetails = { "verified.IC": "pending", userVerifiedLevel: 1.5 };
+								const results = await toast
+									.promise(
+										Promise.all(batchPromises).then(() => {
+											updateDoc(doc(firestore, "users", auth.currentUser.uid), updateDetails);
+											router.push("/member/dashboard");
+										}),
+										{ loading: "Uploading file(s) 📦", success: "File(s) uploaded 👌", error: "Error uploading file(s) 😲" }
+									)
+									.catch(() => {
+										setIsUploading(false);
+									});
+								return results;
+							}
 						}}
-					>{`Will do  👌`}</Button>
+					>
+						Upload
+					</Button>
 				</DialogActions>
 			</Dialog>
 		</Box>
