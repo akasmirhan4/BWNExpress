@@ -138,7 +138,7 @@ function PendingOrderCard(props) {
 						</Button>
 					</Box>
 				</DialogTitle>
-				<DialogContent sx={{minHeight: "80vh", overflowX: "hidden"}}>
+				<DialogContent sx={{ minHeight: "80vh", overflowX: "hidden" }}>
 					<Box sx={{ borderBottom: 1, borderColor: "divider", width: "50vw" }}>
 						<Tabs
 							value={currentTab}
@@ -261,9 +261,8 @@ function PendingOrderCard(props) {
 				) : (
 					<Fragment>
 						{imageURLs.map((image, index) => (
-							<Box sx={{ overflow: "hidden" }}>
+							<Box sx={{ overflow: "hidden" }} key={index}>
 								<CardMedia
-									key={index}
 									component="img"
 									sx={[
 										{

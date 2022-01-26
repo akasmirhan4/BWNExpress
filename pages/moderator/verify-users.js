@@ -164,9 +164,8 @@ function PendingUserCard(props) {
 				) : (
 					<Fragment>
 						{imageURLs.map((image, index) => (
-							<Box sx={{ overflow: "hidden" }}>
+							<Box sx={{ overflow: "hidden" }} key={index}>
 								<CardMedia
-									key={index}
 									component="img"
 									sx={[
 										{
