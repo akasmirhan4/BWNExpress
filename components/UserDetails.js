@@ -2,7 +2,8 @@ import { DatePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import { TextField, Divider, Button, Box } from "@mui/material";
 import { doc, updateDoc } from "firebase/firestore";
-import { firestore, getICs } from "lib/firebase";
+import { httpsCallable } from "firebase/functions";
+import { firestore, functions, getICs } from "lib/firebase";
 import { selectRole } from "lib/slices/userSlice";
 import React, { forwardRef, Fragment, useEffect, useImperativeHandle } from "react";
 import { useState } from "react";
@@ -18,8 +19,24 @@ export const UserDetails = forwardRef((props, ref) => {
 	const role = useSelector(selectRole);
 
 	useImperativeHandle(ref, () => ({
-		save() {
-			const data = { ...user, DOB: new Date(user.DOB).toISOString() };
+		async save() {
+			let data = { ...user, DOB: new Date(user.DOB).toISOString() };
+			console.log({ role: data.role });
+			switch (data.role) {
+				case "moderator":
+					await httpsCallable(functions, "addModerator")({ email: data.email });
+					console.log({ role: data.role });
+					break;
+				case "employee":
+					await httpsCallable(functions, "addEmployee")({ email: data.email });
+					break;
+				case "member":
+					await httpsCallable(functions, "addMember")({ email: data.email });
+					break;
+				default:
+					break;
+			}
+			delete data.role;
 			return updateDoc(doc(firestore, "users", user.uid), data);
 		},
 	}));

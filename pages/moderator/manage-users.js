@@ -268,7 +268,7 @@ function UsersTable(props) {
 								.sort(getComparator(order, _orderBy))
 								.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 								.map((row, index) => (
-									<EnhancedTableRow row={row} key={index} handleClick={handleClick} selected={selected} user={users[index]} />
+									<EnhancedTableRow row={row} key={index} handleClick={handleClick} selected={selected} user={users[page * rowsPerPage + index]} />
 								))}
 							{emptyRows > 0 && (
 								<TableRow
