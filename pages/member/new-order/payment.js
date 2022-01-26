@@ -35,6 +35,7 @@ import { CustomSelector } from "components/FormInputs";
 import CustomUploadButton from "components/CustomUploadButton";
 import { doc, setDoc } from "firebase/firestore";
 import { firestore } from "lib/firebase";
+import { getWeightPrice, paymentMethods } from "lib/formConstant";
 
 export default function Payment() {
 	const router = useRouter();
@@ -107,8 +108,6 @@ export default function Payment() {
 			router.push("form");
 		}
 	}, []);
-
-	const paymentMethods = ["Bank Transfer", "Cash Payment", "Select Soon"];
 
 	function validateInputs() {
 		let _errors = {
@@ -267,39 +266,4 @@ export default function Payment() {
 			</Container>
 		</MemberPageTemplate>
 	);
-}
-
-function getWeightPrice(weight) {
-	const numWeight = Number(weight);
-	/* 
-	0.1kg to 1.99kg - $6
-	2kg to 3.99kg - $9
-	4kg to 5.99kg - $12
-	6kg to 7.99kg - $15
-	8kg to 9.99kg - $18
-	10kg to 11.99kg - $21
-	12kg to 13.99kg - $24
-	14kg to 15.99kg - $27
-	16kg to 17.99kg - $30
-	18kg to 19.99kg - $33
-	20kg to 21.99kg - $36
-	22kg to 23.99kg - $39
-	24kg to 25.99kg - $42
-	26kg and above - $3 per kilo 
-	*/
-
-	if (numWeight > 0 && numWeight < 2) return 6;
-	if (numWeight < 4) return 9;
-	if (numWeight < 6) return 12;
-	if (numWeight < 8) return 15;
-	if (numWeight < 10) return 18;
-	if (numWeight < 12) return 21;
-	if (numWeight < 14) return 24;
-	if (numWeight < 16) return 27;
-	if (numWeight < 18) return 30;
-	if (numWeight < 20) return 33;
-	if (numWeight < 22) return 36;
-	if (numWeight < 24) return 39;
-	if (numWeight < 26) return 42;
-	if (numWeight >= 26) return 42 + 3 * Math.ceil(numWeight - 26);
 }

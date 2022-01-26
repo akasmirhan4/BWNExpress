@@ -1,6 +1,4 @@
-import { CheckRounded, CloseRounded, EditRounded, SendRounded, SentimentVeryDissatisfiedRounded, ZoomInRounded } from "@mui/icons-material";
-import { DatePicker, LocalizationProvider } from "@mui/lab";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import { CheckRounded, CloseRounded, EditRounded, SendRounded, ZoomInRounded } from "@mui/icons-material";
 import {
 	Container,
 	Typography,
@@ -17,16 +15,15 @@ import {
 	DialogTitle,
 	DialogContent,
 	DialogContentText,
-	TextField,
 	DialogActions,
-	Divider,
 	Menu,
 	MenuItem,
 } from "@mui/material";
 import ModeratorPageTemplate from "components/ModeratorPageTemplate";
+import { UserDetails } from "components/UserDetails";
 import { addDoc, collection, doc, onSnapshot, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { getDownloadURL, listAll, ref } from "firebase/storage";
-import { firestore, storage } from "lib/firebase";
+import { firestore, getICs, storage } from "lib/firebase";
 import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
 
@@ -83,26 +80,10 @@ function PendingUserCard(props) {
 
 	const HEIGHT = 512;
 
-	const getICURLs = async (userID) => {
-		try {
-			const list = await listAll(ref(storage, `/users/${userID}/IC`));
-			console.log({ list, items: list.items });
-			const names = list.items.map(({ name }) => name);
-			const promises = list.items.map(getDownloadURL);
-			const URLS = await Promise.all(promises);
-			return URLS.map((URL, index) => {
-				return { URL, name: names[index], ref: list.items[index] };
-			});
-		} catch (e) {
-			console.error(e);
-			return [];
-		}
-	};
-
 	useEffect(() => {
 		(async () => {
 			console.log({ date: new Date(user.DOB) });
-			setImageURLs(await getICURLs(user.uid));
+			setImageURLs(await getICs(user.uid));
 		})();
 	}, []);
 
@@ -121,49 +102,7 @@ function PendingUserCard(props) {
 						Check the details match with his/her IC. You may edit to ensure it is correct and the user will be notified of the change.
 					</DialogContentText>
 					<Box sx={{ my: 2 }}>
-						<TextField margin="dense" label="Full Name" type="text" fullWidth variant="outlined" value={user.fullName} disabled={!editable} />
-						<TextField margin="dense" label="IC" type="text" fullWidth variant="outlined" value={user.IC} disabled={!editable} />
-						<LocalizationProvider dateAdapter={AdapterDateFns} sx>
-							<DatePicker
-								label="Date Of Birth"
-								value={user.DOB}
-								onChange={(_DOB) => {}}
-								inputFormat="dd/MM/yyyy"
-								InputProps={{ disableUnderline: true }}
-								disabled={!editable}
-								renderInput={(params) => <TextField {...params} fullWidth variant="outlined" margin="dense" />}
-								OpenPickerButtonProps={{ sx: { mr: 0 } }}
-							/>
-						</LocalizationProvider>
-						<TextField margin="dense" label="Gender" type="text" fullWidth variant="outlined" value={user.gender} disabled={!editable} />
-						<TextField
-							margin="dense"
-							label="Address"
-							type="text"
-							fullWidth
-							multiline
-							minRows={3}
-							variant="outlined"
-							value={user.address}
-							disabled={!editable}
-						/>
-						{user.isDifferentAddress && (
-							<TextField
-								margin="dense"
-								label="Delivery Address"
-								type="text"
-								fullWidth
-								multiline
-								minRows={3}
-								variant="outlined"
-								value={user.deliveryAddress}
-								disabled={!editable}
-							/>
-						)}
-						<Divider sx={{ my: 2 }} />
-						<TextField margin="dense" label="Preferred Name" type="text" fullWidth variant="outlined" value={user.preferredName} disabled={!editable} />
-						<TextField margin="dense" label="Phone No" type="tel" fullWidth variant="outlined" value={user.phoneNo} disabled={!editable} />
-						<TextField margin="dense" label="Email Address" type="email" fullWidth variant="outlined" value={user.email} disabled={!editable} />
+						<UserDetails editable={editable} user={user} />
 					</Box>
 				</DialogContent>
 				<DialogActions sx={{ justifyContent: "space-between" }}>
@@ -225,21 +164,30 @@ function PendingUserCard(props) {
 				) : (
 					<Fragment>
 						{imageURLs.map((image, index) => (
-							<CardMedia
-								key={index}
-								component="img"
-								sx={{ height: HEIGHT / imageURLs.length, cursor: "pointer" }}
-								src={image.URL}
-								alt={`${image.name}`}
-								onClick={() => {
-									window.open(image.URL, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=0,left=0,width=512,height=512");
-								}}
-							/>
+							<Box sx={{ overflow: "hidden" }}>
+								<CardMedia
+									key={index}
+									component="img"
+									sx={[
+										{
+											"&:hover": {
+												transform: "scale(1.1)",
+											},
+										},
+										{ height: HEIGHT / imageURLs.length, cursor: "pointer", transition: "all 0.5s ease" },
+									]}
+									src={image.URL}
+									alt={`${image.name}`}
+									onClick={() => {
+										window.open(image.URL, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=0,left=0,width=512,height=512");
+									}}
+								/>
+							</Box>
 						))}
 					</Fragment>
 				)}
-				<CardContent sx={{ display: "flex", justifyContent: "space-between" }}>
-					<Box>
+				<CardContent sx={{ display: "flex", justifyContent: "space-between", height: "8em" }}>
+					<Box sx={{ maxWidth: "80%" }}>
 						<Typography gutterBottom variant="h5" component="div">
 							{user.fullName}
 						</Typography>

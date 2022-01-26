@@ -14,13 +14,14 @@ export function CustomTextField(props) {
 }
 
 export function CustomSelector(props) {
-	const { tooltip, errors, required, label, onChange, value, items } = props;
+	const { tooltip = "", errors = [], required, label, onChange, value, items, ...others } = props;
 	return (
 		<Fragment>
 			<Tooltip disableHoverListener title={tooltip} placement="top" arrow enterTouchDelay={100}>
 				<FormControl fullWidth sx={{ mt: { xs: 3, sm: 1 } }}>
-					<InputLabel error={errors.length}>{`${label} ${required ? " *" : ""}`}</InputLabel>
+					<InputLabel sx={{ color: props.disabled ? "rgba(0, 0, 0, 0.38)" : "text.main" }} error={errors.length}>{`${label} ${required ? " *" : ""}`}</InputLabel>
 					<Select
+						{...others}
 						value={value}
 						label={`${label} ${required ? " *" : ""}`}
 						onChange={onChange}

@@ -2,7 +2,7 @@ import { Button, Typography, Box, useTheme, IconButton, Drawer, Tooltip } from "
 import Image from "next/image";
 import styles from "styles/main.module.scss";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { AdminPanelSettingsRounded, Dashboard, GroupAddRounded, Inbox, Logout, PendingActionsRounded, Settings, SwapHoriz } from "@mui/icons-material";
+import { AdminPanelSettingsRounded, Dashboard, GroupAddRounded, Inbox, Logout, ManageAccountsRounded, PendingActionsRounded, Settings, SwapHoriz } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -88,6 +88,7 @@ export default function ModeratorDrawer(props) {
 					<DrawerButton startIcon={<Dashboard />} href="/moderator/dashboard" label="Dashboard" />
 					<DrawerButton startIcon={<GroupAddRounded />} href="/moderator/verify-users" label="Verify Users" />
 					<DrawerButton startIcon={<PendingActionsRounded />} href="/moderator/verify-orders" label="Verify Orders" />
+					<DrawerButton startIcon={<ManageAccountsRounded />} href="/moderator/manage-users" label="Manage Users" />
 				</Box>
 
 				{/* setting nav */}

@@ -29,6 +29,7 @@ import { CustomSelector } from "components/FormInputs";
 import CustomUploadButton from "components/CustomUploadButton";
 import { doc, setDoc } from "firebase/firestore";
 import { firestore } from "lib/firebase";
+import { permitCategories as initPermitCategories } from "lib/formConstant";
 
 export default function PermitApplication() {
 	const router = useRouter();
@@ -40,12 +41,7 @@ export default function PermitApplication() {
 	const [productInformations, setProductInformations] = useState([]);
 	const [openDialog, setOpenDialog] = useState(false);
 	const [itemCategory, setitemCategory] = useState("");
-	const [permitCategories, setPermitCategories] = useState([
-		"MOH Pharmacy",
-		"MOH Food Safety and Quality Unit",
-		"Pusat Dakhwah Islamiah (Religious books)",
-		"Internal Security (All Books)",
-	]);
+	const [permitCategories, setPermitCategories] = useState(initPermitCategories);
 
 	const [errors, setErrors] = useState({
 		permitCategory: [],
@@ -59,28 +55,20 @@ export default function PermitApplication() {
 		setitemCategory(itemCategory);
 		if (MOHPharmacies.includes(itemCategory)) {
 			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") ?? true);
-			setPermitCategories(["MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)"]);
-			setPermitCategory(
-				window.sessionStorage.getItem("permitCategory") ??
-					"MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)"
-			);
+			setPermitCategories([initPermitCategories[0]]);
+			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? initPermitCategories[0]);
 		} else if (MOHFoodSafeties.includes(itemCategory)) {
 			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") == "true" ?? true);
-			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? "MOH Food Safety and Quality Unit (Food products, coffee and other drinks)");
-			setPermitCategories(["MOH Food Safety and Quality Unit (Food products, coffee and other drinks)"]);
+			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? initPermitCategories[1]);
+			setPermitCategories([initPermitCategories[1]]);
 		} else if (internalSecurities.includes(itemCategory)) {
 			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") == "true" ?? true);
 			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? "");
-			setPermitCategories(["Pusat Dakhwah Islamiah (Religious books)", "Internal Security (All Books)"]);
+			setPermitCategories([initPermitCategories[2], initPermitCategories[3]]);
 		} else {
 			setRequiresPermit(window.sessionStorage.getItem("requiresPermit") == "true" ?? false);
 			setPermitCategory(window.sessionStorage.getItem("permitCategory") ?? "");
-			setPermitCategories([
-				"MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)",
-				"MOH Food Safety and Quality Unit (Food products, coffee and other drinks)",
-				"Pusat Dakhwah Islamiah (Religious books)",
-				"Internal Security (All Books)",
-			]);
+			setPermitCategories(initPermitCategories);
 		}
 		setPermitRemark(window.sessionStorage.getItem("permitRemark") ?? "");
 		if (window.sessionStorage.getItem("productInformations")) {
@@ -106,7 +94,7 @@ export default function PermitApplication() {
 		if (!loaded) return;
 		window.sessionStorage.setItem("requiresPermit", requiresPermit);
 	}, [requiresPermit]);
-	
+
 	useEffect(() => {
 		if (!loaded) return;
 		window.sessionStorage.setItem("permitCategory", permitCategory);
