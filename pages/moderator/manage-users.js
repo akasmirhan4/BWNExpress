@@ -1,4 +1,13 @@
-import { CloseRounded, DeleteRounded, EditRounded, FilterListRounded, MoreHorizRounded, SaveRounded } from "@mui/icons-material";
+import {
+	CloseRounded,
+	DeleteRounded,
+	EditRounded,
+	FilterListRounded,
+	MoreHorizRounded,
+	NotificationAddRounded,
+	SaveRounded,
+	SendRounded,
+} from "@mui/icons-material";
 import {
 	Breadcrumbs,
 	Container,
@@ -23,6 +32,10 @@ import {
 	DialogContent,
 	DialogActions,
 	DialogTitle,
+	Menu,
+	MenuItem,
+	ListItemIcon,
+	ListItemText,
 } from "@mui/material";
 import ModeratorPageTemplate from "components/ModeratorPageTemplate";
 import React, { Fragment, useEffect, useRef } from "react";
@@ -32,6 +45,7 @@ import { collection, getDocs, onSnapshot, orderBy } from "firebase/firestore";
 import { firestore } from "lib/firebase";
 import { UserDetails } from "components/UserDetails";
 import toast from "react-hot-toast";
+import { NotificationForm } from "components/NotificationForm";
 
 export default function ManageUsers() {
 	return (
@@ -310,8 +324,11 @@ function getComparator(order, orderBy) {
 function EnhancedTableRow(props) {
 	const { row, handleClick, selected, user } = props;
 	const isItemSelected = selected.indexOf(row.email) !== -1;
-	const [openDialog, setOpenDialog] = useState(false);
+	const [openEditDialog, setOpenEditDialog] = useState(false);
+	const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
 	const userRef = useRef(null);
+	const notifRef = useRef(null);
+	const [anchorEl, setAnchorEl] = useState(null);
 
 	return (
 		<Fragment>
@@ -347,19 +364,52 @@ function EnhancedTableRow(props) {
 						<EditRounded
 							onClick={(e) => {
 								e.stopPropagation();
-								setOpenDialog(true);
+								setOpenEditDialog(true);
 							}}
 						/>
 					</IconButton>
-					<IconButton>
+					<Menu
+						anchorEl={anchorEl}
+						open={Boolean(anchorEl)}
+						onClose={() => {
+							setAnchorEl(null);
+						}}
+						anchorOrigin={{
+							vertical: "bottom",
+							horizontal: "right",
+						}}
+						transformOrigin={{
+							vertical: "top",
+							horizontal: "right",
+						}}
+					>
+						<MenuItem
+							onClick={(e) => {
+								e.stopPropagation();
+								setAnchorEl(null);
+								setOpenNotificationDialog(true);
+							}}
+						>
+							<ListItemIcon>
+								<NotificationAddRounded />
+							</ListItemIcon>
+							<ListItemText>Send Notification</ListItemText>
+						</MenuItem>
+					</Menu>
+					<IconButton
+						onClick={(e) => {
+							e.stopPropagation();
+							setAnchorEl(e.currentTarget);
+						}}
+					>
 						<MoreHorizRounded />
 					</IconButton>
 				</TableCell>
 			</TableRow>
 			<Dialog
-				open={openDialog}
+				open={openEditDialog}
 				onClose={() => {
-					setOpenDialog(false);
+					setOpenEditDialog(false);
 				}}
 			>
 				<DialogTitle>{row.fullName}</DialogTitle>
@@ -370,7 +420,7 @@ function EnhancedTableRow(props) {
 					<IconButton>
 						<CloseRounded
 							onClick={() => {
-								setOpenDialog(false);
+								setOpenEditDialog(false);
 							}}
 						/>
 					</IconButton>
@@ -378,7 +428,35 @@ function EnhancedTableRow(props) {
 						<SaveRounded
 							onClick={() => {
 								toast.promise(userRef.current.save(), { loading: "saving...", error: "error saving", success: "user saved" });
-								setOpenDialog(false);
+								setOpenEditDialog(false);
+							}}
+						/>
+					</IconButton>
+				</DialogActions>
+			</Dialog>
+			<Dialog
+				open={openNotificationDialog}
+				onClose={() => {
+					setOpenNotificationDialog(false);
+				}}
+			>
+				<DialogTitle>{`Notify ${user.preferredName}`}</DialogTitle>
+				<DialogContent>
+					<NotificationForm user={user} ref={notifRef}/>
+				</DialogContent>
+				<DialogActions>
+					<IconButton>
+						<CloseRounded
+							onClick={() => {
+								setOpenNotificationDialog(false);
+							}}
+						/>
+					</IconButton>
+					<IconButton>
+						<SendRounded
+							onClick={() => {
+								toast.promise(notifRef.current.send(), { loading: "notifying...", error: "error notifying", success: "user notified" });
+								setOpenNotificationDialog(false);
 							}}
 						/>
 					</IconButton>

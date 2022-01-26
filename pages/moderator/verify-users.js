@@ -21,9 +21,8 @@ import {
 } from "@mui/material";
 import ModeratorPageTemplate from "components/ModeratorPageTemplate";
 import { UserDetails } from "components/UserDetails";
-import { addDoc, collection, doc, onSnapshot, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
-import { getDownloadURL, listAll, ref } from "firebase/storage";
-import { firestore, getICs, storage } from "lib/firebase";
+import { collection, doc, onSnapshot, query, updateDoc, where } from "firebase/firestore";
+import { firestore, getICs, sendNotification } from "lib/firebase";
 import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
 
@@ -206,15 +205,12 @@ function PendingUserCard(props) {
 						<Button
 							startIcon={<CloseRounded />}
 							onClick={() => {
-								addDoc(collection(firestore, "users", user.uid, "notifications"), {
+								sendNotification(user.uid, {
 									title: "Your verification process has been rejected",
 									subtitle: "Please upload your IC again",
 									details: "Ensure your IC is not expired and the images uploaded are clear",
 									type: "alert",
-									seen: false,
-									archived: false,
 									href: "/member/upload-ic",
-									timestamp: serverTimestamp(),
 								});
 								updateDoc(doc(firestore, "users", user.uid), { "verified.IC": false });
 							}}
@@ -225,16 +221,13 @@ function PendingUserCard(props) {
 							sx={{ ml: 2 }}
 							startIcon={<CheckRounded />}
 							onClick={() => {
-								addDoc(collection(firestore, "users", user.uid, "notifications"), {
+								sendNotification(user.uid, {
 									title: "Your verification process has been accepted",
 									subtitle: "Thank you for registering with us 🤗",
 									details:
 										"You may now place an order by clicking on the Place An Order Button located on the left menu or the Plus button located on the bottom right of the screen",
 									type: "success",
-									seen: false,
-									archived: false,
 									href: "/member/verification",
-									timestamp: serverTimestamp(),
 								});
 								updateDoc(doc(firestore, "users", user.uid), { "verified.IC": true });
 							}}
