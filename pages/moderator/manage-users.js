@@ -61,9 +61,6 @@ function EnhancedTableHead(props) {
 						indeterminate={numSelected > 0 && numSelected < rowCount}
 						checked={rowCount > 0 && numSelected === rowCount}
 						onChange={onSelectAllClick}
-						inputProps={{
-							"aria-label": "select all desserts",
-						}}
 					/>
 				</TableCell>
 				{headCells.map((headCell) => (
@@ -253,7 +250,7 @@ function UsersTable(props) {
 			<Paper sx={{ width: "100%", mb: 2 }}>
 				<EnhancedTableToolbar numSelected={selected.length} />
 				<TableContainer>
-					<Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={"medium"}>
+					<Table sx={{ minWidth: 750 }} size={"medium"}>
 						<EnhancedTableHead
 							numSelected={selected.length}
 							order={order}
@@ -325,7 +322,6 @@ function EnhancedTableRow(props) {
 					handleClick(e, row.email);
 				}}
 				role="checkbox"
-				aria-checked={isItemSelected}
 				tabIndex={-1}
 				key={row.email}
 				selected={isItemSelected}

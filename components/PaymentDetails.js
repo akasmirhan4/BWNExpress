@@ -83,6 +83,7 @@ export default function PaymentDetails(props) {
 				<Box sx={{ mt: 2 }}>
 					{props.files.map((file, index) => (
 						<Button
+							key={index}
 							variant="contained"
 							onClick={() => {
 								window.open(file.URL, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=0,left=0,width=512,height=512");
