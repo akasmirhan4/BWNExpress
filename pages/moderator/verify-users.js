@@ -81,7 +81,6 @@ function PendingUserCard(props) {
 
 	useEffect(() => {
 		(async () => {
-			console.log({ date: new Date(user.DOB) });
 			setImageURLs(await getICs(user.uid));
 		})();
 	}, []);

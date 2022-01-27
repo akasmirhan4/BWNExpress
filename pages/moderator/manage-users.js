@@ -1,10 +1,12 @@
 import {
+	CheckRounded,
 	CloseRounded,
 	DeleteRounded,
 	EditRounded,
 	FilterListRounded,
 	MoreHorizRounded,
 	NotificationAddRounded,
+	PersonRemoveRounded,
 	SaveRounded,
 	SendRounded,
 } from "@mui/icons-material";
@@ -36,16 +38,19 @@ import {
 	MenuItem,
 	ListItemIcon,
 	ListItemText,
+	DialogContentText,
+	Button,
 } from "@mui/material";
 import ModeratorPageTemplate from "components/ModeratorPageTemplate";
 import React, { Fragment, useEffect, useRef } from "react";
 import { useState } from "react";
 import { visuallyHidden } from "@mui/utils";
-import { collection, getDocs, onSnapshot, orderBy } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, onSnapshot, orderBy } from "firebase/firestore";
 import { firestore } from "lib/firebase";
 import { UserDetails } from "components/UserDetails";
 import toast from "react-hot-toast";
 import { NotificationForm } from "components/NotificationForm";
+import { deleteUser } from "firebase/auth";
 
 export default function ManageUsers() {
 	return (
@@ -326,6 +331,7 @@ function EnhancedTableRow(props) {
 	const isItemSelected = selected.indexOf(row.email) !== -1;
 	const [openEditDialog, setOpenEditDialog] = useState(false);
 	const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
+	const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
 	const userRef = useRef(null);
 	const notifRef = useRef(null);
 	const [anchorEl, setAnchorEl] = useState(null);
@@ -395,6 +401,20 @@ function EnhancedTableRow(props) {
 							</ListItemIcon>
 							<ListItemText>Send Notification</ListItemText>
 						</MenuItem>
+						<MenuItem
+							onClick={(e) => {
+								e.stopPropagation();
+								setAnchorEl(null);
+								setOpenDeleteAlert(true);
+							}}
+						>
+							<ListItemIcon>
+								<PersonRemoveRounded color="error" />
+							</ListItemIcon>
+							<ListItemText disableTypography sx={{ color: "error.main" }}>
+								Delete User
+							</ListItemText>
+						</MenuItem>
 					</Menu>
 					<IconButton
 						onClick={(e) => {
@@ -442,7 +462,7 @@ function EnhancedTableRow(props) {
 			>
 				<DialogTitle>{`Notify ${user.preferredName}`}</DialogTitle>
 				<DialogContent>
-					<NotificationForm user={user} ref={notifRef}/>
+					<NotificationForm user={user} ref={notifRef} />
 				</DialogContent>
 				<DialogActions>
 					<IconButton>
@@ -462,6 +482,54 @@ function EnhancedTableRow(props) {
 					</IconButton>
 				</DialogActions>
 			</Dialog>
+			<AlertDialog
+				open={openDeleteAlert}
+				onClose={() => {
+					setOpenDeleteAlert(false);
+				}}
+				callback={() => {
+					toast.promise(deleteDoc(doc(firestore, "users", user.uid)), { loading: "Deleting user...", error: "Error deleting", success: "User deleted" });
+				}}
+				title={"Delete Account"}
+				text={
+					<Fragment>
+						After you have deleted an account, it will be permanently deleted. Accounts cannot be recovered.{"\n\n"}User account:
+						<Typography>{user.email}</Typography>
+					</Fragment>
+				}
+			/>
 		</Fragment>
+	);
+}
+
+function AlertDialog(props) {
+	const { callback, title, text, onClose, ...others } = props;
+	return (
+		<Dialog onClose={onClose} {...others}>
+			<DialogTitle>{title}</DialogTitle>
+			<DialogContent>
+				<DialogContentText sx={{ whiteSpace: "pre-line" }}>{text}</DialogContentText>
+			</DialogContent>
+			<DialogActions sx={{ p: 2 }}>
+				<Button
+					startIcon={<CloseRounded />}
+					onClick={() => {
+						if (onClose) onClose();
+					}}
+				>
+					Cancel
+				</Button>
+				<Button
+					variant="contained"
+					startIcon={<CheckRounded />}
+					onClick={() => {
+						if (callback) callback();
+						if (onClose) onClose();
+					}}
+				>
+					Proceed
+				</Button>
+			</DialogActions>
+		</Dialog>
 	);
 }
