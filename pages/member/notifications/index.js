@@ -5,6 +5,7 @@ import {
 	CheckCircleRounded,
 	ChevronLeft,
 	ChevronRightRounded,
+	ErrorRounded,
 	MessageRounded,
 	UnarchiveRounded,
 } from "@mui/icons-material";
@@ -87,6 +88,9 @@ export default function Notifications() {
 							break;
 						case "alert":
 							icon = <AnnouncementRounded />;
+							break;
+						case "error":
+							icon = <ErrorRounded />;
 							break;
 						default:
 							icon = <BugReportRounded />;

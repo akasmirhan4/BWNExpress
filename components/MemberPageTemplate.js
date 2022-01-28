@@ -1,8 +1,17 @@
-import { Box, Fab, Toolbar, Zoom } from "@mui/material";
+import { Box, Fab, SpeedDial, SpeedDialAction, SpeedDialIcon, Toolbar, Zoom } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import CustomDrawer from "./CustomDrawer";
 import MemberTopbar from "./MemberTopbar";
-import { AddRounded } from "@mui/icons-material/";
+import {
+	AddRounded,
+	ChatBubbleOutlined,
+	ChatBubbleOutlineRounded,
+	ChatBubbleRounded,
+	CloseRounded,
+	HelpOutlineRounded,
+	HelpRounded,
+	VerifiedUserRounded,
+} from "@mui/icons-material/";
 import { useSelector } from "react-redux";
 import { selectUserData } from "lib/slices/userSlice";
 import { useRouter } from "next/router";
@@ -15,6 +24,22 @@ export default function MemberPageTemplate(props) {
 
 	const [verifyStatus, setVerifyStatus] = useState("unverified");
 	const router = useRouter();
+
+	const actions = [
+		{
+			icon: verifyStatus == "verified" ? <AddRounded /> : <VerifiedUserRounded />,
+			name: verifyStatus == "verified" ? "Place An Order" : "Verify Account",
+			onClick: () => {
+				if (verifyStatus == "verified") {
+					router.push("/member/new-order/acknowledgement");
+				} else {
+					router.push("/member/verification");
+				}
+			},
+		},
+		// { icon: <HelpOutlineRounded />, name: "Help", onClick: () => {} },
+		{ icon: <ChatBubbleOutlineRounded />, name: "Contact Support", onClick: () => {} },
+	];
 
 	useEffect(() => {
 		if (userData?.verified) {
@@ -48,21 +73,15 @@ export default function MemberPageTemplate(props) {
 						}}
 					/>
 					<Zoom in={!props.hideFAB}>
-						<Fab
-							color="primary"
-							aria-label="add"
+						<SpeedDial
+							ariaLabel="SpeedDial"
 							sx={{ position: "fixed", bottom: "2em", right: "2em", zIndex: 3 }}
-							onClick={() => {
-								if (verifyStatus == "verified") {
-									router.push("/member/new-order/acknowledgement");
-								} else {
-									toast("Verify account first");
-									router.push("/member/verification");
-								}
-							}}
+							icon={<SpeedDialIcon openIcon={<CloseRounded />} sx={{ color: "white.main" }} />}
 						>
-							<AddRounded color="white" />
-						</Fab>
+							{actions.map((action) => (
+								<SpeedDialAction sx={{ color: "primary.main" }} key={action.name} icon={action.icon} tooltipTitle={action.name} onClick={action.onClick} />
+							))}
+						</SpeedDial>
 					</Zoom>
 					<Box mt={12}>{props.children}</Box>
 				</main>

@@ -16,7 +16,7 @@ import { signOut } from "firebase/auth";
 import RoleDialog from "./RoleDialog";
 import Logo from "./Logo";
 
-export default function ModeratorDrawer(props) {
+export default function EmployeeDrawer(props) {
 	const { palette } = useTheme();
 	const isLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("xl"));
 	const userData = useSelector(selectUserData);
@@ -45,12 +45,12 @@ export default function ModeratorDrawer(props) {
 
 	return (
 		<Drawer {...props} anchor="left" variant={isLargeScreen ? "permanent" : "temporary"}>
-			<Box {...props} sx={{ bgcolor: "secondaryAccent.main" }} display="flex" flexDirection="column" alignItems="center" pb={4} px={2} minWidth={256} flex={1}>
+			<Box {...props} sx={{ bgcolor: "secondary.main" }} display="flex" flexDirection="column" alignItems="center" pb={4} px={2} minWidth={256} flex={1}>
 				{/* Top part of the drawer */}
 				<Box display="flex" flexDirection="column" alignItems="center" mb={2} width="100%">
 					<Link href="/member/dashboard" passHref>
 						<IconButton sx={{ borderRadius: 4, p: 1, m: 1 }}>
-							<Logo width={128} fill={palette.secondary.main}/>
+							<Logo width={128} fill={palette.secondaryAccent.main}/>
 						</IconButton>
 					</Link>
 					<Typography className={styles.companyName} color="white.main">
@@ -59,16 +59,16 @@ export default function ModeratorDrawer(props) {
 					<Link href="/member/verification" passHref>
 						<Button fullWidth>
 							<Typography variant="caption" sx={{ color: palette.white.main }}>
-								{"moderator"} <span className={styles[verifyStatus]}>{verifyStatus}</span>
+								{"employee"} <span className={styles[verifyStatus]}>{verifyStatus}</span>
 							</Typography>
 						</Button>
 					</Link>
 				</Box>
+
 				{/* main nav */}
 				<Box display="flex" flexDirection="column" width="100%" mt={4} flex={1}>
-					<DrawerButton startIcon={<Dashboard />} href="/moderator/dashboard" label="Dashboard" />
-					<DrawerButton startIcon={<GroupAddRounded />} href="/moderator/verify-users" label="Verify Users" />
-					<DrawerButton startIcon={<ManageAccountsRounded />} href="/moderator/manage-users" label="Manage Users" />
+					<DrawerButton startIcon={<Dashboard />} href="/employee/dashboard" label="Dashboard" />
+					<DrawerButton startIcon={<PendingActionsRounded />} href="/employee/verify-orders" label="Verify Orders" />
 				</Box>
 
 				{/* setting nav */}
@@ -105,7 +105,7 @@ export default function ModeratorDrawer(props) {
 						}}
 						startIcon={<Logout />}
 						fullWidth
-						color="offWhite"
+						color="lightGrey"
 						sx={{ mb: 1 }}
 						style={{ justifyContent: "flex-start", paddingLeft: "1em" }}
 					>
@@ -133,7 +133,7 @@ function DrawerButton(props) {
 					variant="contained"
 					startIcon={startIcon}
 					fullWidth
-					color="secondary"
+					color="secondaryAccent"
 					sx={{ boxShadow: (theme) => theme.shadows[1], mb: 1 }}
 					style={{ justifyContent: "flex-start", paddingLeft: "1em", color: "white" }}
 				>

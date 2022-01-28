@@ -111,7 +111,6 @@ export default function PermitApplication() {
 	}, []);
 
 	function validateInputs() {
-		const currencyRegex = /^\d*(\.\d{2})?$/;
 		let _errors = {
 			permitCategory: [],
 			productInformations: [],
@@ -191,9 +190,9 @@ export default function PermitApplication() {
 							<Grid item xs={12}>
 								<Typography variant="subtitle1" color="error.main" sx={{ ml: 1 }}>
 									<span style={{ fontWeight: "bold" }}>Please Note: </span>
-									{permitCategory == "MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)" &&
+									{permitCategory == "MOH Pharmacy" &&
 										"Permits will take between 3 to 5 weeks for MOH approval."}
-									{permitCategory == "MOH Food Safety and Quality Unit (Food products, coffee and other drinks)" &&
+									{permitCategory == "MOH Food Safety and Quality Unit" &&
 										"Permits will more than 5 weeks for MOH approval for food items."}
 								</Typography>
 							</Grid>

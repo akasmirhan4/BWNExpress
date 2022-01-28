@@ -75,6 +75,7 @@ function MiddleComponent(props) {
 				});
 				setSnapshots([userSnapshot, notificationSnapshot]);
 			} else {
+				router.push("/home")
 				console.log("logging out");
 				dispatch(setUserExists(false));
 				dispatch(setUserData(null));

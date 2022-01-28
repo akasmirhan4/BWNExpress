@@ -24,7 +24,17 @@ export default function OrderDetails(props) {
 			<CustomSelector
 				label="Status"
 				value={order.status}
-				items={["awaitingParcel", "readyForCollection", "atCollectionCenter", "pendingAction", "processingPermit", "delivering", "delivered", "inTransit"]}
+				items={[
+					"orderSubmitted",
+					"awaitingParcel",
+					"readyForCollection",
+					"atCollectionCenter",
+					"pendingAction",
+					"processingPermit",
+					"delivering",
+					"delivered",
+					"inTransit",
+				]}
 				onChange={(e) => {
 					setOrder({ ...order, status: e.target.value });
 				}}

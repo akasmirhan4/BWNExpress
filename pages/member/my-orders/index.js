@@ -94,10 +94,11 @@ export default function MyOrders() {
 			getOrders().then((orders) => {
 				if (!orders) return;
 				dispatch(setOrders(orders));
+				console.log(orders);
 				const _rows = orders.map(({ orderID, dateSubmitted, status, estimatedDuration }) => {
 					return {
 						orderID,
-						dateSubmitted: new Date(dateSubmitted.seconds * 1000 + dateSubmitted.nanoseconds / 1000000).toISOString(),
+						dateSubmitted: dateSubmitted?.toDate(),
 						status,
 						estimatedDuration,
 					};

@@ -100,6 +100,7 @@ export default function Form() {
 
 	useEffect(() => {
 		if (orderID) return;
+		if (window.sessionStorage.getItem("orderID")) return;
 		const docRef = doc(collection(firestore, `allOrders`));
 		setOrderID(docRef.id);
 		window.sessionStorage.setItem("orderID", docRef.id);
@@ -166,13 +167,10 @@ export default function Form() {
 		if (itemCategory) {
 			if (MOHPharmacies.includes(itemCategory)) {
 				window.sessionStorage.setItem("requiresPermit", true);
-				window.sessionStorage.setItem(
-					"permitCategory",
-					"MOH Pharmacy (cosmetics, skincare products, haircare products, nail polish, fragrances and essential oils)"
-				);
+				window.sessionStorage.setItem("permitCategory", "MOH Pharmacy");
 			} else if (MOHFoodSafeties.includes(itemCategory)) {
 				window.sessionStorage.setItem("requiresPermit", true);
-				window.sessionStorage.setItem("permitCategory", "MOH Food Safety and Quality Unit (Food products, coffee and other drinks)");
+				window.sessionStorage.setItem("permitCategory", "MOH Food Safety and Quality Unit");
 			} else if (internalSecurities.includes(itemCategory)) {
 				window.sessionStorage.setItem("requiresPermit", true);
 				window.sessionStorage.setItem("permitCategory", "");

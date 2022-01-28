@@ -34,23 +34,25 @@ import {
 	Tab,
 	ListItemIcon,
 	ListItemText,
+	TextField,
 } from "@mui/material";
-import ModeratorPageTemplate from "components/ModeratorPageTemplate";
+import EmployeePageTemplate from "components/EmployeePageTemplate";
 import OrderDetails from "components/OrderDetails";
 import PaymentDetails from "components/PaymentDetails";
 import PermitDetails from "components/PermitDetails";
 import { UserDetails } from "components/UserDetails";
-import { collection, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore";
-import { firestore, getFiles, getICs } from "lib/firebase";
+import { addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
+import { auth, firestore, getFiles, getICs } from "lib/firebase";
 import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function VerifyOrders() {
 	const [pendingOrders, setPendingOrders] = useState([]);
 
 	useEffect(() => {
 		onSnapshot(
-			query(collection(firestore, "allOrders"), where("complete", "==", true), where("status", "==", "awaitingParcel"), orderBy("timestamp", "asc")),
+			query(collection(firestore, "allOrders"), where("complete", "==", true), where("status", "==", "orderSubmitted"), orderBy("timestamp", "asc")),
 			(querySnapshot) => {
 				let pendingOrders = [];
 				querySnapshot.forEach((doc) => {
@@ -63,7 +65,7 @@ export default function VerifyOrders() {
 	}, []);
 
 	return (
-		<ModeratorPageTemplate>
+		<EmployeePageTemplate>
 			<Container>
 				<Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
 					<Typography color="text.primary">Verify Orders</Typography>
@@ -85,7 +87,7 @@ export default function VerifyOrders() {
 					)}
 				</Grid>
 			</Container>
-		</ModeratorPageTemplate>
+		</EmployeePageTemplate>
 	);
 }
 
@@ -93,10 +95,12 @@ function PendingOrderCard(props) {
 	const { order } = props;
 	const [imageURLs, setImageURLs] = useState([]);
 	const [openDialog, setOpenDialog] = useState(false);
+	const [openRejectDialog, setOpenRejectDialog] = useState(false);
 	const [editable, setEditable] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [user, setUser] = useState(null);
 	const [currentTab, setCurrentTab] = useState(0);
+	const [rejectReason, setRejectReason] = useState("");
 
 	const HEIGHT = 512;
 
@@ -118,8 +122,90 @@ function PendingOrderCard(props) {
 		})();
 	}, []);
 
+	const approveOrder = () => {
+		updateDoc(doc(firestore, "allOrders", order.orderID), { status: "orderApproved" });
+		addDoc(collection(firestore, "users", user.uid, "notifications"), {
+			title: "Your order has been approved",
+			subtitle: "We are now awaiting for your parcel to arrive in Labuan",
+			details: "If you have any questions regarding this order, feel free to use the nudge button in My Orders",
+			type: "success",
+			seen: false,
+			archived: false,
+			href: "/member/my-orders",
+			timestamp: serverTimestamp(),
+		});
+		addDoc(collection(firestore, "allOrders", order.orderID, "logTracker"), {
+			timestamp: serverTimestamp(),
+			status: "orderApproved",
+			byUser: auth.currentUser.uid,
+		});
+	};
+	const rejectOrder = () => {
+		if (!rejectReason) {
+			toast.error("Provide a reason before rejecting");
+			return;
+		}
+		toast.promise(
+			Promise.all([
+				updateDoc(doc(firestore, "allOrders", order.orderID), { status: "orderRejected" }),
+				addDoc(collection(firestore, "users", user.uid, "notifications"), {
+					title: "We sincerely apologies but your order has been rejected",
+					subtitle: `Reason: ${rejectReason}`,
+					details: "If you have any questions regarding this order, feel free to use the nudge button in My Orders",
+					type: "error",
+					seen: false,
+					archived: false,
+					href: "/member/my-orders",
+					timestamp: serverTimestamp(),
+				}),
+				addDoc(collection(firestore, "allOrders", order.orderID, "logTracker"), {
+					timestamp: serverTimestamp(),
+					status: "orderRejected",
+					details: rejectReason,
+					byUser: auth.currentUser.uid,
+				}),
+			]),
+			{ loading: "Rejecting order...", error: "Error rejecting", success: "Order rejected" }
+		);
+	};
+
 	return (
 		<Fragment>
+			<Dialog
+				open={openRejectDialog}
+				onClose={() => {
+					setOpenRejectDialog(false);
+				}}
+			>
+				<DialogTitle>Reject Order</DialogTitle>
+				<DialogContent>
+					<TextField
+						margin="dense"
+						label="Reason"
+						type="text"
+						fullWidth
+						variant="outlined"
+						value={rejectReason}
+						onChange={(e) => {
+							setRejectReason(e.target.value);
+						}}
+					/>
+				</DialogContent>
+				<DialogActions>
+					<Button
+						startIcon={<SendRounded />}
+						onClick={() => {
+							rejectOrder();
+							setOpenRejectDialog(false);
+						}}
+					>
+						Reject
+					</Button>
+					<Button startIcon={<CancelRounded />} onClick={() => setOpenRejectDialog(false)}>
+						Cancel
+					</Button>
+				</DialogActions>
+			</Dialog>
 			<Dialog
 				open={openDialog}
 				onClose={() => {
@@ -130,10 +216,22 @@ function PendingOrderCard(props) {
 				<DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: 1, borderColor: "divider" }}>
 					{order.orderID}
 					<Box>
-						<Button startIcon={<CheckRounded />} onClick={() => setOpenDialog(false)}>
+						<Button
+							startIcon={<CheckRounded />}
+							onClick={() => {
+								approveOrder();
+								setOpenDialog(false);
+							}}
+						>
 							Approve
 						</Button>
-						<Button startIcon={<CloseRounded />} onClick={() => setOpenDialog(false)}>
+						<Button
+							startIcon={<CloseRounded />}
+							onClick={() => {
+								setOpenRejectDialog(true);
+								setOpenDialog(false);
+							}}
+						>
 							Reject
 						</Button>
 					</Box>

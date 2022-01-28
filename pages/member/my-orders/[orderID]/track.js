@@ -211,7 +211,7 @@ function getDefault(data, generalData) {
 						break;
 					case "declared":
 						defaultIcon = <PublishRounded />;
-						title = `Order form submitted / Standby for parcel`;
+						title = `Order form submitted`;
 						break;
 				}
 				break;
