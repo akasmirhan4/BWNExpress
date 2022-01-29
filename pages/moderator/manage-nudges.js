@@ -91,6 +91,7 @@ function NudgeCard(props) {
 							onClick={() => {
 								window.open(imageURL, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=0,left=0,width=512,height=512");
 							}}
+							key={index}
 						>
 							<Typography>{`image #${index}`}</Typography>
 						</MenuItem>
