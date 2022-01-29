@@ -33,7 +33,6 @@ export default function SearchOrders() {
 	const [orders, setOrders] = useState([]);
 
 	useEffect(() => {
-<<<<<<< HEAD
 		onSnapshot(query(collection(firestore, "allOrders"), orderBy("timestamp", "asc")), (querySnapshot) => {
 			let orders = [];
 			querySnapshot.forEach((doc) => {
@@ -41,18 +40,6 @@ export default function SearchOrders() {
 			});
 			setOrders(orders);
 		});
-=======
-		onSnapshot(
-			query(collection(firestore, "allOrders"), orderBy("timestamp", "asc")),
-			(querySnapshot) => {
-				let orders = [];
-				querySnapshot.forEach((doc) => {
-					orders.push(doc.data());
-				});
-				setOrders(orders);
-			}
-		);
->>>>>>> f4e228c1d3e2b2019bc50ad56107d83698b93144
 	}, []);
 
 	return (
