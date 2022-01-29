@@ -33,6 +33,15 @@ export default function SearchOrders() {
 	const [orders, setOrders] = useState([]);
 
 	useEffect(() => {
+<<<<<<< HEAD
+		onSnapshot(query(collection(firestore, "allOrders"), orderBy("timestamp", "asc")), (querySnapshot) => {
+			let orders = [];
+			querySnapshot.forEach((doc) => {
+				orders.push(doc.data());
+			});
+			setOrders(orders);
+		});
+=======
 		onSnapshot(
 			query(collection(firestore, "allOrders"), orderBy("timestamp", "asc")),
 			(querySnapshot) => {
@@ -43,6 +52,7 @@ export default function SearchOrders() {
 				setOrders(orders);
 			}
 		);
+>>>>>>> f4e228c1d3e2b2019bc50ad56107d83698b93144
 	}, []);
 
 	return (
@@ -171,8 +181,8 @@ function ParcelArrivalDialog(props) {
 					{images.length > 0 && (
 						<Fragment>
 							<Typography sx={{ mt: 1 }}>File selected: </Typography>
-							{images.map((image) => (
-								<Link href={URL.createObjectURL(image)} target="_blank">
+							{images.map((image, index) => (
+								<Link href={URL.createObjectURL(image)} target="_blank" key={index}>
 									{image.name}
 								</Link>
 							))}
