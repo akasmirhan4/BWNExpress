@@ -2,7 +2,18 @@ import { Button, Typography, Box, useTheme, IconButton, Drawer, Tooltip } from "
 import Image from "next/image";
 import styles from "styles/main.module.scss";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { AdminPanelSettingsRounded, Dashboard, GroupAddRounded, Inbox, Logout, ManageAccountsRounded, PendingActionsRounded, Settings, SwapHoriz } from "@mui/icons-material";
+import {
+	AdminPanelSettingsRounded,
+	Dashboard,
+	GroupAddRounded,
+	Inbox,
+	Logout,
+	ManageAccountsRounded,
+	PendingActionsRounded,
+	SearchRounded,
+	Settings,
+	SwapHoriz,
+} from "@mui/icons-material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -50,7 +61,7 @@ export default function EmployeeDrawer(props) {
 				<Box display="flex" flexDirection="column" alignItems="center" mb={2} width="100%">
 					<Link href="/member/dashboard" passHref>
 						<IconButton sx={{ borderRadius: 4, p: 1, m: 1 }}>
-							<Logo width={128} fill={palette.secondaryAccent.main}/>
+							<Logo width={128} fill={palette.secondaryAccent.main} />
 						</IconButton>
 					</Link>
 					<Typography className={styles.companyName} color="white.main">
@@ -68,7 +79,7 @@ export default function EmployeeDrawer(props) {
 				{/* main nav */}
 				<Box display="flex" flexDirection="column" width="100%" mt={4} flex={1}>
 					<DrawerButton startIcon={<Dashboard />} href="/employee/dashboard" label="Dashboard" />
-					<DrawerButton startIcon={<PendingActionsRounded />} href="/employee/verify-orders" label="Verify Orders" />
+					<DrawerButton startIcon={<SearchRounded />} href="/employee/search-orders" label="Search Orders" />
 				</Box>
 
 				{/* setting nav */}

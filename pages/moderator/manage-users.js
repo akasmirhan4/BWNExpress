@@ -236,6 +236,7 @@ function UsersTable(props) {
 	};
 
 	const handleClick = (event, email) => {
+		console.log(selected);
 		const selectedIndex = selected.indexOf(email);
 		let newSelected = [];
 

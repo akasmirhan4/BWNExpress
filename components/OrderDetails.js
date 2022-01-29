@@ -25,6 +25,8 @@ export default function OrderDetails(props) {
 				label="Status"
 				value={order.status}
 				items={[
+					"orderApproved",
+					"orderRejected",
 					"orderSubmitted",
 					"awaitingParcel",
 					"readyForCollection",
