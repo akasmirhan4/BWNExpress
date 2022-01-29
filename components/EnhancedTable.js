@@ -222,6 +222,7 @@ const EnhancedTableToolbar = (props) => {
 				</Typography>
 			)}
 			<TextField
+				label=""
 				margin="dense"
 				size="small"
 				value={search}
