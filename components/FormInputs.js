@@ -1,4 +1,4 @@
-import { TextField, FormHelperText, Tooltip, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { TextField, FormHelperText, Tooltip, FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
 import { Fragment } from "react";
 
 export function CustomTextField(props) {
@@ -14,12 +14,14 @@ export function CustomTextField(props) {
 }
 
 export function CustomSelector(props) {
-	const { tooltip = "", errors = [], required, label, onChange, value, items, ...others } = props;
+	const { tooltip = "", errors = [], required, label, onChange, value, items, sx, ...others } = props;
 	return (
-		<Fragment>
+		<Box sx={sx}>
 			<Tooltip disableHoverListener title={tooltip} placement="top" arrow enterTouchDelay={100}>
 				<FormControl fullWidth sx={{ mt: { xs: 3, sm: 1 } }}>
-					<InputLabel sx={{ color: props.disabled ? "rgba(0, 0, 0, 0.38)" : "text.main" }} error={errors.length}>{`${label} ${required ? " *" : ""}`}</InputLabel>
+					<InputLabel sx={{ color: props.disabled ? "rgba(0, 0, 0, 0.38)" : "text.main" }} error={errors.length}>{`${label} ${
+						required ? " *" : ""
+					}`}</InputLabel>
 					<Select
 						{...others}
 						value={value}
@@ -39,6 +41,6 @@ export function CustomSelector(props) {
 				</FormControl>
 			</Tooltip>
 			<FormHelperText error>{errors.join(" , ")}</FormHelperText>
-		</Fragment>
+		</Box>
 	);
 }

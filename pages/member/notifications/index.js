@@ -187,8 +187,7 @@ function NotificationCard(props) {
 							{props.archive ? (
 								<IconButton
 									onClick={async (e) => {
-										e.preventDefault();
-										console.log("unarchived");
+										e.stopPropagation();
 										await archiveNotification(props.id, false);
 									}}
 								>
@@ -197,8 +196,7 @@ function NotificationCard(props) {
 							) : (
 								<IconButton
 									onClick={async (e) => {
-										e.preventDefault();
-										console.log("archived");
+										e.stopPropagation();
 										await archiveNotification(props.id);
 									}}
 								>
@@ -208,7 +206,7 @@ function NotificationCard(props) {
 
 							<IconButton
 								onClick={(e) => {
-									e.preventDefault();
+									e.stopPropagation();
 									if (props.href) router.push(props.href);
 								}}
 							>

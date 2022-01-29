@@ -1,4 +1,4 @@
-import { AddRounded, CloseRounded, EditRounded, MoreHorizRounded, SendRounded } from "@mui/icons-material";
+import { AnnouncementRounded, CloseRounded, EditRounded, MoreHorizRounded, SendRounded } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
 	Container,
@@ -15,13 +15,16 @@ import {
 	Tab,
 	Box,
 	Link,
-	TextField,
+	Menu,
+	MenuItem,
+	ListItemIcon,
+	ListItemText,
 } from "@mui/material";
-import CustomUploadButton from "components/CustomUploadButton";
 import EnhancedTable from "components/EnhancedTable";
 import ModeratorPageTemplate from "components/ModeratorPageTemplate";
+import NudgeDialog from "components/NudgeDialog";
 import OrderDetails from "components/OrderDetails";
-import { collection, doc, getDoc, onSnapshot, orderBy, query, setDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot, orderBy, query, setDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { firestore, storage } from "lib/firebase";
 import { Fragment, useEffect, useState } from "react";
@@ -29,8 +32,10 @@ import toast from "react-hot-toast";
 
 export default function SearchOrders() {
 	const [openArrivalDialog, setOpenArrivalDialog] = useState(false);
+	const [openNudgeDialog, setOpenNudgeDialog] = useState(false);
 	const [order, setOrder] = useState(null);
 	const [orders, setOrders] = useState([]);
+	const [anchorEl, setAnchorEl] = useState(null);
 
 	useEffect(() => {
 		onSnapshot(query(collection(firestore, "allOrders"), orderBy("timestamp", "asc")), (querySnapshot) => {
@@ -48,6 +53,14 @@ export default function SearchOrders() {
 				<Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
 					<Typography color="text.primary">Manage Orders</Typography>
 				</Breadcrumbs>
+				<NudgeDialog
+					order={order}
+					open={openNudgeDialog}
+					onClose={() => {
+						setOpenNudgeDialog(false);
+					}}
+					to="member"
+				/>
 				<ParcelArrivalDialog
 					order={order}
 					open={openArrivalDialog}
@@ -111,8 +124,24 @@ export default function SearchOrders() {
 									<EditRounded />
 								</IconButton>
 							</Tooltip>
+							<Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl(null)}>
+								<MenuItem
+									onClick={(e) => {
+										setOrder(row);
+										e.stopPropagation();
+										setAnchorEl(null);
+										setOpenNudgeDialog(true);
+									}}
+								>
+									<ListItemIcon>
+										<AnnouncementRounded />
+									</ListItemIcon>
+									<ListItemText>Nudge</ListItemText>
+								</MenuItem>
+							</Menu>
 							<IconButton
 								onClick={(e) => {
+									setAnchorEl(e.target);
 									e.stopPropagation();
 								}}
 							>
@@ -194,7 +223,6 @@ function ParcelArrivalDialog(props) {
 							setIsSubmitting(false);
 							return;
 						}
-						let batchPromises = [];
 						const getURL = (file) => {
 							return new Promise(async (resolve) => {
 								const storageRef = ref(storage, `unsubmittedParcels/${trackingNumber}/${file.name}`);

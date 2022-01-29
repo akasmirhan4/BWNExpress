@@ -25,6 +25,7 @@ export default function OrderDetails(props) {
 				label="Status"
 				value={order.status}
 				items={[
+					"arrivedLabuan",
 					"orderApproved",
 					"orderRejected",
 					"orderSubmitted",
@@ -102,6 +103,7 @@ export default function OrderDetails(props) {
 				disabled={!editable}
 			/>
 			<TextField margin="dense" label="Remark" type="text" fullWidth multiline minRows={3} variant="outlined" value={order.remark} disabled={!editable} />
+			<TextField margin="dense" label="Labuan Remark" type="text" fullWidth multiline minRows={3} variant="outlined" value={order.labuanRemark} disabled={!editable} />
 			{props.files?.length > 0 && (
 				<Box sx={{ mt: 2 }}>
 					{props.files.map((file, index) => (

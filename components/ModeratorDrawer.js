@@ -2,10 +2,15 @@ import { Button, Typography, Box, useTheme, IconButton, Drawer, Tooltip } from "
 import styles from "styles/main.module.scss";
 import {
 	AdminPanelSettingsRounded,
+	AnnouncementOutlined,
+	AnnouncementRounded,
 	ContentPasteRounded,
 	Dashboard,
+	DashboardOutlined,
+	GroupAddOutlined,
 	GroupAddRounded,
 	Logout,
+	ManageAccountsOutlined,
 	ManageAccountsRounded,
 	PendingActionsRounded,
 	Settings,
@@ -73,12 +78,13 @@ export default function ModeratorDrawer(props) {
 				</Box>
 				{/* main nav */}
 				<Box display="flex" flexDirection="column" width="100%" mt={4} flex={1}>
-					<DrawerButton startIcon={<Dashboard />} href="/moderator/dashboard" label="Dashboard" />
-					<DrawerButton startIcon={<GroupAddRounded />} href="/moderator/verify-users" label="Verify Users" />
-					<DrawerButton startIcon={<ManageAccountsRounded />} href="/moderator/manage-users" label="Manage Users" />
+					<DrawerButton startIcon={<DashboardOutlined />} href="/moderator/dashboard" label="Dashboard" />
+					<DrawerButton startIcon={<GroupAddOutlined />} href="/moderator/verify-users" label="Verify Users" />
+					<DrawerButton startIcon={<ManageAccountsOutlined />} href="/moderator/manage-users" label="Manage Users" />
 
 					<DrawerButton startIcon={<PendingActionsRounded />} href="/moderator/verify-orders" label="Verify Orders" />
 					<DrawerButton startIcon={<ContentPasteRounded />} href="/moderator/manage-orders" label="Manage Orders" />
+					<DrawerButton startIcon={<AnnouncementOutlined />} href="/moderator/manage-nudges" label="Incoming Nudges" />
 				</Box>
 
 				{/* setting nav */}

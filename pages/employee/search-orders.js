@@ -164,6 +164,7 @@ function ParcelArrivalDialog(props) {
 	const [images, setImages] = useState([]);
 	const [trackingNumber, setTrackingNumber] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [remark, setRemark] = useState("");
 
 	useEffect(() => {
 		setTrackingNumber(order?.trackingNumber ?? "");
@@ -201,6 +202,19 @@ function ParcelArrivalDialog(props) {
 						disabled={!!order}
 						sx={{ mb: 2 }}
 						onChange={(e) => setTrackingNumber(e.target.value)}
+						required
+					/>
+					<TextField
+						margin="dense"
+						label="Labuan Remark"
+						type="text"
+						fullWidth
+						minRows={3}
+						multiline
+						variant="outlined"
+						value={remark}
+						sx={{ mb: 2 }}
+						onChange={(e) => setRemark(e.target.value)}
 					/>
 					<CustomUploadButton
 						tooltip="Ensure Tracking ID is visible with its barcode"
@@ -215,7 +229,6 @@ function ParcelArrivalDialog(props) {
 								images.push(files[i]);
 							}
 							setImages(images);
-							console.log(images);
 						}}
 					/>
 					{images.length > 0 && (
@@ -253,10 +266,12 @@ function ParcelArrivalDialog(props) {
 
 							await toast.promise(
 								Promise.all([
-									updateDoc(doc(firestore, "allOrders", order.orderID), { status: "arrivedLabuan" }),
+									updateDoc(doc(firestore, "allOrders", order.orderID), { status: "arrivedLabuan", labuanRemark: remark }),
 									addDoc(collection(firestore, "allOrders", order.orderID, "logTracker"), {
 										timestamp: serverTimestamp(),
 										status: "arrivedLabuan",
+										location: "Collection Warehouse, Labuan",
+										labuanRemark: remark,
 										byUser: auth.currentUser.uid,
 										imageURL: result.URL,
 									}),

@@ -3,23 +3,26 @@ import { Box } from "@mui/system";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import React, { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { auth, getLogTracker, getOrder } from "lib/firebase";
+import { firestore, getOrder } from "lib/firebase";
 import toast from "react-hot-toast";
 import NextLink from "next/link";
 import {
 	BugReportRounded,
 	CheckRounded,
 	CircleRounded,
+	CloseRounded,
 	ErrorRounded,
 	LocalShippingRounded,
 	MoreHorizRounded,
 	PaidRounded,
 	PublishRounded,
+	RoomRounded,
 	TouchAppRounded,
 } from "@mui/icons-material";
 import { cloneElement } from "react";
 import { useSelector } from "react-redux";
 import { selectUserExists } from "lib/slices/userSlice";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 
 export default function Details() {
 	return (
@@ -46,30 +49,32 @@ function TrackerComponent(props) {
 	const orderID = router.query.orderID;
 	const [headerColor, setHeaderColor] = useState("secondary.main");
 	const [headerTitle, setHeaderTitle] = useState("...");
-	const userExist = useSelector(selectUserExists);
 
 	useEffect(() => {
-		if (userExist) {
-			(async () => {
-				const results = await toast.promise(Promise.all([getLogTracker(orderID), getOrder(orderID)]), {
-					loading: "fetching data...",
-					success: "data loaded",
-					error: "error fetching data",
-				});
-				console.log(results);
-				if (!results[0] || !results[1]) {
-					toast.error("Data missing. Redirecting...");
-					router.push("/member/my-orders");
-				} else {
-					setTrackerLogs(results[0]);
-					setOrderData(results[1]);
-					const { title, defaultColor } = getDefault(results[0][0], results[1]);
-					setHeaderTitle(title);
-					setHeaderColor(defaultColor);
-				}
-			})();
+		if (!orderID) return;
+		onSnapshot(query(collection(firestore, "allOrders", orderID, "logTracker"), orderBy("timestamp", "desc")), (snapshots) => {
+			let logs = [];
+			snapshots.forEach((snapshot) => {
+				logs.push(snapshot.data());
+			});
+			setTrackerLogs(logs);
+		});
+		getOrder(orderID).then((data) => {
+			if (!data && !orderID) {
+				toast.error("Data missing. Redirecting...");
+				router.push("/member/my-orders");
+			}
+			setOrderData(data);
+		});
+	}, [orderID]);
+
+	useEffect(() => {
+		if (orderData && trackerLogs.length > 0) {
+			const { title, defaultColor } = getDefault(trackerLogs[0], orderData);
+			setHeaderTitle(title);
+			setHeaderColor(defaultColor);
 		}
-	}, [userExist]);
+	}, [orderData, trackerLogs]);
 
 	return (
 		<Box
@@ -242,6 +247,20 @@ function getDefault(data, generalData) {
 				defaultColor = "lightGrey.secondary";
 				title = `Processing Permit`;
 				defaultIcon = <CircleRounded />;
+				break;
+			case "orderApproved":
+				defaultColor = "success.main";
+				defaultIcon = <CheckRounded />;
+				title = `Order Approved`;
+				break;
+			case "orderRejected":
+				defaultColor = "error.main";
+				defaultIcon = <CloseRounded />;
+				title = `Order Rejected - ${data.details}`;
+				break;
+			case "arrivedLabuan":
+				defaultIcon = <RoomRounded />;
+				title = `Parcel arrived in Labuan`;
 				break;
 			case "custom":
 				defaultColor = "lightGrey.secondary";

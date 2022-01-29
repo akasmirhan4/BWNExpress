@@ -18,10 +18,12 @@ export default function CustomUploadButton(props) {
 		maxFile = 4,
 		type = "unknown",
 		preventUpload = false,
+		sx,
+		...others
 	} = props;
 
 	return (
-		<Fragment>
+		<Box sx={sx}>
 			<Tooltip title={tooltip} placement="top" arrow enterTouchDelay={100}>
 				<LoadingButton
 					loading={loading}
@@ -33,6 +35,7 @@ export default function CustomUploadButton(props) {
 					size="large"
 					fullWidth
 					component="label"
+					{...others}
 				>
 					{label}
 					{required ? " *" : ""}
@@ -112,12 +115,12 @@ export default function CustomUploadButton(props) {
 			<Box>
 				{props.value?.length > 0 &&
 					props.value?.map((doc, index) => (
-						<Link href={doc?.URL} key={index} target={"_blank"}>
-							<Typography variant="body2">{doc?.name}</Typography>
+						<Link href={doc?.URL ?? URL.createObjectURL(doc)} key={index} target={"_blank"}>
+							<Typography variant="body2" color="primary">{doc?.name}</Typography>
 						</Link>
 					))}
 			</Box>
 			<FormHelperText error>{errors.join(" , ")}</FormHelperText>
-		</Fragment>
+		</Box>
 	);
 }

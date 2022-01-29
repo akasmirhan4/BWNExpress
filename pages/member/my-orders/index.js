@@ -1,4 +1,13 @@
-import { ExpandMoreRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, MapRounded, PageviewRounded } from "@mui/icons-material";
+import {
+	ExpandMoreRounded,
+	KeyboardArrowDownRounded,
+	KeyboardArrowUpRounded,
+	MapRounded,
+	FormatListBulletedRounded,
+	MoreHorizRounded,
+	FindInPageRounded,
+	AnnouncementRounded,
+} from "@mui/icons-material";
 import { DateRangePicker, LocalizationProvider } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import {
@@ -7,7 +16,6 @@ import {
 	AccordionSummary,
 	Box,
 	Breadcrumbs,
-	Button,
 	Checkbox,
 	Collapse,
 	Container,
@@ -17,6 +25,10 @@ import {
 	FormLabel,
 	Grid,
 	IconButton,
+	ListItemIcon,
+	ListItemText,
+	Menu,
+	MenuItem,
 	Skeleton,
 	Table,
 	TableBody,
@@ -34,7 +46,8 @@ import { getOrders } from "lib/firebase";
 import { selectUserExists, setOrders } from "lib/slices/userSlice";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Link from "next/link";
+import router from "next/router";
+import NudgeDialog from "components/NudgeDialog";
 
 export default function MyOrders() {
 	const [status, setStatus] = useState({
@@ -94,7 +107,6 @@ export default function MyOrders() {
 			getOrders().then((orders) => {
 				if (!orders) return;
 				dispatch(setOrders(orders));
-				console.log(orders);
 				const _rows = orders.map(({ orderID, dateSubmitted, status, estimatedDuration }) => {
 					return {
 						orderID,
@@ -223,7 +235,9 @@ function EnhancedTableRow(props) {
 	const [collapseOpen, setCollapseOpen] = useState(false);
 	const isMdDown = useMediaQuery((theme) => theme.breakpoints.down("md"));
 	const isSmDown = useMediaQuery((theme) => theme.breakpoints.down("sm"));
-	const row = props.row;
+	const { row } = props;
+	const [openNudgeDialog, setOpenNudgeDialog] = useState(false);
+	const [anchorEl, setAnchorEl] = useState(null);
 
 	function camelCaseToText(camel) {
 		const result = camel.replace(/([A-Z])/g, " $1");
@@ -233,6 +247,25 @@ function EnhancedTableRow(props) {
 
 	return (
 		<Fragment>
+			<NudgeDialog open={openNudgeDialog} onClose={() => setOpenNudgeDialog(false)} order={row} to="moderator"/>
+			<Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl(null)}>
+				<MenuItem onClick={() => router.push(`/member/my-orders/${encodeURIComponent(row.orderID)}/details`)}>
+					<ListItemIcon>
+						<FindInPageRounded color="primary" />
+					</ListItemIcon>
+					<ListItemText>See Details</ListItemText>
+				</MenuItem>
+				<MenuItem
+					onClick={() => {
+						setOpenNudgeDialog(true);
+					}}
+				>
+					<ListItemIcon>
+						<AnnouncementRounded color="primary" />
+					</ListItemIcon>
+					<ListItemText>Send Nudge</ListItemText>
+				</MenuItem>
+			</Menu>
 			<TableRow key={row.orderID}>
 				{isMdDown && (
 					<TableCell sx={{ px: 0, width: "1em" }}>
@@ -251,27 +284,27 @@ function EnhancedTableRow(props) {
 				{!isMdDown && <TableCell>{row.estimatedDuration ?? "-"}</TableCell>}
 				{!isMdDown && (
 					<TableCell align="right">
-						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`} passHref>
-							<Tooltip title="See more details" placement="top" arrow>
-								<IconButton>
-									<PageviewRounded color="primary" />
-								</IconButton>
-							</Tooltip>
-						</Link>
 						<Tooltip title="In Progress" placement="top" arrow>
 							<span>
-								<IconButton sx={{ ml: 1 }} disabled={true}>
+								<IconButton disabled={true}>
 									<MapRounded color="lightGrey.secondary" />
 								</IconButton>
 							</span>
 						</Tooltip>
-						<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`} passHref>
-							<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
-								<Button variant="contained" sx={{ ml: 1 }}>
-									Track Order
-								</Button>
-							</Tooltip>
-						</Link>
+						<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
+							<IconButton
+								onClick={() => {
+									router.push(`/member/my-orders/${encodeURIComponent(row.orderID)}/track`);
+								}}
+							>
+								<FormatListBulletedRounded color="primary" />
+							</IconButton>
+						</Tooltip>
+						<Tooltip title="More Actions" placement="top" arrow>
+							<IconButton onClick={(e) => setAnchorEl(e.target)}>
+								<MoreHorizRounded color="primary" />
+							</IconButton>
+						</Tooltip>
 					</TableCell>
 				)}
 			</TableRow>
@@ -304,34 +337,23 @@ function EnhancedTableRow(props) {
 											{!isSmDown && <TableCell sx={{ borderBottom: "unset" }}>ACTIONS</TableCell>}
 											<TableCell colSpan={isSmDown ? 2 : 1} align={!isSmDown ? "center" : "right"} sx={{ borderBottom: "unset" }}>
 												<Box display="flex" justifyContent={isSmDown ? "center" : "flex-end"} mt={1}>
-													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/details`} passHref>
-														<IconButton>
-															<PageviewRounded color="primary" />
-														</IconButton>
-													</Link>
 													<Tooltip title="In Progress" placement="top" arrow>
 														<span>
-															<IconButton sx={{ mx: 1 }} disabled={true}>
+															<IconButton sx={{ mx: 1 }} disabled>
 																<MapRounded color="lightGrey.secondary" />
 															</IconButton>
 														</span>
 													</Tooltip>
-													<Link href={`/member/my-orders/${encodeURIComponent(row.orderID)}/track`} passHref>
-														<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
-															<Button
-																variant="contained"
-																sx={{
-																	whiteSpace: "nowrap",
-																	textOverflow: "ellipsis",
-																	overflow: "hidden",
-																	ml: 1,
-																}}
-																fullWidth
-															>
-																Track Order
-															</Button>
-														</Tooltip>
-													</Link>
+													<Tooltip title="Trace where your parcel have gone to" placement="top" arrow>
+														<IconButton onClick={() => router.push(`/member/my-orders/${encodeURIComponent(row.orderID)}/track`)}>
+															<FormatListBulletedRounded color="primary" />
+														</IconButton>
+													</Tooltip>
+													<Tooltip title="More Actions" placement="top" arrow>
+														<IconButton onClick={(e) => setAnchorEl(e.target)}>
+															<MoreHorizRounded color="primary" />
+														</IconButton>
+													</Tooltip>
 												</Box>
 											</TableCell>
 										</TableRow>
