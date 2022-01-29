@@ -36,7 +36,7 @@ import {
 	ListItemText,
 	TextField,
 } from "@mui/material";
-import EmployeePageTemplate from "components/EmployeePageTemplate";
+import ModeratorPageTemplate from "components/ModeratorPageTemplate";
 import OrderDetails from "components/OrderDetails";
 import PaymentDetails from "components/PaymentDetails";
 import PermitDetails from "components/PermitDetails";
@@ -65,7 +65,7 @@ export default function VerifyOrders() {
 	}, []);
 
 	return (
-		<EmployeePageTemplate>
+		<ModeratorPageTemplate>
 			<Container>
 				<Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
 					<Typography color="text.primary">Verify Orders</Typography>
@@ -87,7 +87,7 @@ export default function VerifyOrders() {
 					)}
 				</Grid>
 			</Container>
-		</EmployeePageTemplate>
+		</ModeratorPageTemplate>
 	);
 }
 
@@ -238,13 +238,7 @@ function PendingOrderCard(props) {
 				</DialogTitle>
 				<DialogContent sx={{ minHeight: "80vh", overflowX: "hidden" }}>
 					<Box sx={{ borderBottom: 1, borderColor: "divider", width: "50vw" }}>
-						<Tabs
-							value={currentTab}
-							onChange={(e, newTab) => {
-								console.log(newTab);
-								setCurrentTab(newTab);
-							}}
-						>
+						<Tabs value={currentTab} onChange={(e, newTab) => setCurrentTab(newTab)}>
 							<Tab label="order" />
 							<Tab label="permit" />
 							<Tab label="payment" />

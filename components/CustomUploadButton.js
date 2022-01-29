@@ -17,6 +17,7 @@ export default function CustomUploadButton(props) {
 		required,
 		maxFile = 4,
 		type = "unknown",
+		preventUpload = false,
 	} = props;
 
 	return (
@@ -68,6 +69,11 @@ export default function CustomUploadButton(props) {
 										toast.error("Upload images, pdf files, or word files only");
 										return;
 									}
+								}
+								if (preventUpload) {
+									setLoading(false);
+									onChange(files);
+									return;
 								}
 
 								const orderID = window.sessionStorage.getItem("orderID");

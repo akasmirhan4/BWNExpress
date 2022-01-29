@@ -1,8 +1,15 @@
 import { Button, Typography, Box, useTheme, IconButton, Drawer, Tooltip } from "@mui/material";
-import Image from "next/image";
 import styles from "styles/main.module.scss";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { AdminPanelSettingsRounded, Dashboard, GroupAddRounded, Inbox, Logout, ManageAccountsRounded, PendingActionsRounded, Settings, SwapHoriz } from "@mui/icons-material";
+import {
+	AdminPanelSettingsRounded,
+	ContentPasteRounded,
+	Dashboard,
+	GroupAddRounded,
+	Logout,
+	ManageAccountsRounded,
+	PendingActionsRounded,
+	Settings,
+} from "@mui/icons-material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -50,7 +57,7 @@ export default function ModeratorDrawer(props) {
 				<Box display="flex" flexDirection="column" alignItems="center" mb={2} width="100%">
 					<Link href="/member/dashboard" passHref>
 						<IconButton sx={{ borderRadius: 4, p: 1, m: 1 }}>
-							<Logo width={128} fill={palette.secondary.main}/>
+							<Logo width={128} fill={palette.secondary.main} />
 						</IconButton>
 					</Link>
 					<Typography className={styles.companyName} color="white.main">
@@ -69,6 +76,9 @@ export default function ModeratorDrawer(props) {
 					<DrawerButton startIcon={<Dashboard />} href="/moderator/dashboard" label="Dashboard" />
 					<DrawerButton startIcon={<GroupAddRounded />} href="/moderator/verify-users" label="Verify Users" />
 					<DrawerButton startIcon={<ManageAccountsRounded />} href="/moderator/manage-users" label="Manage Users" />
+
+					<DrawerButton startIcon={<PendingActionsRounded />} href="/moderator/verify-orders" label="Verify Orders" />
+					<DrawerButton startIcon={<ContentPasteRounded />} href="/moderator/manage-orders" label="Manage Orders" />
 				</Box>
 
 				{/* setting nav */}
