@@ -16,9 +16,9 @@ export function CustomTextField(props) {
 export function CustomSelector(props) {
 	const { tooltip = "", errors = [], required, label, onChange, value, items, sx, ...others } = props;
 	return (
-		<Box sx={sx}>
+		<Fragment>
 			<Tooltip disableHoverListener title={tooltip} placement="top" arrow enterTouchDelay={100}>
-				<FormControl fullWidth sx={{ mt: { xs: 3, sm: 1 } }}>
+				<FormControl fullWidth sx={{ ...sx, mt: { xs: 3, sm: 1 } }}>
 					<InputLabel sx={{ color: props.disabled ? "rgba(0, 0, 0, 0.38)" : "text.main" }} error={errors.length}>{`${label} ${
 						required ? " *" : ""
 					}`}</InputLabel>
@@ -29,7 +29,6 @@ export function CustomSelector(props) {
 						onChange={onChange}
 						margin="dense"
 						sx={{ boxShadow: (theme) => theme.shadows[1] }}
-						required
 						error={errors.length}
 					>
 						{items.map((item, index) => (
@@ -41,6 +40,6 @@ export function CustomSelector(props) {
 				</FormControl>
 			</Tooltip>
 			<FormHelperText error>{errors.join(" , ")}</FormHelperText>
-		</Box>
+		</Fragment>
 	);
 }

@@ -247,7 +247,7 @@ function EnhancedTableRow(props) {
 
 	return (
 		<Fragment>
-			<NudgeDialog open={openNudgeDialog} onClose={() => setOpenNudgeDialog(false)} order={row} to="moderator"/>
+			<NudgeDialog open={openNudgeDialog} onClose={() => setOpenNudgeDialog(false)} order={row} to="moderator" redirect/>
 			<Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl(null)}>
 				<MenuItem onClick={() => router.push(`/member/my-orders/${encodeURIComponent(row.orderID)}/details`)}>
 					<ListItemIcon>
@@ -255,11 +255,7 @@ function EnhancedTableRow(props) {
 					</ListItemIcon>
 					<ListItemText>See Details</ListItemText>
 				</MenuItem>
-				<MenuItem
-					onClick={() => {
-						setOpenNudgeDialog(true);
-					}}
-				>
+				<MenuItem onClick={() => setOpenNudgeDialog(true)}>
 					<ListItemIcon>
 						<AnnouncementRounded color="primary" />
 					</ListItemIcon>

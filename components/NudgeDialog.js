@@ -8,9 +8,10 @@ import toast from "react-hot-toast";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { AnnouncementRounded, CloseRounded } from "@mui/icons-material";
 import { useState } from "react";
+import router from "next/router";
 
 export default function NudgeDialog(props) {
-	const { open, onClose, order, to } = props;
+	const { open, onClose, order, to, redirect = "false" } = props;
 	const [orderQuery, setOrderQuery] = useState("");
 	const [remark, setRemark] = useState("");
 	const [images, setImages] = useState([]);
@@ -52,7 +53,7 @@ export default function NudgeDialog(props) {
 				timestamp: serverTimestamp(),
 				query: orderQuery,
 				remark,
-				to: to ?? "member",
+				to: to ?? "moderator",
 				imageURLs: results.map(({ URL }) => URL),
 				orderRef: doc(firestore, "allOrders", order.orderID),
 			}),
@@ -62,6 +63,7 @@ export default function NudgeDialog(props) {
 				error: "Error sending nudge",
 			}
 		);
+		if (redirect) router.push(`/member/my-orders/${order.orderID}/nudges`);
 		handleClose();
 	};
 

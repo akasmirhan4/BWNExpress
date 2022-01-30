@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import ModeratorPageTemplate from "components/ModeratorPageTemplate";
 import { collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
-import { firestore, storage } from "lib/firebase";
+import { auth, firestore, sendNotification, storage } from "lib/firebase";
 import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
 import { SendRounded, FindInPageRounded, AttachFileRounded, CloseRounded } from "@mui/icons-material";
@@ -28,6 +28,7 @@ import OrderDetails from "components/OrderDetails";
 import CustomUploadButton from "components/CustomUploadButton";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import toast from "react-hot-toast";
+import { LoadingButton } from "@mui/lab";
 
 export default function ManageNudges() {
 	const [nudges, setNudges] = useState([]);
@@ -36,9 +37,8 @@ export default function ManageNudges() {
 		onSnapshot(query(collection(firestore, "nudges"), where("answered", "==", false), orderBy("timestamp", "asc")), (querySnapshot) => {
 			let nudges = [];
 			querySnapshot.forEach((doc) => {
-				nudges.push({...doc.data(), id: doc.id});
+				nudges.push({ ...doc.data(), id: doc.id });
 			});
-			console.log({ nudges });
 			setNudges(nudges);
 		});
 	}, []);
@@ -104,12 +104,26 @@ function NudgeCard(props) {
 		}
 		const nudgeRef = doc(firestore, "nudges", nudge.id);
 		const results = await Promise.all(batchPromises);
+		sendNotification(order.userID, {
+			title: "You received a nudge response from us 👋",
+			subtitle: nudge.query,
+			details: `Reply: ${reply}`,
+			type: "nudge",
+			href: `/member/my-orders/${order.orderID}/nudges`,
+			notification: {
+				email: true,
+				SMS: true,
+				app: true,
+				desktop: true,
+			},
+		});
 
 		await toast.promise(
 			updateDoc(nudgeRef, {
 				answered: true,
 				answeredTimestamp: serverTimestamp(),
-				answeredImagesURL: results.map(({ URL }) => URL),
+				answeredImageURLs: results.map(({ URL }) => URL),
+				answeredBy: auth.currentUser.uid,
 				reply,
 			}),
 			{
@@ -118,6 +132,8 @@ function NudgeCard(props) {
 				error: "Error replying to nudge",
 			}
 		);
+		setIsSending(false);
+		setReply("");
 	};
 
 	return (
@@ -185,9 +201,9 @@ function NudgeCard(props) {
 						)}
 					</Box>
 					<Box>
-						<Button onClick={sendReply} startIcon={<SendRounded />} disabled={!reply}>
+						<LoadingButton loading={isSending} onClick={sendReply} startIcon={<SendRounded />} disabled={!reply}>
 							Send
-						</Button>
+						</LoadingButton>
 					</Box>
 				</CardActions>
 			</Card>

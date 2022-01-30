@@ -158,6 +158,7 @@ export default function Payment() {
 								label="Payment Method"
 								required
 								value={paymentMethod}
+								fullWidth
 								onChange={(e) => {
 									setPaymentMethod(e.target.value);
 									if (errors.paymentMethod.length) setErrors({ ...errors, paymentMethod: [] });
