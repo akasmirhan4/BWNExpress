@@ -5,7 +5,7 @@ import Link2 from "next/link";
 
 import { useState } from "react";
 import GoogleSignInBtn from "components/GoogleSignInBtn";
-import { auth, FacebookAuthProvider } from "lib/firebase";
+import { auth, facebookAuthProvider } from "lib/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function Register(params) {
@@ -215,7 +215,7 @@ function RegisterContainer(props) {
 								}}
 								fullWidth
 								onClick={() => {
-									auth.signInWithPopup(FacebookAuthProvider);
+									auth.signInWithPopup(facebookAuthProvider);
 								}}
 							>
 								<FacebookRounded fontSize="large" sx={{ mr: 3, ml: -0.5 }} />

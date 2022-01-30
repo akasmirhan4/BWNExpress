@@ -7,6 +7,7 @@ import {
 	ChevronRightRounded,
 	ErrorRounded,
 	MessageRounded,
+	NotificationImportantRounded,
 	UnarchiveRounded,
 } from "@mui/icons-material";
 import {
@@ -80,6 +81,9 @@ export default function Notifications() {
 
 					let icon;
 					switch (notification.type) {
+						case "nudge":
+							icon = <AnnouncementRounded />;
+							break;
 						case "message":
 							icon = <MessageRounded />;
 							break;
@@ -87,7 +91,7 @@ export default function Notifications() {
 							icon = <CheckCircleRounded />;
 							break;
 						case "alert":
-							icon = <AnnouncementRounded />;
+							icon = <NotificationImportantRounded />;
 							break;
 						case "error":
 							icon = <ErrorRounded />;
