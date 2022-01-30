@@ -19,12 +19,15 @@ import {
 	DialogActions,
 } from "@mui/material";
 import ModeratorPageTemplate from "components/ModeratorPageTemplate";
-import { collection, getDoc, onSnapshot, orderBy, query, where } from "firebase/firestore";
-import { firestore } from "lib/firebase";
+import { collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
+import { firestore, storage } from "lib/firebase";
 import moment from "moment";
 import { Fragment, useEffect, useState } from "react";
 import { SendRounded, FindInPageRounded, AttachFileRounded, CloseRounded } from "@mui/icons-material";
 import OrderDetails from "components/OrderDetails";
+import CustomUploadButton from "components/CustomUploadButton";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import toast from "react-hot-toast";
 
 export default function ManageNudges() {
 	const [nudges, setNudges] = useState([]);
@@ -33,7 +36,7 @@ export default function ManageNudges() {
 		onSnapshot(query(collection(firestore, "nudges"), where("answered", "==", false), orderBy("timestamp", "asc")), (querySnapshot) => {
 			let nudges = [];
 			querySnapshot.forEach((doc) => {
-				nudges.push(doc.data());
+				nudges.push({...doc.data(), id: doc.id});
 			});
 			console.log({ nudges });
 			setNudges(nudges);
@@ -70,9 +73,11 @@ export default function ManageNudges() {
 function NudgeCard(props) {
 	const { nudge } = props;
 	const [openDialog, setOpenDialog] = useState(false);
-	const [answer, setAnswer] = useState("");
+	const [reply, setReply] = useState("");
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [order, setOrder] = useState(null);
+	const [files, setFiles] = useState([]);
+	const [isSending, setIsSending] = useState(false);
 
 	useEffect(() => {
 		if (!nudge.orderRef) return;
@@ -80,6 +85,40 @@ function NudgeCard(props) {
 			setOrder(doc.data());
 		});
 	}, []);
+
+	const sendReply = async () => {
+		if (!order) return;
+		setIsSending(true);
+
+		const getURL = (file) => {
+			return new Promise(async (resolve) => {
+				const storageRef = ref(storage, `nudges/${nudge.id}/${file.name}`);
+				await uploadBytes(storageRef, file);
+				const URL = await getDownloadURL(storageRef);
+				resolve({ URL, ref: storageRef, name: file.name, type: file.type });
+			});
+		};
+		let batchPromises = [];
+		for (let i = 0; i < files.length; i++) {
+			batchPromises.push(getURL(files[i]));
+		}
+		const nudgeRef = doc(firestore, "nudges", nudge.id);
+		const results = await Promise.all(batchPromises);
+
+		await toast.promise(
+			updateDoc(nudgeRef, {
+				answered: true,
+				answeredTimestamp: serverTimestamp(),
+				answeredImagesURL: results.map(({ URL }) => URL),
+				reply,
+			}),
+			{
+				loading: "replying...",
+				success: "Replied to nudge!",
+				error: "Error replying to nudge",
+			}
+		);
+	};
 
 	return (
 		<Fragment>
@@ -113,7 +152,22 @@ function NudgeCard(props) {
 							{moment(nudge.timestamp.toDate()).fromNow()}
 						</Typography>
 					</Box>
-					<TextField label="Answer" multiline minRows={3} fullWidth required value={answer} onChangeCapture={(e) => setAnswer(e.target.value)} sx={{ mt: 2 }} />
+					<TextField label="Reply" multiline minRows={3} fullWidth required value={reply} onChangeCapture={(e) => setReply(e.target.value)} sx={{ mt: 2 }} />
+					<CustomUploadButton
+						tooltip="Attach reference"
+						label="Attach file (Optional)"
+						maxFile={4}
+						value={files}
+						preventUpload
+						onChange={(files) => {
+							let _files = [];
+							for (let i = 0; i < files.length; i++) {
+								_files.push(files[i]);
+							}
+							setFiles(_files);
+						}}
+						sx={{ my: 2 }}
+					/>
 				</CardContent>
 				<CardActions sx={{ justifyContent: "space-between" }}>
 					<Box>
@@ -131,7 +185,7 @@ function NudgeCard(props) {
 						)}
 					</Box>
 					<Box>
-						<Button onClick={() => {}} startIcon={<SendRounded />}>
+						<Button onClick={sendReply} startIcon={<SendRounded />} disabled={!reply}>
 							Send
 						</Button>
 					</Box>

@@ -1,4 +1,4 @@
-import { Breadcrumbs, Container, Link, Typography } from "@mui/material";
+import { Breadcrumbs, Container, Link, Tab, Tabs, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import MemberPageTemplate from "components/MemberPageTemplate";
 import OrderSummary from "components/OrderSummary";
@@ -55,18 +55,11 @@ export default function Details() {
 					</NextLink>
 					<Typography color="text.primary">Details</Typography>
 				</Breadcrumbs>
-				<Box
-					my={4}
-					py={4}
-					sx={{ borderWidth: 1, borderStyle: "solid", borderColor: "lightGrey.main", px: { xs: 2, sm: 4, md: 6 }, boxShadow: (theme) => theme.shadows[1] }}
-					display={"flex"}
-					flexDirection={"column"}
-					width={"100%"}
-					bgcolor={"white.main"}
-					borderRadius={4}
-				>
-					<OrderSummary orderData={orderData} />
-				</Box>
+				<Tabs value={0} sx={{ borderBottom: 1, borderColor: "divider", mt: 4 }}>
+					<Tab label="Order Summary" href={`/member/my-orders/${router.query.orderID}/details`} />
+					<Tab label="Nudges" href={`/member/my-orders/${router.query.orderID}/nudges`} />
+				</Tabs>
+				<OrderSummary orderData={orderData} />
 			</Container>
 		</MemberPageTemplate>
 	);
