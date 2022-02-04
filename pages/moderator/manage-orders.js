@@ -24,7 +24,7 @@ import EnhancedTable from "components/EnhancedTable";
 import ModeratorPageTemplate from "components/ModeratorPageTemplate";
 import NudgeDialog from "components/NudgeDialog";
 import OrderDetails from "components/OrderDetails";
-import { collection, doc, getDoc, onSnapshot, orderBy, query, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, onSnapshot, orderBy, query, setDoc, where } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { firestore, storage } from "lib/firebase";
 import { Fragment, useEffect, useState } from "react";
@@ -38,7 +38,7 @@ export default function SearchOrders() {
 	const [anchorEl, setAnchorEl] = useState(null);
 
 	useEffect(() => {
-		onSnapshot(query(collection(firestore, "allOrders"), orderBy("timestamp", "asc")), (querySnapshot) => {
+		onSnapshot(query(collection(firestore, "allOrders"), where("complete", "==", true), orderBy("timestamp", "asc")), (querySnapshot) => {
 			let orders = [];
 			querySnapshot.forEach((doc) => {
 				orders.push(doc.data());
@@ -92,7 +92,7 @@ export default function SearchOrders() {
 							alignRight: false,
 							disablePadding: false,
 							label: "Date",
-							value: (time) => time.toDate().toLocaleDateString(),
+							value: (time) => time?.toDate().toLocaleDateString(),
 						},
 						{
 							id: "status",
@@ -156,6 +156,7 @@ export default function SearchOrders() {
 }
 
 function camelCaseToText(camel) {
+	if (!camel) return "";
 	const result = camel.replace(/([A-Z])/g, " $1");
 	const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
 	return finalResult;

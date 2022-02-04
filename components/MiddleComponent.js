@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { auth, firestore, getAvatarURL, perf, setFCM } from "lib/firebase";
 import { useSelector, useDispatch } from "react-redux";
-import { selectUserData, selectUserExists, setAvatarURL, setNotifications, setRole, setUserData, setUserExists } from "lib/slices/userSlice";
+import { selectRole, selectUserData, selectUserExists, setAvatarURL, setNotifications, setRole, setUserData, setUserExists } from "lib/slices/userSlice";
 import { routeManager } from "lib/routeManager";
 import cookieCutter from "cookie-cutter";
 import { useRouter } from "next/router";
@@ -19,6 +19,7 @@ function MiddleComponent(props) {
 	const [snapshots, setSnapshots] = useState([]);
 	const userExists = useSelector(selectUserExists);
 	const dispatch = useDispatch();
+	const role = useSelector(selectRole);
 
 	useEffect(() => {
 		setLang(cookieCutter.get("lang") ?? "EN");
@@ -26,12 +27,12 @@ function MiddleComponent(props) {
 
 	useEffect(() => {
 		if (!isLoading) {
-			routeManager(userData, route);
+			routeManager(userData, route, role);
 			setPageLoaded(true);
 		} else {
 			setPageLoaded(false);
 		}
-	}, [route, userData, auth.currentUser, isLoading]);
+	}, [route, userData, auth.currentUser, isLoading, role]);
 
 	useEffect(() => {
 		auth.onAuthStateChanged(async (user) => {
@@ -75,7 +76,7 @@ function MiddleComponent(props) {
 				});
 				setSnapshots([userSnapshot, notificationSnapshot]);
 			} else {
-				router.push("/home")
+				router.push("/home");
 				console.log("logging out");
 				dispatch(setUserExists(false));
 				dispatch(setUserData(null));

@@ -122,7 +122,9 @@ export default function CustomDrawer(props) {
 								open={openRoleDialog}
 								onClose={(role) => {
 									setOpenRoleDialog(false);
-									router.push(`/${role}/dashboard`);
+									if (router.route.split("/")[1] != role) {
+										router.push(`/${role}/dashboard`);
+									}
 								}}
 							/>
 						</Fragment>
