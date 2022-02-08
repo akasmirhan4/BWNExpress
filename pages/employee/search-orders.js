@@ -47,6 +47,7 @@ export default function SearchOrders() {
 				querySnapshot.forEach((doc) => {
 					pendingOrders.push(doc.data());
 				});
+				console.log("submittedOrders", pendingOrders);
 				setSubmittedOrders(pendingOrders);
 			}
 		);
@@ -57,6 +58,7 @@ export default function SearchOrders() {
 				querySnapshot.forEach((doc) => {
 					pendingOrders.push(doc.data());
 				});
+				console.log("approvedOrders", pendingOrders);
 				setApprovedOrders(pendingOrders);
 			}
 		);

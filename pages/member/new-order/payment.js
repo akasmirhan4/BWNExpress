@@ -197,27 +197,41 @@ export default function Payment() {
 							</TableContainer>
 						</Grid>
 
-						<Grid item xs={12}>
-							{paymentMethod == "Bank Transfer" && (
-								<CustomUploadButton
-									tooltip="Accepts only images/pdf with max 5MB size"
-									label="upload screenshot of bank transfer"
-									accept="image/jpeg,image/png,application/pdf"
-									type="bankTransfers"
-									maxFile={1}
-									value={bankTransfers}
-									onChange={(results) => {
-										if (errors.bankTransfers.length) setErrors({ ...errors, bankTransfers: [] });
-										setBankTransfers(results);
-										window.sessionStorage.setItem("bankTransfers", JSON.stringify(results));
-									}}
-								/>
-							)}
-						</Grid>
 						{paymentMethod == "Bank Transfer" && (
-							<Grid item xs={12}>
-								<FormHelperText>Please make your payment and send us a screenshot to validate the payment</FormHelperText>
-							</Grid>
+							<>
+								<Grid item xs={12}>
+									<Typography variant="body1" gutterBottom>
+										Baiduri Bank Account: {"    "}
+										<Link
+											style={{ cursor: "cursor", fontWeight: "bold" }}
+											onClick={() => {
+												toast("Baiduri # Copied to clipboard");
+												navigator.clipboard.writeText("0201740329221");
+											}}
+										>
+											0201740329221
+										</Link>
+									</Typography>
+								</Grid>
+								<Grid item xs={12}>
+									<CustomUploadButton
+										tooltip="Accepts only images/pdf with max 5MB size"
+										label="upload screenshot of bank transfer"
+										accept="image/jpeg,image/png,application/pdf"
+										type="bankTransfers"
+										maxFile={1}
+										value={bankTransfers}
+										onChange={(results) => {
+											if (errors.bankTransfers.length) setErrors({ ...errors, bankTransfers: [] });
+											setBankTransfers(results);
+											window.sessionStorage.setItem("bankTransfers", JSON.stringify(results));
+										}}
+									/>
+								</Grid>
+								<Grid item xs={12}>
+									<FormHelperText>Please make your payment and send us a screenshot to validate the payment</FormHelperText>
+								</Grid>
+							</>
 						)}
 						<Grid item xs={12} sm={6} display={"flex"}>
 							<NextLink href="/member/new-order/permit-application" passHref>
