@@ -7,11 +7,12 @@ import ImageWithSkeleton from "components/ImageWithSkeleton";
 import { Fragment, useEffect, useState } from "react";
 import { auth, getPendingActionOrders } from "lib/firebase";
 import { DoNotTouchRounded } from "@mui/icons-material";
-import { selectUserExists } from "lib/slices/userSlice";
+import { selectUserData, selectUserExists } from "lib/slices/userSlice";
 import { useSelector } from "react-redux";
 import Link from "next/link";
 import VizSensor from "react-visibility-sensor";
 import MemberPageTemplate from "components/MemberPageTemplate";
+import toast from "react-hot-toast";
 
 export default function Dashboard() {
 	return (
@@ -21,6 +22,7 @@ export default function Dashboard() {
 					<Typography color="text.primary">Dashboard</Typography>
 				</Breadcrumbs>
 			</Container>
+			<SnailAddressBox sx={{ mt: 4 }} />
 			<PendingPaymentsBox sx={{ mt: 4 }} />
 			<PendingActionsBox sx={{ mt: 4 }} />
 			<PricesContainer sx={{ mt: 4 }} />
@@ -28,6 +30,42 @@ export default function Dashboard() {
 		</MemberPageTemplate>
 	);
 }
+
+const SnailAddressBox = (props) => {
+	const { sx } = props;
+	const user = useSelector(selectUserData);
+	const snailAddress = `Snailer Express - ${user?.fullName ?? "..."} (${
+		user?.IC.slice(-4) ?? "..."
+	})\nGround floor, Lot 7, Block A\nMPL Saguking Warehouse\n87000 WP Labuan\nHP: 016 2058917 (Delivery purposes only) `;
+	return (
+		<Container {...props}>
+			<Box sx={{ borderColor: "border.main", borderWidth: 0.5, borderStyle: "solid", borderRadius: 4, py: 2, px: 4, boxShadow: (theme) => theme.shadows[1] }}>
+				<Typography variant="h6" sx={{ mb: 2 }}>
+					Labuan Address
+				</Typography>
+				<Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+					<Box sx={{ flex: 1 }}>
+						<Typography variant="h8" sx={{ mb: 2, whiteSpace: "pre-wrap" }} color="secondaryAccent.main">
+							{snailAddress}
+						</Typography>
+					</Box>
+					<Box>
+						<Button
+							variant="contained"
+							onClick={() => {
+								// Copy address
+								navigator.clipboard.writeText(snailAddress);
+								toast.success("Address copied to clipboard");
+							}}
+						>
+							Copy Address
+						</Button>
+					</Box>
+				</Box>
+			</Box>
+		</Container>
+	);
+};
 
 function PricesContainer(props) {
 	const isSmallScreen = useMediaQuery((theme) => theme.breakpoints.down("md"));
@@ -180,7 +218,7 @@ function PendingActionsBox(props) {
 }
 
 function PromotionsBox(props) {
-	const promoImgs = ["bojack-0.png", "bojack-1.png", "bojack-2.png"];
+	const promoImgs = ["placeholder.png", "placeholder.png", "placeholder.png"];
 	return (
 		<Container {...props}>
 			<Typography color="text.main" fontWeight="500" mb={2} sx={{ textAlign: { xs: "center", sm: "left" } }}>
