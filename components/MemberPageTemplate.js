@@ -38,7 +38,9 @@ export default function MemberPageTemplate(props) {
 			},
 		},
 		// { icon: <HelpOutlineRounded />, name: "Help", onClick: () => {} },
-		{ icon: <ChatBubbleOutlineRounded />, name: "Contact Support", onClick: () => {} },
+		{ icon: <ChatBubbleOutlineRounded />, name: "Contact Support", onClick: () => {
+			router.push("/member/support");
+		} },
 	];
 
 	useEffect(() => {

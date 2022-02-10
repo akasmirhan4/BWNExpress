@@ -15,10 +15,6 @@ export default function CustomHead(props) {
 			<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
 			<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 			<link rel="manifest" href="/site.webmanifest" />
-			<script id="mcjs">
-				!function(c,h,i,m,p){((m = c.createElement(h)), (p = c.getElementsByTagName(h)[0]), (m.async = 1), (m.src = i), p.parentNode.insertBefore(m, p))}
-				(document,"script","https://chimpstatic.com/mcjs-connected/js/users/44427041a87f70b210ef0c8bf/4062e46340bdc427a4acfff56.js");
-			</script>
 			{!!links && links.map((link, index) => <link key={index} rel="stylesheet" href={link} />)}
 		</Head>
 	);
