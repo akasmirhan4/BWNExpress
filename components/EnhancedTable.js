@@ -58,7 +58,14 @@ export default function EnhancedTable(props) {
 			return;
 		}
 		const searchableIDs = headers.filter(({ searchable }) => searchable).map(({ id }) => id);
-		const filteredRow = data.filter((row) => searchableIDs.filter((key) => row[key].toLowerCase().includes(search.toLowerCase())).length);
+		const filteredRow = data.filter(
+			(row) =>
+				searchableIDs.filter((key) => {
+					const header = headers.find((header) => header.id === key);
+
+					return header.value ? header.value(row[key]).toLowerCase().includes(search.toLowerCase()) : row[key].toLowerCase().includes(search.toLowerCase());
+				}).length
+		);
 		setRows(filteredRow);
 	}, [search, data]);
 
@@ -300,26 +307,40 @@ function EnhancedTableRow(props) {
 				<TableCell padding="checkbox">
 					<Checkbox color="primary" checked={isItemSelected} />
 				</TableCell>
-				{headers.map((header, i) =>
-					i == 0 ? (
-						!header.action ? (
-							<TableCell key={header.id} component={"th"} scope={"row"} padding="none" align={header.alignRight ? "right" : "left"}>
-								{header.value ? header.value(row[header.id]) : row[header.id]}
-							</TableCell>
-						) : (
-							actions
-						)
-					) : !header.action ? (
-						<TableCell key={header.id} align={header.alignRight ? "right" : "left"}>
-							{header.value ? header.value(row[header.id]) : row[header.id]}
-						</TableCell>
-					) : (
-						<TableCell key={"actions"} align="right">
-							{actions(row)}
-						</TableCell>
-					)
-				)}
+				{headers.map((header, i) => (
+					<EnhancedCell key={i} header={header} row={row} i={i} actions={actions} />
+				))}
 			</TableRow>
 		</Fragment>
 	);
 }
+
+const EnhancedCell = (props) => {
+	const { row, header, i, actions } = props;
+	const [value, setValue] = useState("");
+	useEffect(() => {
+		if (!header.value) {
+			setValue(row[header.id]);
+		} else {
+			Promise.resolve(header.value(row[header.id])).then(setValue);
+		}
+	}, [header, row]);
+
+	return i == 0 ? (
+		!header.action ? (
+			<TableCell key={header.id} component={"th"} scope={"row"} padding="none" align={header.alignRight ? "right" : "left"}>
+				{value}
+			</TableCell>
+		) : (
+			actions
+		)
+	) : !header.action ? (
+		<TableCell key={header.id} align={header.alignRight ? "right" : "left"}>
+			{value}
+		</TableCell>
+	) : (
+		<TableCell key={"actions"} align="right">
+			{actions(row)}
+		</TableCell>
+	);
+};

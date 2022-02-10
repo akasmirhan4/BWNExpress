@@ -38,11 +38,16 @@ export default function SearchOrders() {
 	const [anchorEl, setAnchorEl] = useState(null);
 
 	useEffect(() => {
-		onSnapshot(query(collection(firestore, "allOrders"), where("complete", "==", true), orderBy("timestamp", "asc")), (querySnapshot) => {
-			let orders = [];
-			querySnapshot.forEach((doc) => {
-				orders.push(doc.data());
+		onSnapshot(query(collection(firestore, "allOrders"), where("complete", "==", true), orderBy("timestamp", "asc")), async (querySnapshot) => {
+			const orders = querySnapshot.docs.map((doc) => doc.data());
+			const userRefs = orders.map((order) => order.userRef);
+			const userData = await Promise.all(userRefs.map((userRef) => getDoc(userRef)));
+
+			//insert userData to orders
+			orders.forEach((order, index) => {
+				order.userData = userData[index].data();
 			});
+			console.log({ orders });
 			setOrders(orders);
 		});
 	}, []);
@@ -79,6 +84,14 @@ export default function SearchOrders() {
 							label: "Order ID",
 							key: true,
 							searchable: true,
+						},
+						{
+							id: "userData",
+							alignRight: false,
+							disablePadding: false,
+							label: "Name",
+							searchable: true,
+							value: (userData) => userData.fullName,
 						},
 						{
 							id: "trackingNumber",
