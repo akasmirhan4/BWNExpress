@@ -1,4 +1,5 @@
 import {
+	AnnouncementRounded,
 	CheckRounded,
 	CloseRounded,
 	DeleteRounded,
@@ -45,12 +46,13 @@ import ModeratorPageTemplate from "components/ModeratorPageTemplate";
 import React, { Fragment, useEffect, useRef } from "react";
 import { useState } from "react";
 import { visuallyHidden } from "@mui/utils";
-import { collection, deleteDoc, doc, getDocs, onSnapshot, orderBy } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, orderBy } from "firebase/firestore";
 import { firestore } from "lib/firebase";
 import { UserDetails } from "components/UserDetails";
 import toast from "react-hot-toast";
 import { NotificationForm } from "components/NotificationForm";
 import { deleteUser } from "firebase/auth";
+import EnhancedTable from "components/EnhancedTable";
 
 export default function ManageUsers() {
 	return (
@@ -65,125 +67,66 @@ export default function ManageUsers() {
 	);
 }
 
-function EnhancedTableHead(props) {
-	const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
-	const createSortHandler = (property) => (event) => {
-		onRequestSort(event, property);
-	};
+const EditDialog = ({ open, onClose, user }) => {
+	const userRef = useRef(null);
 
 	return (
-		<TableHead>
-			<TableRow>
-				<TableCell padding="checkbox">
-					<Checkbox
-						color="primary"
-						indeterminate={numSelected > 0 && numSelected < rowCount}
-						checked={rowCount > 0 && numSelected === rowCount}
-						onChange={onSelectAllClick}
+		<Dialog open={open} onClose={onClose}>
+			<DialogTitle>{user?.fullName}</DialogTitle>
+			<DialogContent>{user && <UserDetails editable={true} user={user} ref={userRef} />}</DialogContent>
+			<DialogActions>
+				<IconButton>
+					<CloseRounded onClick={onClose} />
+				</IconButton>
+				<IconButton>
+					<SaveRounded
+						onClick={() => {
+							toast.promise(userRef.current.save(), { loading: "saving...", error: "error saving", success: "user saved" });
+							onClose();
+						}}
 					/>
-				</TableCell>
-				{headCells.map((headCell) => (
-					<TableCell
-						key={headCell.id}
-						align={headCell.alignRight ? "right" : "left"}
-						padding={headCell.disablePadding ? "none" : "normal"}
-						sortDirection={orderBy === headCell.id ? order : false}
-					>
-						<TableSortLabel active={orderBy === headCell.id} direction={orderBy === headCell.id ? order : "asc"} onClick={createSortHandler(headCell.id)}>
-							{headCell.label}
-							{orderBy === headCell.id ? (
-								<Box component="span" sx={visuallyHidden}>
-									{order === "desc" ? "sorted descending" : "sorted ascending"}
-								</Box>
-							) : null}
-						</TableSortLabel>
-					</TableCell>
-				))}
-			</TableRow>
-		</TableHead>
-	);
-}
-
-const EnhancedTableToolbar = (props) => {
-	const { numSelected } = props;
-
-	return (
-		<Toolbar
-			sx={{
-				pl: { sm: 2 },
-				pr: { xs: 1, sm: 1 },
-				...(numSelected > 0 && {
-					bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-				}),
-			}}
-		>
-			{numSelected > 0 ? (
-				<Typography sx={{ flex: "1 1 100%" }} color="inherit" variant="subtitle1" component="div">
-					{numSelected} selected
-				</Typography>
-			) : (
-				<Typography sx={{ flex: "1 1 100%" }} variant="h6" id="tableTitle" component="div">
-					Registered Users
-				</Typography>
-			)}
-
-			{numSelected > 0 ? (
-				<Tooltip title="Delete">
-					<IconButton disabled>
-						<DeleteRounded />
-					</IconButton>
-				</Tooltip>
-			) : (
-				<Tooltip title="Filter list">
-					<IconButton disabled>
-						<FilterListRounded />
-					</IconButton>
-				</Tooltip>
-			)}
-		</Toolbar>
+				</IconButton>
+			</DialogActions>
+		</Dialog>
 	);
 };
-const headCells = [
-	{
-		id: "fullName",
-		alignRight: false,
-		disablePadding: true,
-		label: "Full Name",
-	},
-	{
-		id: "email",
-		alignRight: false,
-		disablePadding: false,
-		label: "Email",
-	},
-	{
-		id: "role",
-		alignRight: true,
-		disablePadding: false,
-		label: "Role",
-	},
-	{
-		id: "status",
-		alignRight: true,
-		disablePadding: false,
-		label: "Status",
-	},
-	{
-		id: "action",
-		alignRight: true,
-		disablePadding: false,
-		label: "Action",
-	},
-];
+
+const NotificationDialog = ({ open, onClose, user }) => {
+	const notifRef = useRef(null);
+	return (
+		<Dialog open={open} onClose={onClose}>
+			<DialogTitle>
+				<Typography variant="h5">{`Notify ${user?.fullName}`}</Typography>
+				<Typography variant="caption">{user?.email}</Typography>
+			</DialogTitle>
+			<DialogContent>
+				<NotificationForm user={user} ref={notifRef} />
+			</DialogContent>
+			<DialogActions>
+				<IconButton>
+					<CloseRounded onClick={onClose} />
+				</IconButton>
+				<IconButton>
+					<SendRounded
+						onClick={() => {
+							toast.promise(notifRef.current.send(), { loading: "notifying...", error: "error notifying", success: "user notified" });
+							onClose();
+						}}
+					/>
+				</IconButton>
+			</DialogActions>
+		</Dialog>
+	);
+};
 
 function UsersTable(props) {
-	const [order, setOrder] = useState("asc");
-	const [_orderBy, _setOrderBy] = useState("calories");
-	const [selected, setSelected] = useState([]);
-	const [page, setPage] = useState(0);
-	const [rowsPerPage, setRowsPerPage] = useState(5);
 	const [users, setUsers] = useState([]);
 	const [rows, setRows] = useState([]);
+	const [anchorEl, setAnchorEl] = useState(null);
+	const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
+	const [editDialogOpen, setEditDialogOpen] = useState(false);
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const [selectedUser, setSelectedUser] = useState(null);
 
 	useEffect(() => {
 		onSnapshot(collection(firestore, "users"), orderBy("creationDate", "asc"), (snapshots) => {
@@ -195,7 +138,7 @@ function UsersTable(props) {
 			setRows(
 				users.map((user) => {
 					let status;
-					switch (user.verified?.IC) {
+					switch (user?.verified?.IC) {
 						case "pending":
 							status = "pending";
 							break;
@@ -203,303 +146,142 @@ function UsersTable(props) {
 							status = "verified";
 							break;
 						case false:
-							status = "unverified";
+							if (user?.IC) {
+								status = "unverified";
+								break;
+							} else {
+								status = "unregistered";
+								break;
+							}
+						case "uploadingLater":
+							status = "not yet upload";
 							break;
 						default:
 							status = "error";
 							break;
 					}
 					return {
-						fullName: user.fullName,
-						email: user.email,
+						...user,
+						fullName: user?.fullName ?? "-",
+						email: user?.email,
 						status,
-						role: user.role,
+						role: user?.role,
 					};
 				})
 			);
 		});
 	}, []);
 
-	const handleRequestSort = (event, property) => {
-		const isAsc = _orderBy === property && order === "asc";
-		setOrder(isAsc ? "desc" : "asc");
-		_setOrderBy(property);
-	};
-
-	const handleSelectAllClick = (event) => {
-		if (event.target.checked) {
-			const newSelecteds = rows.map((n) => n.email);
-			setSelected(newSelecteds);
-			return;
-		}
-		setSelected([]);
-	};
-
-	const handleClick = (event, email) => {
-		console.log(selected);
-		const selectedIndex = selected.indexOf(email);
-		let newSelected = [];
-
-		if (selectedIndex === -1) {
-			newSelected = newSelected.concat(selected, email);
-		} else if (selectedIndex === 0) {
-			newSelected = newSelected.concat(selected.slice(1));
-		} else if (selectedIndex === selected.length - 1) {
-			newSelected = newSelected.concat(selected.slice(0, -1));
-		} else if (selectedIndex > 0) {
-			newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-		}
-
-		setSelected(newSelected);
-	};
-
-	const handleChangePage = (event, newPage) => {
-		setPage(newPage);
-	};
-
-	const handleChangeRowsPerPage = (event) => {
-		setRowsPerPage(parseInt(event.target.value, 10));
-		setPage(0);
-	};
-
-	// Avoid a layout jump when reaching the last page with empty rows.
-	const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+	useEffect(() => {
+		console.log({ selectedUser });
+	}, [selectedUser]);
 
 	return (
-		<Box sx={{ width: "100%" }}>
-			<Paper sx={{ width: "100%", mb: 2 }}>
-				<EnhancedTableToolbar numSelected={selected.length} />
-				<TableContainer>
-					<Table sx={{ minWidth: 750 }} size={"medium"}>
-						<EnhancedTableHead
-							numSelected={selected.length}
-							order={order}
-							orderBy={_orderBy}
-							onSelectAllClick={handleSelectAllClick}
-							onRequestSort={handleRequestSort}
-							rowCount={rows.length}
-						/>
-						<TableBody>
-							{rows
-								.slice()
-								.sort(getComparator(order, _orderBy))
-								.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-								.map((row, index) => (
-									<EnhancedTableRow row={row} key={index} handleClick={handleClick} selected={selected} user={users[page * rowsPerPage + index]} />
-								))}
-							{emptyRows > 0 && (
-								<TableRow
-									style={{
-										height: 53 * emptyRows,
-									}}
-								>
-									<TableCell colSpan={6} />
-								</TableRow>
-							)}
-						</TableBody>
-					</Table>
-				</TableContainer>
-				<TablePagination
-					rowsPerPageOptions={[5, 10, 25]}
-					component="div"
-					count={rows.length}
-					rowsPerPage={rowsPerPage}
-					page={page}
-					onPageChange={handleChangePage}
-					onRowsPerPageChange={handleChangeRowsPerPage}
-				/>
-			</Paper>
-		</Box>
-	);
-}
-
-function descendingComparator(a, b, orderBy) {
-	if (b[orderBy] < a[orderBy]) {
-		return -1;
-	}
-	if (b[orderBy] > a[orderBy]) {
-		return 1;
-	}
-	return 0;
-}
-
-function getComparator(order, orderBy) {
-	return order === "desc" ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function EnhancedTableRow(props) {
-	const { row, handleClick, selected, user } = props;
-	const isItemSelected = selected.indexOf(row.email) !== -1;
-	const [openEditDialog, setOpenEditDialog] = useState(false);
-	const [openNotificationDialog, setOpenNotificationDialog] = useState(false);
-	const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
-	const userRef = useRef(null);
-	const notifRef = useRef(null);
-	const [anchorEl, setAnchorEl] = useState(null);
-
-	return (
-		<Fragment>
-			<TableRow
-				hover
-				onClick={(e) => {
-					e.stopPropagation();
-					handleClick(e, row.email);
-				}}
-				role="checkbox"
-				tabIndex={-1}
-				key={row.email}
-				selected={isItemSelected}
-			>
-				<TableCell padding="checkbox">
-					<Checkbox color="primary" checked={isItemSelected} />
-				</TableCell>
-				<TableCell component="th" scope="row" padding="none" align={headCells[1].alignRight ? "right" : "left"}>
-					{row.fullName}
-				</TableCell>
-				<TableCell align={headCells[1].alignRight ? "right" : "left"}>{row.email}</TableCell>
-				<TableCell align={headCells[2].alignRight ? "right" : "left"}>{row.role}</TableCell>
-				<TableCell align={headCells[3].alignRight ? "right" : "left"}>
-					<Chip
-						size="small"
-						sx={{ color: "white.main" }}
-						label={row.status}
-						color={row.status == "verified" ? "success" : row.status == "unverified" ? "error" : row.status == "pending" ? "warning" : "info"}
-					/>
-				</TableCell>
-				<TableCell align={headCells[4].alignRight ? "right" : "left"}>
-					<IconButton>
-						<EditRounded
+		<>
+			<EnhancedTable
+				title="Registered Users"
+				headers={[
+					{
+						id: "email",
+						alignRight: false,
+						disablePadding: false,
+						label: "Email",
+						searchable: true,
+						key: true,
+					},
+					{
+						id: "fullName",
+						alignRight: false,
+						disablePadding: false,
+						label: "Name",
+						searchable: true,
+					},
+					{
+						id: "role",
+						alignRight: false,
+						disablePadding: false,
+						label: "Role",
+					},
+					{
+						id: "status",
+						alignRight: false,
+						disablePadding: false,
+						label: "Status",
+					},
+					{
+						id: "action",
+						alignRight: true,
+						disablePadding: false,
+						label: "Action",
+						action: true,
+					},
+				]}
+				data={rows}
+				actions={(row) => (
+					<Fragment>
+						<Tooltip title="Edit User">
+							<IconButton
+								onClick={(e) => {
+									console.log({ user: row });
+									setSelectedUser(row);
+									setEditDialogOpen(true);
+									e.stopPropagation();
+								}}
+							>
+								<EditRounded />
+							</IconButton>
+						</Tooltip>
+						<Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl(null)}>
+							<MenuItem
+								onClick={(e) => {
+									e.stopPropagation();
+									setAnchorEl(null);
+									setNotificationDialogOpen(true);
+								}}
+							>
+								<ListItemIcon>
+									<AnnouncementRounded />
+								</ListItemIcon>
+								<ListItemText>Send Notification</ListItemText>
+							</MenuItem>
+						</Menu>
+						<IconButton
 							onClick={(e) => {
+								console.log({ user: row });
+								setSelectedUser(row);
+								setAnchorEl(e.target);
 								e.stopPropagation();
-								setOpenEditDialog(true);
-							}}
-						/>
-					</IconButton>
-					<Menu
-						anchorEl={anchorEl}
-						open={Boolean(anchorEl)}
-						onClose={() => {
-							setAnchorEl(null);
-						}}
-						anchorOrigin={{
-							vertical: "bottom",
-							horizontal: "right",
-						}}
-						transformOrigin={{
-							vertical: "top",
-							horizontal: "right",
-						}}
-					>
-						<MenuItem
-							onClick={(e) => {
-								e.stopPropagation();
-								setAnchorEl(null);
-								setOpenNotificationDialog(true);
 							}}
 						>
-							<ListItemIcon>
-								<NotificationAddRounded />
-							</ListItemIcon>
-							<ListItemText>Send Notification</ListItemText>
-						</MenuItem>
-						<MenuItem
-							onClick={(e) => {
-								e.stopPropagation();
-								setAnchorEl(null);
-								setOpenDeleteAlert(true);
-							}}
-						>
-							<ListItemIcon>
-								<PersonRemoveRounded color="error" />
-							</ListItemIcon>
-							<ListItemText disableTypography sx={{ color: "error.main" }}>
-								Delete User
-							</ListItemText>
-						</MenuItem>
-					</Menu>
-					<IconButton
-						onClick={(e) => {
-							e.stopPropagation();
-							setAnchorEl(e.currentTarget);
-						}}
-					>
-						<MoreHorizRounded />
-					</IconButton>
-				</TableCell>
-			</TableRow>
-			<Dialog
-				open={openEditDialog}
-				onClose={() => {
-					setOpenEditDialog(false);
-				}}
-			>
-				<DialogTitle>{row.fullName}</DialogTitle>
-				<DialogContent>
-					<UserDetails editable={true} user={user} ref={userRef} />
-				</DialogContent>
-				<DialogActions>
-					<IconButton>
-						<CloseRounded
-							onClick={() => {
-								setOpenEditDialog(false);
-							}}
-						/>
-					</IconButton>
-					<IconButton>
-						<SaveRounded
-							onClick={() => {
-								toast.promise(userRef.current.save(), { loading: "saving...", error: "error saving", success: "user saved" });
-								setOpenEditDialog(false);
-							}}
-						/>
-					</IconButton>
-				</DialogActions>
-			</Dialog>
-			<Dialog
-				open={openNotificationDialog}
-				onClose={() => {
-					setOpenNotificationDialog(false);
-				}}
-			>
-				<DialogTitle>{`Notify ${user.preferredName}`}</DialogTitle>
-				<DialogContent>
-					<NotificationForm user={user} ref={notifRef} />
-				</DialogContent>
-				<DialogActions>
-					<IconButton>
-						<CloseRounded
-							onClick={() => {
-								setOpenNotificationDialog(false);
-							}}
-						/>
-					</IconButton>
-					<IconButton>
-						<SendRounded
-							onClick={() => {
-								toast.promise(notifRef.current.send(), { loading: "notifying...", error: "error notifying", success: "user notified" });
-								setOpenNotificationDialog(false);
-							}}
-						/>
-					</IconButton>
-				</DialogActions>
-			</Dialog>
+							<MoreHorizRounded />
+						</IconButton>
+					</Fragment>
+				)}
+			/>
+			<NotificationDialog open={notificationDialogOpen} onClose={() => setNotificationDialogOpen(false)} user={selectedUser} />
+			<EditDialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} user={selectedUser} />
 			<AlertDialog
-				open={openDeleteAlert}
+				open={deleteDialogOpen}
 				onClose={() => {
-					setOpenDeleteAlert(false);
+					setDeleteDialogOpen(false);
 				}}
 				callback={() => {
-					toast.promise(deleteDoc(doc(firestore, "users", user.uid)), { loading: "Deleting user...", error: "Error deleting", success: "User deleted" });
+					toast.promise(deleteDoc(doc(firestore, "users", selectedUser?.uid)), {
+						loading: "Deleting user?...",
+						error: "Error deleting",
+						success: "User deleted",
+					});
 				}}
 				title={"Delete Account"}
 				text={
 					<Fragment>
 						After you have deleted an account, it will be permanently deleted. Accounts cannot be recovered.{"\n\n"}User account:
-						<Typography>{user.email}</Typography>
+						<Typography>{selectedUser?.email}</Typography>
 					</Fragment>
 				}
 			/>
-		</Fragment>
+			;
+		</>
 	);
 }
 
