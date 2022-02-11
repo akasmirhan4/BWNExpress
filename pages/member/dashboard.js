@@ -34,9 +34,8 @@ export default function Dashboard() {
 const SnailAddressBox = (props) => {
 	const { sx } = props;
 	const user = useSelector(selectUserData);
-	const snailAddress = `Snailer Express - ${user?.fullName ?? "..."} (${
-		user?.IC.slice(-4) ?? "..."
-	})\nGround floor, Lot 7, Block A\nMPL Saguking Warehouse\n87000 WP Labuan\nHP: 016 2058917 (Delivery purposes only) `;
+	const snailAddress = 
+	`${user?.fullName ?? "..."} - ${user?.IC.slice(-4) ?? "..."},\nSnailer Express,\nGround floor, Lot 7, Block A,\nMPL Saguking Warehouse,\n87000 WP Labuan,\nHP: 016 2058917 (Delivery purposes only)`;
 	return (
 		<Container {...props}>
 			<Box sx={{ borderColor: "border.main", borderWidth: 0.5, borderStyle: "solid", borderRadius: 4, py: 2, px: 4, boxShadow: (theme) => theme.shadows[1] }}>
