@@ -3,7 +3,7 @@ import CustomUploadButton from "components/CustomUploadButton";
 import { LoadingButton } from "@mui/lab";
 import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { firestore, storage } from "lib/firebase";
+import { firestore, sendNotification, storage } from "lib/firebase";
 import toast from "react-hot-toast";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { AnnouncementRounded, CloseRounded } from "@mui/icons-material";
@@ -11,7 +11,7 @@ import { useState } from "react";
 import router from "next/router";
 
 export default function NudgeDialog(props) {
-	const { open, onClose, order, to, redirect = "false" } = props;
+	const { open, onClose, order, to = "moderator", redirect = "false" } = props;
 	const [orderQuery, setOrderQuery] = useState("");
 	const [remark, setRemark] = useState("");
 	const [images, setImages] = useState([]);
@@ -47,18 +47,32 @@ export default function NudgeDialog(props) {
 		const results = await Promise.all(batchPromises);
 		setDoc(doc(firestore, "allOrders", order.orderID, "nudges", nudgeID), { ref: nudgeRef });
 
+		sendNotification(order.userID, {
+			title: to === "moderator" ? "You have sent a nudge" : "You have received a nudge",
+			subtitle: orderQuery,
+			details: remark,
+			type: "nudge",
+			href: `/member/my-orders/${order.orderID}/nudges`,
+			notification: {
+				email: true,
+				SMS: true,
+				app: true,
+				desktop: true,
+			},
+		});
+
 		await toast.promise(
 			setDoc(nudgeRef, {
 				answered: false,
 				timestamp: serverTimestamp(),
 				query: orderQuery,
 				remark,
-				to: to ?? "moderator",
+				to,
 				imageURLs: results.map(({ URL }) => URL),
 				orderRef: doc(firestore, "allOrders", order.orderID),
 			}),
 			{
-				loading: "nudging the team...",
+				loading: to === "moderator" ? "nudging the team..." : "nudging the customer...",
 				success: "Nudged",
 				error: "Error sending nudge",
 			}
@@ -69,25 +83,29 @@ export default function NudgeDialog(props) {
 
 	return (
 		<Dialog open={open} onClose={handleClose}>
-			<DialogTitle>Got queries with this order? Give us a nudge 😬</DialogTitle>
+			<DialogTitle>{to === "moderator" ? "Got queries with this order? Give us a nudge 😬" : "Send nudge to customer regarding this order"}</DialogTitle>
 			<DialogContent>
-				<DialogContentText>Order ID: {order?.orderID}</DialogContentText>
-				<CustomSelector
-					label="Order Query"
-					tooltip="Common query"
-					required
-					onChange={(e) => setOrderQuery(e.target.value)}
-					value={orderQuery}
-					items={[
-						"When is the parcel expected to arrive?",
-						"What is the status of the permit application?",
-						"What are the next steps?",
-						"I think the parcel is charged wrongly",
-						"There is an issue with this order",
-						"Others",
-					]}
-					sx={{ my: 2 }}
-				/>
+				<DialogContentText sx={{ mb: 2 }}>Order ID: {order?.orderID}</DialogContentText>
+				{to === "moderator" ? (
+					<CustomSelector
+						label="Order Query"
+						tooltip="Common query"
+						required
+						onChange={(e) => setOrderQuery(e.target.value)}
+						value={orderQuery}
+						items={[
+							"When is the parcel expected to arrive?",
+							"What is the status of the permit application?",
+							"What are the next steps?",
+							"I think the parcel is charged wrongly",
+							"There is an issue with this order",
+							"Others",
+						]}
+						sx={{ my: 2 }}
+					/>
+				) : (
+					<TextField label="Order Query" fullWidth sx={{ mb: 1 }} required value={orderQuery} onChange={(e) => setOrderQuery(e.target.value)} />
+				)}
 				<TextField
 					label="Remark"
 					multiline
@@ -96,7 +114,7 @@ export default function NudgeDialog(props) {
 					sx={{ mb: 1 }}
 					required={orderQuery == "Others"}
 					value={remark}
-					onChangeCapture={(e) => setRemark(e.target.value)}
+					onChange={(e) => setRemark(e.target.value)}
 				/>
 				<CustomUploadButton
 					tooltip="Attach any images for reference"

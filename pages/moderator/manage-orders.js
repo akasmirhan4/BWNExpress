@@ -140,7 +140,6 @@ export default function SearchOrders() {
 							<Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl(null)}>
 								<MenuItem
 									onClick={(e) => {
-										setOrder(row);
 										e.stopPropagation();
 										setAnchorEl(null);
 										setOpenNudgeDialog(true);
@@ -154,6 +153,7 @@ export default function SearchOrders() {
 							</Menu>
 							<IconButton
 								onClick={(e) => {
+									setOrder(row);
 									setAnchorEl(e.target);
 									e.stopPropagation();
 								}}

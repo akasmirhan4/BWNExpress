@@ -240,6 +240,7 @@ function EnhancedTableRow(props) {
 	const [anchorEl, setAnchorEl] = useState(null);
 
 	function camelCaseToText(camel) {
+		if (!camel) return "";
 		const result = camel.replace(/([A-Z])/g, " $1");
 		const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
 		return finalResult;
@@ -247,7 +248,7 @@ function EnhancedTableRow(props) {
 
 	return (
 		<Fragment>
-			<NudgeDialog open={openNudgeDialog} onClose={() => setOpenNudgeDialog(false)} order={row} to="moderator" redirect/>
+			<NudgeDialog open={openNudgeDialog} onClose={() => setOpenNudgeDialog(false)} order={row} to="moderator" redirect />
 			<Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl(null)}>
 				<MenuItem onClick={() => router.push(`/member/my-orders/${encodeURIComponent(row.orderID)}/details`)}>
 					<ListItemIcon>
